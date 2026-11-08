@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>接口对接看板 · 演示样例</title>
+<meta name="description" content="企业系统对接演示：数据源列表、字段映射、同步日志、失败重试、对账差异。演示样例 · Demo，非真实客户项目。">
+<style>
+  :root{
+    --bg:#f1f4f2;--panel:#fff;--ink:#17231f;--ink2:#42544d;--mut:#7f928a;
+    --line:#dfe7e2;--line2:#c9d6cf;
+    --deep:#132a26;--deep2:#1c3a34;
+    --acc:#0f7a5f;--acc-soft:#e4f2ec;--acc2:#12916f;
+    --warn:#b07a1c;--warn-soft:#fbf1df;--bad:#c04434;--bad-soft:#fbeae7;
+    --cyan:#217b8c;
+    --mono:ui-monospace,"SFMono-Regular",Consolas,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif;font-size:13.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  button,select{font-family:inherit}
+
+  .demo-note{background:#0d1f1b;color:#a9c2b7;font-size:11px;text-align:center;padding:6px 12px}
+  .demo-note b{color:#7fd3b4}
+  .demo-note a{color:#7fd3b4;margin-left:8px}
+
+  .top{background:var(--deep);color:#b9cdc4;height:54px;display:flex;align-items:center;gap:16px;padding:0 20px;position:sticky;top:0;z-index:30}
+  .top .brand{display:flex;align-items:center;gap:9px;color:#fff;font-size:13.5px;font-weight:600}
+  .top .brand i{width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,#1c8d6e,#0f7a5f);display:grid;place-items:center;font-style:normal;font-size:10px;font-family:var(--mono)}
+  .top .env{font-family:var(--mono);font-size:9.5px;border:1px solid #2f5048;color:#8fb5a5;padding:2px 7px;border-radius:3px;letter-spacing:.08em}
+  .top .r{margin-left:auto;display:flex;align-items:center;gap:16px;font-size:11px;color:#8fa9a0;font-family:var(--mono)}
+  .top .r b{color:#7fd3b4;font-weight:500}
+  @media(max-width:720px){.top .r span.h{display:none}}
+
+  .wrap{max-width:1420px;margin:0 auto;padding:16px 20px 34px}
+  @media(max-width:520px){.wrap{padding:12px}}
+
+  .layout{display:grid;grid-template-columns:274px 1fr;gap:14px;align-items:start}
+  @media(max-width:980px){.layout{grid-template-columns:1fr}}
+
+  /* sources */
+  .src-panel{background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .src-h{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+  .src-h h2{margin:0;font-size:13px;font-weight:600}
+  .src-h span{font-size:10.5px;color:var(--mut);font-family:var(--mono)}
+  .src{padding:11px 14px;border-bottom:1px solid #eef3f0;cursor:pointer;position:relative}
+  .src:hover{background:#f7fbf9}
+  .src.on{background:var(--acc-soft)}
+  .src.on:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--acc)}
+  .src .r1{display:flex;align-items:center;gap:7px;margin-bottom:3px}
+  .src .r1 b{font-size:12.5px;font-weight:600}
+  .src .r1 .st{margin-left:auto;font-size:9.5px;font-family:var(--mono);padding:1px 5px;border-radius:3px}
+  .ok{background:#e4f2ec;color:#0f7a5f}
+  .warnb{background:var(--warn-soft);color:var(--warn)}
+  .bad{background:var(--bad-soft);color:var(--bad)}
+  .src .r2{display:flex;justify-content:space-between;font-size:10.5px;color:var(--mut)}
+  .src .r2 em{font-style:normal;font-family:var(--mono)}
+  .src .bar{height:3px;background:#eef3f0;border-radius:2px;margin-top:6px;overflow:hidden}
+  .src .bar i{display:block;height:100%;background:var(--acc);border-radius:2px}
+  .src-foot{padding:10px 14px;font-size:10.5px;color:var(--mut);background:#fafcfb}
+
+  /* main */
+  .main{min-width:0}
+  .pageh{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+  .pageh h1{margin:0;font-size:18px;font-weight:600}
+  .pageh p{margin:2px 0 0;font-size:11.5px;color:var(--mut)}
+  .pageh .acts{display:flex;gap:8px}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:5px;border:1px solid var(--line2);background:#fff;font-size:11.5px;color:var(--ink2);cursor:pointer}
+  .btn:hover{border-color:#9fb5ab}
+  .btn-p{background:var(--acc);border-color:var(--acc);color:#fff}
+  .btn-p:hover{background:#0c6550;color:#fff}
+  .btn-sm{padding:4px 9px;font-size:11px}
+  .btn:disabled{opacity:.5;cursor:default}
+
+  .sum{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+  @media(max-width:820px){.sum{grid-template-columns:1fr 1fr}}
+  .sum div{background:#fff;border:1px solid var(--line);border-radius:7px;padding:11px 13px}
+  .sum .k{font-size:10.5px;color:var(--mut)}
+  .sum strong{display:block;font-size:19px;font-weight:600;letter-spacing:-.01em;font-family:var(--mono)}
+  .sum strong.okc{color:var(--acc)}
+  .sum strong.badc{color:var(--bad)}
+  .sum small{font-size:10.5px;color:var(--mut)}
+
+  .tabs{display:flex;gap:2px;background:#fff;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;padding:0 6px;overflow-x:auto}
+  .tabs button{background:none;border:none;padding:11px 13px;font-size:12.5px;color:var(--ink2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+  .tabs button.on{color:var(--acc);border-color:var(--acc);font-weight:600}
+  .tabs button .n{font-family:var(--mono);font-size:9.5px;padding:1px 5px;border-radius:8px;background:#f0f4f2;color:#5d6f68;margin-left:5px}
+  .tabs button.on .n{background:var(--acc-soft);color:var(--acc)}
+  .tabs button .n.r{background:var(--bad-soft);color:var(--bad)}
+
+  .panel{background:#fff;border:1px solid var(--line);border-radius:0 0 8px 8px;overflow:hidden}
+  .pbar{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .pbar .sp{margin-left:auto;font-size:10.5px;color:var(--mut);font-family:var(--mono)}
+  .pbar select{border:1px solid var(--line2);border-radius:4px;padding:4px 7px;font-size:11px;color:var(--ink2);background:#fff;outline:none}
+
+  .tbl-wrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:11.5px;min-width:720px}
+  thead th{background:#f7faf8;text-align:left;padding:8px 12px;font-size:10.5px;color:var(--ink2);font-weight:600;border-bottom:1px solid var(--line);white-space:nowrap}
+  tbody td{padding:9px 12px;border-bottom:1px solid #eef3f0;vertical-align:middle}
+  tbody tr:hover{background:#f9fcfb}
+  .m{font-family:var(--mono);font-size:11px}
+  .dim{color:var(--mut)}
+  .arrow{color:var(--mut);font-family:var(--mono);text-align:center;width:26px}
+  .tag{font-size:9.5px;padding:1px 6px;border-radius:3px;white-space:nowrap}
+  .t-ok{background:var(--acc-soft);color:var(--acc)}
+  .t-warn{background:var(--warn-soft);color:var(--warn)}
+  .t-bad{background:var(--bad-soft);color:var(--bad)}
+  .t-gray{background:#f0f4f2;color:#63766e}
+  .t-cyan{background:#e5f2f5;color:var(--cyan)}
+
+  .map-flow{display:grid;grid-template-columns:1fr 34px 1fr 1fr;align-items:center}
+  @media(max-width:700px){.map-flow{grid-template-columns:1fr}}
+  .code{font-family:var(--mono);font-size:11px;background:#f6f9f7;border:1px solid var(--line);border-radius:3px;padding:1px 5px;color:#2b4a40}
+  .rule{font-size:10.5px;color:var(--mut)}
+  .map-group td{background:#f7faf8;font-weight:600;font-size:11px;color:var(--ink2)}
+
+  .logrow{cursor:pointer}
+  .logdetail{background:#fbfdfc}
+  .logdetail td{padding:0}
+  .logdetail .box{padding:10px 14px;font-family:var(--mono);font-size:10.5px;color:#3d5750;line-height:1.9;white-space:pre-wrap;border-bottom:1px solid var(--line)}
+
+  .empty{padding:40px 20px;text-align:center;color:var(--mut);font-size:12px}
+  .diffnote{padding:10px 14px;background:#fffdf7;border-bottom:1px solid #f0e6cd;font-size:11px;color:#8a6d2a}
+
+  .footnote{padding:12px 14px;font-size:10.5px;color:var(--mut);line-height:1.8;background:#fafcfb;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+
+<div class="demo-note">演示样例 · DEMO &nbsp;·&nbsp; 本页为能力演示，<b>非真实客户项目</b>，接口与数据均为模拟<a href="../../cases/">← 返回案例库</a></div>
+
+<div class="top">
+  <div class="brand"><i>SY</i>集成中台</div>
+  <div class="env">SANDBOX</div>
+  <div class="r">
+    <span class="h">最近同步 <b id="topTime">09:42:18</b></span>
+    <span>调度器 <b>运行中</b></span>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="layout">
+
+    <aside class="src-panel">
+      <div class="src-h"><h2>数据源</h2><span>6 / 6</span></div>
+      <div id="srcList"></div>
+      <div class="src-foot">点击切换数据源，右侧日志与映射随之过滤。</div>
+    </aside>
+
+    <div class="main">
+      <div class="pageh">
+        <div>
+          <h1>接口对接看板</h1>
+          <p>ERP / CRM / OA / MES 与支付、短信、物流、电子发票之间的数据流转。</p>
+        </div>
+        <div class="acts">
+          <button class="btn" id="syncAll">全量同步</button>
+          <button class="btn btn-p" id="retryAll">重试失败任务</button>
+        </div>
+      </div>
+
+      <div class="sum">
+        <div><div class="k">今日同步记录</div><strong id="kRows">—</strong><small>条</small></div>
+        <div><div class="k">成功率</div><strong class="okc" id="kRate">—</strong><small>近 24 小时</small></div>
+        <div><div class="k">待重试</div><strong class="badc" id="kFail">—</strong><small>条失败记录</small></div>
+        <div><div class="k">对账差异</div><strong id="kDiff">—</strong><small>笔待处理</small></div>
+      </div>
+
+      <div class="tabs" id="tabs">
+        <button class="on" data-v="map">字段映射</button>
+        <button data-v="log">同步日志<span class="n" id="nLog">0</span></button>
+        <button data-v="retry">失败重试<span class="n r" id="nRetry">0</span></button>
+        <button data-v="diff">对账差异<span class="n" id="nDiff">0</span></button>
+      </div>
+
+      <div class="panel">
+        <div class="pbar" id="pbar"></div>
+        <div id="viewMap"></div>
+        <div id="viewLog" style="display:none"></div>
+        <div id="viewRetry" style="display:none"></div>
+        <div id="viewDiff" style="display:none"></div>
+        <div class="footnote">接口地址、密钥、字段名均为演示占位；正式项目中的密钥存放在服务端环境变量，不写入前端页面。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var SOURCES = [
+  { id:'erp', name:'用友 ERP-U8', type:'ERP', status:'ok', last:'09:42', rate:99.4, desc:'销售订单 / 库存' },
+  { id:'crm', name:'自建 CRM', type:'CRM', status:'ok', last:'09:40', rate:98.8, desc:'客户 / 商机' },
+  { id:'oa', name:'泛微 OA', type:'OA', status:'warn', last:'09:38', rate:96.2, desc:'审批结果回写' },
+  { id:'mes', name:'车间 MES', type:'MES', status:'bad', last:'09:31', rate:91.5, desc:'工单 / 报工' },
+  { id:'pay', name:'微信支付', type:'支付', status:'ok', last:'09:42', rate:99.9, desc:'支付 / 退款' },
+  { id:'inv', name:'电子发票平台', type:'发票', status:'warn', last:'09:35', rate:97.1, desc:'开票 / 红冲' }
+];
+
+var MAPPINGS = [
+  { group:'销售订单 → ERP', src:'order_no', tgt:'cOrderCode', rule:'trim + 转大写', st:'ok' },
+  { group:'销售订单 → ERP', src:'created_at', tgt:'dOrderDate', rule:'ISO8601 → yyyy-MM-dd', st:'ok' },
+  { group:'销售订单 → ERP', src:'customer.code', tgt:'cCusCode', rule:'查客户映射表，未匹配则挂起', st:'warn' },
+  { group:'销售订单 → ERP', src:'amount_total', tgt:'nAmount', rule:'分 → 元，保留 2 位小数', st:'ok' },
+  { group:'销售订单 → ERP', src:'items[].sku', tgt:'details[].cInvCode', rule:'SKU 编码直传', st:'ok' },
+  { group:'销售订单 → ERP', src:'status', tgt:'cStatus', rule:'枚举映射：paid→2 / unpaid→1', st:'ok' },
+  { group:'CRM → 订单', src:'customer.phone', tgt:'contact_mobile', rule:'去空格与 +86 前缀', st:'ok' },
+  { group:'CRM → 订单', src:'customer.level', tgt:'price_tier', rule:'A→1 / B→2 / C→3', st:'warn' },
+  { group:'OA → 订单', src:'approval.result', tgt:'approve_flag', rule:'agree→Y / reject→N', st:'ok' },
+  { group:'MES → ERP', src:'workorder.qty', tgt:'nQty', rule:'数值校验，负数丢弃', st:'bad' }
+];
+
+var LOGS = [
+  { t:'09:42:18', src:'erp', batch:'B-20260908-0142', rows:326, ok:326, fail:0, ms:842, status:'ok' },
+  { t:'09:41:52', src:'pay', batch:'B-20260908-0141', rows:58, ok:58, fail:0, ms:311, status:'ok' },
+  { t:'09:40:07', src:'crm', batch:'B-20260908-0140', rows:143, ok:142, fail:1, ms:1204, status:'warn' },
+  { t:'09:38:44', src:'oa', batch:'B-20260908-0139', rows:37, ok:35, fail:2, ms:986, status:'warn' },
+  { t:'09:35:20', src:'inv', batch:'B-20260908-0138', rows:24, ok:23, fail:1, ms:1540, status:'warn' },
+  { t:'09:31:09', src:'mes', batch:'B-20260908-0137', rows:412, ok:389, fail:23, ms:4210, status:'bad' },
+  { t:'09:28:31', src:'erp', batch:'B-20260908-0136', rows:298, ok:298, fail:0, ms:776, status:'ok' },
+  { t:'09:24:02', src:'pay', batch:'B-20260908-0135', rows:61, ok:61, fail:0, ms:289, status:'ok' },
+  { t:'09:19:47', src:'crm', batch:'B-20260908-0134', rows:120, ok:120, fail:0, ms:1042, status:'ok' },
+  { t:'09:12:15', src:'mes', batch:'B-20260908-0133', rows:388, ok:388, fail:0, ms:3980, status:'ok' }
+];
+
+var FAILS = [
+  { id:'F-0912', src:'mes', ref:'WO-20260908-0417', err:'E1024', msg:'数量字段为负值（-12），违反校验规则', tries:2, time:'09:31' },
+  { id:'F-0911', src:'mes', ref:'WO-20260908-0419', err:'E1007', msg:'工单编码在 ERP 中不存在，无法匹配', tries:1, time:'09:31' },
+  { id:'F-0910', src:'mes', ref:'WO-20260908-0421', err:'E1024', msg:'数量字段为负值（-3），违反校验规则', tries:3, time:'09:31' },
+  { id:'F-0909', src:'oa', ref:'AP-20260908-0088', err:'E2041', msg:'审批状态枚举值 unknown，缺少映射', tries:1, time:'09:38' },
+  { id:'F-0908', src:'oa', ref:'AP-20260908-0091', err:'E2041', msg:'审批状态枚举值 unknown，缺少映射', tries:1, time:'09:38' },
+  { id:'F-0907', src:'crm', ref:'CU-20260908-1162', err:'E3005', msg:'客户编码为空，映射表未命中', tries:2, time:'09:40' },
+  { id:'F-0906', src:'inv', ref:'IV-20260908-0033', err:'E4012', msg:'开票金额与订单金额差异 0.02 元', tries:1, time:'09:35' }
+];
+
+var DIFFS = [
+  { no:'SO-20260907-118', src:'ERP', a:'¥ 12,480.00', b:'¥ 12,480.00', type:'重复单', desc:'ERP 中存在两条相同订单号，疑似重推', st:'待处理' },
+  { no:'SO-20260907-121', src:'微信支付', a:'¥ 3,260.00', b:'¥ 3,260.10', type:'金额差异', desc:'支付手续费四舍五入导致 0.10 元差额', st:'待处理' },
+  { no:'SO-20260907-126', src:'ERP', a:'—', b:'¥ 8,900.00', type:'漏单', desc:'平台有单，ERP 无对应记录，同步任务未覆盖', st:'待处理' },
+  { no:'SO-20260907-130', src:'电子发票', a:'¥ 5,600.00', b:'—', type:'漏开票', desc:'订单已完成，发票平台无开票记录', st:'待处理' },
+  { no:'SO-20260907-133', src:'ERP', a:'¥ 2,180.00', b:'¥ 2,180.00', type:'状态不一致', desc:'平台已退款，ERP 仍为已收款', st:'已处理' }
+];
+
+var curSrc = 'all';
+var curTab = 'map';
+var logs = LOGS.slice();
+var fails = FAILS.slice();
+var diffs = DIFFS.slice();
+
+/* ---------- source list ---------- */
+function statusTag(s){
+  if(s === 'ok') return '<span class="st ok">正常</span>';
+  if(s === 'warn') return '<span class="st warnb">告警</span>';
+  return '<span class="st bad">异常</span>';
+}
+function renderSources(){
+  document.getElementById('srcList').innerHTML = SOURCES.map(function(s){
+    return '<div class="src'+ (curSrc === s.id ? ' on' : '') +'" data-id="'+s.id+'">'
+      + '<div class="r1"><b>'+s.name+'</b><span class="tag t-gray">'+s.type+'</span>'+statusTag(s.status)+'</div>'
+      + '<div class="r2"><span>'+s.desc+'</span><em>'+s.last+'</em></div>'
+      + '<div class="bar"><i style="width:'+s.rate+'%"></i></div>'
+      + '</div>';
+  }).join('');
+}
+
+document.getElementById('srcList').addEventListener('click', function(e){
+  var el = e.target.closest('.src');
+  if(!el) return;
+  var id = el.getAttribute('data-id');
+  curSrc = (curSrc === id) ? 'all' : id;
+  renderSources();
+  renderAll();
+});
+
+/* ---------- tabs ---------- */
+document.getElementById('tabs').addEventListener('click', function(e){
+  var b = e.target.closest('button');
+  if(!b) return;
+  curTab = b.getAttribute('data-v');
+  var all = this.querySelectorAll('button');
+  for(var i=0;i<all.length;i++) all[i].classList.toggle('on', all[i]===b);
+  ['map','log','retry','diff'].forEach(function(v){
+    document.getElementById('view' + v.charAt(0).toUpperCase() + v.slice(1)).style.display = (v === curTab ? 'block' : 'none');
+  });
+  renderAll();
+});
+
+/* ---------- views ---------- */
+function renderMap2(){
+  var out = '';
+  var lastGroup = '';
+  MAPPINGS.forEach(function(m){
+    if(m.group !== lastGroup){
+      lastGroup = m.group;
+      out += '<tr class="map-group"><td colspan="5">'+m.group+'</td></tr>';
+    }
+    var st = m.st === 'ok' ? '<span class="tag t-ok">正常</span>' : (m.st === 'warn' ? '<span class="tag t-warn">需确认</span>' : '<span class="tag t-bad">异常</span>');
+    out += '<tr><td class="m">'+m.src+'</td><td class="arrow">→</td><td class="m">'+m.tgt+'</td>'
+      + '<td class="rule">'+m.rule+'</td><td>'+st+'</td></tr>';
+  });
+  document.getElementById('viewMap').innerHTML =
+    '<div class="tbl-wrap"><table>'
+    + '<thead><tr><th>源字段</th><th></th><th>目标字段</th><th>转换规则</th><th>校验</th></tr></thead>'
+    + '<tbody>'+out+'</tbody></table></div>';
+}
+
+function renderLog(){
+  var list = logs.filter(function(l){ return curSrc === 'all' || l.src === curSrc; });
+  if(!list.length){ document.getElementById('viewLog').innerHTML = '<div class="empty">该数据源暂无同步日志</div>'; return; }
+  var rows = list.map(function(l,i){
+    var s = l.status === 'ok' ? '<span class="tag t-ok">成功</span>' : (l.status === 'warn' ? '<span class="tag t-warn">部分失败</span>' : '<span class="tag t-bad">失败</span>');
+    return '<tr class="logrow" data-i="'+i+'" data-id="'+l.batch+'">'
+      + '<td class="m dim">'+l.t+'</td>'
+      + '<td><span class="tag t-cyan">'+ srcName(l.src) +'</span></td>'
+      + '<td class="m">'+l.batch+'</td>'
+      + '<td class="m">'+l.rows+'</td>'
+      + '<td class="m" style="color:#0f7a5f">'+l.ok+'</td>'
+      + '<td class="m" style="color:'+(l.fail?'#c04434':'#7f928a')+'">'+l.fail+'</td>'
+      + '<td class="m dim">'+l.ms+' ms</td>'
+      + '<td>'+s+'</td>'
+      + '</tr>'
+      + '<tr class="logdetail" id="ld-'+i+'" style="display:none"><td colspan="8"><div class="box">'
+      + '[batch] '+l.batch+'\n[source] '+srcName(l.src)+'  [rows] '+l.rows+'  [success] '+l.ok+'  [failed] '+l.fail+'\n'
+      + '[elapsed] '+l.ms+'ms  [status] '+l.status+'\n'
+      + (l.fail ? '[error] 部分记录校验失败，详见「失败重试」页签' : '[ok] 全部记录写入成功')
+      + '</div></td></tr>';
+  }).join('');
+  document.getElementById('viewLog').innerHTML = '<div class="tbl-wrap"><table>'
+    + '<thead><tr><th>时间</th><th>数据源</th><th>批次号</th><th>记录数</th><th>成功</th><th>失败</th><th>耗时</th><th>状态</th></tr></thead>'
+    + '<tbody>'+rows+'</tbody></table></div>';
+}
+
+function srcName(id){
+  var s = SOURCES.filter(function(x){ return x.id === id; })[0];
+  return s ? s.name : id;
+}
+
+document.getElementById('viewLog').addEventListener('click', function(e){
+  var tr = e.target.closest('.logrow');
+  if(!tr) return;
+  var d = document.getElementById('ld-' + tr.getAttribute('data-i'));
+  if(d) d.style.display = d.style.display === 'none' ? 'table-row' : 'none';
+});
+
+function renderRetry(){
+  var list = fails.filter(function(f){ return curSrc === 'all' || f.src === curSrc; });
+  if(!list.length){
+    document.getElementById('viewRetry').innerHTML = '<div class="empty">当前数据源没有失败记录</div>';
+    return;
+  }
+  var rows = list.map(function(f){
+    var st = f.state === 'done' ? '<span class="tag t-ok">已重试成功</span>'
+      : (f.state === 'fail' ? '<span class="tag t-bad">重试失败</span>' : '<span class="tag t-warn">待重试</span>');
+    var btn = f.state === 'done'
+      ? '<button class="btn btn-sm" disabled>已完成</button>'
+      : '<button class="btn btn-sm btn-p" data-f="'+f.id+'">重试</button>';
+    return '<tr><td class="m">'+f.id+'</td><td><span class="tag t-cyan">'+srcName(f.src)+'</span></td>'
+      + '<td class="m">'+f.ref+'</td><td class="m" style="color:#c04434">'+f.err+'</td>'
+      + '<td class="dim" style="white-space:normal;min-width:200px">'+f.msg+'</td>'
+      + '<td class="m">'+f.tries+'</td><td>'+st+'</td><td>'+btn+'</td></tr>';
+  }).join('');
+  document.getElementById('viewRetry').innerHTML = '<div class="tbl-wrap"><table>'
+    + '<thead><tr><th>失败 ID</th><th>数据源</th><th>业务单号</th><th>错误码</th><th>失败原因</th><th>已试</th><th>状态</th><th>操作</th></tr></thead>'
+    + '<tbody>'+rows+'</tbody></table></div>'
+    + '<div class="footnote">重试只会重新推送失败记录，不会重复写入已成功的部分。</div>';
+}
+
+document.getElementById('viewRetry').addEventListener('click', function(e){
+  var b = e.target.closest('button[data-f]');
+  if(!b) return;
+  var id = b.getAttribute('data-f');
+  fails.forEach(function(f){
+    if(f.id === id){ f.tries++; f.state = f.tries >= 3 ? 'fail' : 'done'; }
+  });
+  renderRetry();
+  renderCounts();
+});
+
+function renderDiff(){
+  var list = diffs.filter(function(d){
+    if(curSrc === 'all') return true;
+    var s = SOURCES.filter(function(x){ return x.id === curSrc; })[0];
+    return s && (d.src === s.type || d.src === s.name);
+  });
+  var st = function(s){ return s === '已处理' ? '<span class="tag t-ok">已处理</span>' : '<span class="tag t-warn">待处理</span>'; };
+  var rows = list.map(function(d){
+    return '<tr><td class="m">'+d.no+'</td><td><span class="tag t-gray">'+d.src+'</span></td>'
+      + '<td class="m">'+d.a+'</td><td class="m">'+d.b+'</td>'
+      + '<td><span class="tag t-bad">'+d.type+'</span></td>'
+      + '<td class="dim" style="white-space:normal;min-width:200px">'+d.desc+'</td>'
+      + '<td>'+st(d.st)+'</td>'
+      + '<td>'+(d.st === '待处理' ? '<button class="btn btn-sm" data-d="'+d.no+'">标记已处理</button>' : '<span class="dim">—</span>')+'</td></tr>';
+  }).join('');
+  document.getElementById('viewDiff').innerHTML =
+    '<div class="diffnote">对账以「平台订单」为准，与 ERP、支付、发票三方的记录逐笔比对；差异不会自动覆盖，需人工确认后再处理。</div>'
+    + '<div class="tbl-wrap"><table>'
+    + '<thead><tr><th>订单号</th><th>差异来源</th><th>平台金额</th><th>对方金额</th><th>差异类型</th><th>说明</th><th>状态</th><th>操作</th></tr></thead>'
+    + '<tbody>'+ (rows || '<tr><td colspan="8" class="empty">当前数据源无对账差异</td></tr>') +'</tbody></table></div>';
+}
+
+document.getElementById('viewDiff').addEventListener('click', function(e){
+  var b = e.target.closest('button[data-d]');
+  if(!b) return;
+  var no = b.getAttribute('data-d');
+  diffs.forEach(function(d){ if(d.no === no) d.st = '已处理'; });
+  renderDiff();
+  renderCounts();
+});
+
+/* ---------- counts ---------- */
+function renderCounts(){
+  var pendingFails = fails.filter(function(f){ return f.state !== 'done'; }).length;
+  var pendingDiffs = diffs.filter(function(d){ return d.st === '待处理'; }).length;
+  document.getElementById('nLog').textContent = logs.length;
+  document.getElementById('nRetry').textContent = pendingFails;
+  document.getElementById('nDiff').textContent = pendingDiffs;
+
+  var totalRows = logs.reduce(function(a,b){ return a + b.rows; }, 0);
+  var okRows = logs.reduce(function(a,b){ return a + b.ok; }, 0);
+  document.getElementById('kRows').textContent = totalRows;
+  document.getElementById('kRate').textContent = (okRows / totalRows * 100).toFixed(1) + '%';
+  document.getElementById('kFail').textContent = pendingFails;
+  document.getElementById('kDiff').textContent = pendingDiffs;
+}
+
+function renderPbar(){
+  var el = document.getElementById('pbar');
+  if(curTab === 'map'){
+    el.innerHTML = '<span style="font-size:11.5px;color:#42544d">当前数据源：<b>'+(curSrc==='all'?'全部':srcName(curSrc))+'</b></span>'
+      + '<span class="sp">共 '+MAPPINGS.length+' 条字段映射 · 2 条需确认</span>';
+  } else if(curTab === 'log'){
+    el.innerHTML = '<select id="logFilter"><option value="all">全部状态</option><option value="ok">仅成功</option><option value="fail">仅失败</option></select>'
+      + '<span class="sp">点击行展开批次详情</span>';
+  } else if(curTab === 'retry'){
+    el.innerHTML = '<span style="font-size:11.5px;color:#42544d">失败记录会保留原始报文，重试不覆盖历史</span>'
+      + '<span class="sp">间隔 5 分钟自动重试 · 最多 3 次</span>';
+  } else {
+    el.innerHTML = '<span style="font-size:11.5px;color:#42544d">对账任务：每日 06:00 / 12:00 / 18:00 自动执行</span>'
+      + '<span class="sp">上次执行 09:00 · 差异 '+diffs.filter(function(d){return d.st==='待处理';}).length+' 笔</span>';
+  }
+}
+
+function renderAll(){
+  renderPbar();
+  renderMap2();
+  renderLog();
+  renderRetry();
+  renderDiff();
+  renderCounts();
+}
+
+/* ---------- top actions ---------- */
+document.getElementById('syncAll').addEventListener('click', function(){
+  var now = new Date();
+  var hh = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+  logs.unshift({ t:hh, src:'erp', batch:'B-20260908-0143', rows:120, ok:120, fail:0, ms:690, status:'ok' });
+  renderAll();
+  this.textContent = '已触发（演示）';
+  var self = this;
+  setTimeout(function(){ self.textContent = '全量同步'; }, 1800);
+});
+
+document.getElementById('retryAll').addEventListener('click', function(){
+  fails.forEach(function(f){ if(f.state !== 'done'){ f.tries++; f.state = f.tries >= 3 ? 'fail' : 'done'; } });
+  renderAll();
+});
+
+renderSources();
+renderAll();
+</script>
+</body>
+</html>
