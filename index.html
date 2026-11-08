@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>昆山软件开发服务商 · 小程序 / 系统对接 / 云服务器 / 企业邮箱</title>
-<meta name="description" content="昆山本地软件开发服务商，承接微信小程序开发、接口与 ERP 对接、云服务器部署运维、企业邮箱搭建、企业官网与后台管理系统、既有系统维护与功能增改。">
+<title>昆山软件开发服务商 · 小程序 / 系统对接 / 云服务器 / AI 私有化部署</title>
+<meta name="description" content="昆山本地软件开发服务商，承接微信小程序开发、接口与 ERP 对接、云服务器部署运维、企业邮箱搭建、企业官网与后台管理系统、AI 智能体与 AI 私有化离线部署、既有系统维护与功能增改。">
 <style>
   :root{
     --paper:#f6f4ef;
@@ -201,7 +201,7 @@
   .demo-note{font-size:12px;color:var(--muted);margin:0;max-width:46em}
   .demo-note b{color:var(--ink-2)}
 
-  .cap-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px}
+  .cap-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:22px}
   @media (max-width:1000px){.cap-strip{grid-template-columns:repeat(2,1fr)}}
   @media (max-width:620px){.cap-strip{grid-template-columns:1fr}}
   .cap-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:17px 18px;transition:border-color .16s,transform .16s}
@@ -233,6 +233,44 @@
   .ai-demo .pill{font-size:10px;border-radius:4px;padding:1px 6px;background:#173a30;color:#57e0b8}
   .ai-demo .bar{height:1px;background:#1e2a35;margin:7px 0}
   .ai-demo .meta{font-size:10.5px;color:#6f8294;line-height:1.6}
+
+  /* offline (AI 私有化) */
+  .offline-panel{
+    background:linear-gradient(155deg,#0c1a20 0%,#0f2027 50%,#12262c 100%);
+    border-radius:18px;padding:30px 28px;color:#dbe7ea;position:relative;overflow:hidden;
+  }
+  .offline-panel:before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+    background-size:52px 52px;
+    -webkit-mask-image:radial-gradient(circle at 80% 0%,#000,transparent 70%);
+    mask-image:radial-gradient(circle at 80% 0%,#000,transparent 70%);
+  }
+  .offline-head{position:relative;display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:flex-end;margin-bottom:20px}
+  .offline-head .ok{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10.5px;letter-spacing:.16em;color:#d9a856}
+  .offline-head h2{color:#f2f7f8;font-size:clamp(21px,2.5vw,28px);margin:8px 0 8px;letter-spacing:-.01em}
+  .offline-head p{margin:0;font-size:13.5px;color:#a6b8c0;max-width:40em;line-height:1.75}
+  .offline-head .badge{
+    display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:#8fd6b4;
+    border:1px solid #26473c;background:#0e2a22;border-radius:999px;padding:6px 12px;white-space:nowrap;
+  }
+  .offline-head .badge i{width:6px;height:6px;border-radius:50%;background:#4ecb8b;display:block;box-shadow:0 0 7px #4ecb8b}
+  .off-grid{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+  @media (max-width:900px){.off-grid{grid-template-columns:1fr}}
+  .off-card{background:rgba(255,255,255,.045);border:1px solid #253840;border-radius:11px;padding:16px 16px 14px}
+  .off-card.mid{border-color:#b0812f;background:rgba(217,168,86,.07)}
+  .off-card .t{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .off-card h3{margin:0;font-size:15px;color:#f0f6f7;font-weight:650}
+  .off-card .t span{font-size:10px;font-family:ui-monospace,Menlo,Consolas,monospace;color:#7f929c;letter-spacing:.08em}
+  .off-card .q{margin:5px 0 9px;font-size:13px;color:#d9a856;font-weight:600}
+  .off-card .q small{font-size:10.5px;color:#7f929c;font-weight:400}
+  .off-card ul{margin:0;padding-left:16px;font-size:12.3px;color:#b3c4cc;line-height:1.8}
+  .off-note{position:relative;font-size:11.8px;color:#8fa2ab;line-height:1.8;border-top:1px solid #22343c;padding-top:13px}
+  .off-note b{color:#d9a856;font-weight:600}
+  .off-acts{position:relative;display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+  .off-acts .m{background:#d9a856;color:#241a05;border-radius:999px;padding:9px 16px;font-size:12.8px;font-weight:700}
+  .off-acts .s{border:1px solid #344a54;color:#c8d7dd;border-radius:999px;padding:9px 14px;font-size:12.3px}
+  .off-acts .s:hover{border-color:#557080;color:#fff}
 
   /* process */
   .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-top:1px solid var(--line)}
@@ -301,6 +339,7 @@
     <nav class="links">
       <a href="#services">产品/服务</a>
       <a href="#cases">案例</a>
+      <a href="#offline">AI 私有化</a>
       <a href="#process">流程</a>
       <a href="#about">关于</a>
       <a href="#contact">联系我们</a>
@@ -326,6 +365,7 @@
         <li><b>云服务器</b> 部署运维</li>
         <li><b>企业邮箱</b> 搭建</li>
         <li><b>网站与后台</b> 系统</li>
+        <li><b>AI 私有化</b> 离线部署</li>
       </ul>
       <div class="hero-actions">
         <a class="btn btn-dark" href="#cases">查看案例 Demo</a>
@@ -334,8 +374,8 @@
       <p class="hero-note">昆山及周边可面谈 · 需求沟通不收费 · 演示项目数据均为模拟</p>
 
       <div class="strip">
-        <div><strong>6 类</strong><span>可承接的技术服务</span></div>
-        <div><strong>4 个</strong><span>可直接点开的演示系统</span></div>
+        <div><strong>7 类</strong><span>可承接的技术服务</span></div>
+        <div><strong>15 个</strong><span>可直接点开的演示系统</span></div>
         <div><strong>5 步</strong><span>从沟通到售后的交付流程</span></div>
         <div><strong>1 人</strong><span>对接、开发、上线全跟进</span></div>
       </div>
@@ -407,7 +447,7 @@
           <div class="sec-kicker">CASES / 02</div>
           <h2>按行业看案例</h2>
         </div>
-        <p class="sec-desc">8 个有本地客户基础的行业入口，13 个可点 Demo。每张卡写清客户类型、交付内容、周期与演示口径，不写“服务过 XX 家”。</p>
+        <p class="sec-desc">8 个有本地客户基础的行业入口，15 个可点 Demo。每张卡写清客户类型、交付内容、周期与演示口径，不写“服务过 XX 家”。</p>
       </div>
 
       <div class="ind-nav">
@@ -600,6 +640,13 @@
           <p>知识库问答、询盘分流、报表同步。答不上来走兜底转人工，不承诺准确率。</p>
           <span class="go">看 3 个 Demo →</span>
         </a>
+        <a class="cap-card" href="cases/#offline">
+          <span class="ck">CORE / 工厂场景</span>
+          <h3>AI 私有化 / 离线部署</h3>
+          <span class="num">按配置报价</span>
+          <p>工控机 / 单卡 / 双卡三档，数据不出厂、断网可用。设备手册问答、故障诊断、图纸检索。</p>
+          <span class="go">看三档配置 →</span>
+        </a>
         <a class="cap-card" href="cases/#ops">
           <span class="ck">SERVICE / 服务保障</span>
           <h3>运维年框</h3>
@@ -619,12 +666,80 @@
     </div>
   </section>
 
+  <!-- AI 私有化 -->
+  <section id="offline">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <div class="sec-kicker">AI OFFLINE / 03</div>
+          <h2>AI 私有化 / 离线部署</h2>
+        </div>
+        <p class="sec-desc">给工厂用的一条独立业务线。设备数据、工艺文件、客户图纸不出厂区网络，断网也能跑。</p>
+      </div>
+
+      <div class="offline-panel reveal">
+        <div class="offline-head">
+          <div>
+            <div class="ok">ON-PREMISE / NO INTERNET REQUIRED</div>
+            <h2>数据不出厂，断网可用</h2>
+            <p>不是把云端问答换个皮肤。模型、知识库、检索全部装在你自己的机房里，物理断网仍然可用；工艺文件与图纸不上传、不出内网。</p>
+          </div>
+          <span class="badge"><i></i>本地部署 · 无外网依赖</span>
+        </div>
+
+        <div class="off-grid">
+          <div class="off-card">
+            <div class="t"><h3>入门档</h3><span>CPU</span></div>
+            <div class="q">按配置报价 <small>· 工控机</small></div>
+            <ul>
+              <li>纯 CPU 工控机部署</li>
+              <li>7B 以下量化模型</li>
+              <li>SOP / 设备手册问答</li>
+              <li>适合先验证效果</li>
+            </ul>
+          </div>
+          <div class="off-card mid">
+            <div class="t"><h3>标准档</h3><span>24G × 1</span></div>
+            <div class="q">按配置报价 <small>· 单卡工作站</small></div>
+            <ul>
+              <li>单卡 24G 工作站</li>
+              <li>故障诊断问答</li>
+              <li>报表自动生成</li>
+              <li>图纸检索</li>
+            </ul>
+          </div>
+          <div class="off-card">
+            <div class="t"><h3>进阶档</h3><span>24G × 2 / EDGE</span></div>
+            <div class="q">按配置报价 <small>· 双卡或边缘盒子</small></div>
+            <ul>
+              <li>双卡工作站或边缘盒子</li>
+              <li>多场景并发</li>
+              <li>视觉质检配合</li>
+              <li>与产线 / MES 对接</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="off-note">
+          <b>报价口径：</b>硬件按现场条件选型（是否独立机房、供电与散热、是否要求物理断网），价格随配置浮动，先出配置单再报价。<br>
+          <b>边界说明：</b>视觉质检属另一套技术栈，我们配合实施，不宣称全部自研；不承诺识别准确率，验收以厂内真实手册与故障记录做样本。
+        </div>
+
+        <div class="off-acts">
+          <a class="m" href="demos/ai-offline/">打开离线诊断助手 →</a>
+          <a class="s" href="demos/ai-inspect/">产线巡检与报工</a>
+          <a class="s" href="cases/#offline">案例库里的同类 Demo</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- process -->
   <section id="process">
     <div class="wrap">
       <div class="sec-head">
         <div>
-          <div class="sec-kicker">PROCESS / 03</div>
+          <div class="sec-kicker">PROCESS / 04</div>
           <h2>服务流程</h2>
         </div>
         <p class="sec-desc">先把事情说清楚再动手。每一步都有明确产出，不满意可以在对应环节停下。</p>
@@ -644,7 +759,7 @@
     <div class="wrap">
       <div class="sec-head">
         <div>
-          <div class="sec-kicker">ABOUT / 04</div>
+          <div class="sec-kicker">ABOUT / 05</div>
           <h2>关于</h2>
         </div>
       </div>
@@ -670,7 +785,7 @@
     <div class="wrap">
       <div class="sec-head">
         <div>
-          <div class="sec-kicker">CONTACT / 05</div>
+          <div class="sec-kicker">CONTACT / 06</div>
           <h2>联系我们</h2>
         </div>
         <p class="sec-desc">把想做的事简单写几句发过来就行，先说清楚场景，再谈怎么做。</p>
