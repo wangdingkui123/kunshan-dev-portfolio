@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>案例库 · 昆山软件开发</title>
+<meta name="description" content="按行业分类的软件能力演示库：企业官网、后台管理系统、小程序、电商零售、制造业、接口与集成、云与运维。以下为能力演示，非真实客户项目。">
+<style>
+  :root{
+    --bg:#f7f7f5;--card:#fff;--ink:#15181b;--ink2:#3d4349;--mut:#7b8288;
+    --line:#e6e6e1;--line2:#d3d3cc;--accent:#14523f;--soft:#ecf0ed;
+    --max:1180px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.7 "PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+  header{position:sticky;top:0;z-index:40;background:rgba(247,247,245,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .hd{display:flex;align-items:center;justify-content:space-between;height:62px;gap:20px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px}
+  .mark{width:28px;height:28px;border-radius:8px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:11px;font-family:ui-monospace,Menlo,Consolas,monospace}
+  .back{font-size:13.5px;color:var(--ink2);border:1px solid var(--line2);padding:7px 14px;border-radius:999px;background:#fff}
+  .back:hover{border-color:var(--ink2)}
+
+  .hero{padding:48px 0 30px}
+  .kicker{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;letter-spacing:.18em;color:var(--mut)}
+  h1{font-size:clamp(24px,3.2vw,34px);margin:10px 0 12px;letter-spacing:-.01em}
+  .lead{color:var(--ink2);font-size:14.5px;max-width:52em;margin:0}
+  .disclaimer{
+    display:inline-flex;gap:9px;align-items:flex-start;margin-top:18px;padding:10px 14px;border-radius:9px;
+    background:#fff;border:1px solid var(--line);font-size:12.8px;color:var(--ink2);max-width:100%;
+  }
+  .disclaimer b{color:var(--accent)}
+
+  .filters{position:sticky;top:62px;z-index:30;background:rgba(247,247,245,.94);backdrop-filter:blur(10px);padding:14px 0;border-bottom:1px solid var(--line)}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{
+    flex:0 0 auto;font-size:13px;padding:7px 14px;border-radius:999px;border:1px solid var(--line2);
+    background:#fff;color:var(--ink2);cursor:pointer;transition:.15s;white-space:nowrap;font-family:inherit;
+  }
+  .chip:hover{border-color:var(--ink2)}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .count{font-size:12.5px;color:var(--mut);margin-left:auto;flex:0 0 auto;white-space:nowrap}
+
+  main{padding:30px 0 70px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media (max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:640px){.grid{grid-template-columns:1fr}}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:.18s}
+  .card:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(20,30,26,.07);border-color:var(--line2)}
+  .thumb{height:168px;position:relative;overflow:hidden;border-bottom:1px solid var(--line);background:#eef0ec}
+  .badge{position:absolute;left:12px;top:12px;z-index:3;font-size:11px;padding:3px 9px;border-radius:5px;background:rgba(255,255,255,.92);color:var(--ink2);border:1px solid rgba(0,0,0,.06)}
+  .body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px;flex:1}
+  .body h2{font-size:15.5px;margin:0;font-weight:650;letter-spacing:0}
+  .prob{margin:0;font-size:13px;color:var(--ink2)}
+  .prob b{color:var(--accent);font-weight:600}
+  .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:auto;padding-top:6px}
+  .tags span{font-size:11px;color:var(--mut);border:1px solid var(--line);border-radius:5px;padding:2px 7px;background:#fafaf7}
+  .enter{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--line);margin-top:8px}
+  .enter a{font-size:13px;font-weight:600;color:var(--accent)}
+  .enter small{font-size:11.5px;color:var(--mut)}
+  .empty{padding:60px 0;text-align:center;color:var(--mut);font-size:14px}
+
+  /* ---------- thumbnails ---------- */
+  .t-shop{background:linear-gradient(145deg,#f0ece3,#e6e9e2)}
+  .t-shop i{position:absolute;left:50%;top:16px;transform:translateX(-50%);width:92px;height:152px;background:#fff;border-radius:12px 12px 0 0;border:1px solid #ded9cd;box-shadow:0 10px 22px rgba(20,30,26,.12)}
+  .t-shop i:before{content:"";position:absolute;left:0;right:0;top:0;height:22px;border-radius:12px 12px 0 0;background:linear-gradient(135deg,#1c6b52,#14523f)}
+  .t-shop i:after{content:"";position:absolute;left:8px;right:8px;top:32px;height:44px;border-radius:6px;background:#e9ece6}
+  .t-shop u{position:absolute;left:calc(50% - 46px);top:84px;width:38px;height:30px;border-radius:5px;background:#f0eee7}
+  .t-shop u+u{left:calc(50% + 8px)}
+
+  .t-phone{background:linear-gradient(150deg,#e9ece6,#dfe5dd)}
+  .t-phone i{position:absolute;left:50%;top:14px;transform:translateX(-50%);width:104px;height:176px;border-radius:18px;background:#12161a;padding:5px;box-shadow:0 12px 26px rgba(20,30,26,.22)}
+  .t-phone i:before{content:"";display:block;width:100%;height:100%;border-radius:14px;background:#fbfaf6;background-image:linear-gradient(#1c6b52 0 22px,transparent 22px),radial-gradient(circle at 30% 46%,#e6e9e2 0 12px,transparent 12px),radial-gradient(circle at 50% 46%,#e6e9e2 0 12px,transparent 12px),radial-gradient(circle at 70% 46%,#e6e9e2 0 12px,transparent 12px),linear-gradient(#eceadf 0 6px,transparent 6px) 8px 92px/78% 6px no-repeat}
+  .t-phone i:after{content:"";position:absolute;left:16px;right:16px;bottom:22px;height:5px;border-radius:3px;background:#e4e1d7;box-shadow:0 -14px 0 #e4e1d7}
+
+  .t-ops{background:#0d1216}
+  .t-ops i{position:absolute;inset:14px 12px -6px;border-radius:10px;background:#111a20;border:1px solid #1f2c35;padding:9px}
+  .t-ops i:before{content:"";display:block;height:100%;background:
+    linear-gradient(#22313b 0 7px,transparent 7px) 0 0/34px 100% no-repeat,
+    linear-gradient(#17242c 0 26px,transparent 26px) 46px 0/calc(33% - 8px) 100% no-repeat,
+    linear-gradient(#17242c 0 26px,transparent 26px) calc(50% + 2px) 0/calc(33% - 8px) 100% no-repeat,
+    linear-gradient(#17242c 0 26px,transparent 26px) 100% 0/calc(33% - 8px) 100% no-repeat;
+    background-repeat:no-repeat}
+  .t-ops i:after{content:"";position:absolute;left:52px;right:20px;top:56px;height:58px;border-radius:5px;background:#0f181e;border:1px solid #22313b;
+    background-image:linear-gradient(180deg,rgba(61,220,151,.3),rgba(61,220,151,0));clip-path:polygon(0 74%,16% 60%,32% 68%,48% 36%,64% 46%,80% 24%,100% 14%,100% 100%,0 100%)}
+
+  .t-mail{background:linear-gradient(145deg,#efece4,#e7e9e3)}
+  .t-mail i{position:absolute;inset:18px 14px -8px;background:#fff;border:1px solid #e0dcd0;border-radius:9px;display:grid;grid-template-columns:58px 1fr;overflow:hidden;box-shadow:0 10px 22px rgba(20,30,26,.1)}
+  .t-mail i:before{content:"";background:#f3f1ea;border-right:1px solid #e6e2d7;background-image:linear-gradient(#ddd9cc 0 6px,transparent 6px);background-size:calc(100% - 16px) 20px;background-position:8px 10px;background-repeat:repeat-y}
+  .t-mail i:after{content:"";padding:10px;background-image:linear-gradient(#dfe7e0 0 9px,transparent 9px),linear-gradient(#eceae2 0 6px,transparent 6px);background-size:60% 9px,100% 6px;background-position:10px 12px,10px 32px;background-repeat:no-repeat,repeat-y}
+
+  .t-brand{background:linear-gradient(150deg,#1f2a26,#0f1614)}
+  .t-brand i{position:absolute;left:26px;top:34px;right:90px;height:9px;border-radius:2px;background:rgba(255,255,255,.85)}
+  .t-brand i:before{content:"";position:absolute;top:20px;left:0;width:64%;height:9px;border-radius:2px;background:rgba(255,255,255,.55)}
+  .t-brand i:after{content:"";position:absolute;top:44px;left:0;width:40%;height:5px;border-radius:2px;background:rgba(255,255,255,.28)}
+  .t-brand u{position:absolute;right:26px;bottom:26px;width:74px;height:74px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#d9c7a3,#8a6a3b)}
+
+  .t-factory{background:linear-gradient(160deg,#dfe3e6,#c9d2d6)}
+  .t-factory i{position:absolute;left:0;right:0;bottom:0;height:78px;background:#2b3a42;clip-path:polygon(0 34%,16% 34%,16% 8%,34% 8%,34% 34%,52% 34%,52% 16%,70% 16%,70% 34%,86% 34%,86% 0,100% 0,100% 100%,0 100%)}
+  .t-factory i:before{content:"";position:absolute;left:14px;right:14px;top:14px;height:6px;border-radius:3px;background:rgba(255,255,255,.55)}
+  .t-factory u{position:absolute;left:20px;top:22px;width:78px;height:44px;border-radius:4px;background:rgba(255,255,255,.75);box-shadow:0 0 0 1px rgba(0,0,0,.04)}
+  .t-factory u+u{left:auto;right:20px;width:52px;height:52px}
+
+  .t-trade{background:linear-gradient(150deg,#f1f2f0,#e2e6e6)}
+  .t-trade i{position:absolute;left:18px;top:22px;font:700 15px/1.1 Georgia,serif;color:#1b2a33;letter-spacing:.02em}
+  .t-trade i:before{content:"GLOBAL";display:block}
+  .t-trade i:after{content:"SUPPLY";display:block;opacity:.55;font-size:12px}
+  .t-trade u{position:absolute;right:18px;top:22px;width:76px;height:8px;border-radius:2px;background:#9aa7ad}
+  .t-trade s{position:absolute;left:18px;right:18px;bottom:16px;height:64px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-decoration:none}
+  .t-trade s b{display:block;border-radius:4px;background:#fff;border:1px solid #d8dcdc;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+
+  .t-crm{background:linear-gradient(160deg,#eef2f6,#dde5ec)}
+  .t-crm i{position:absolute;inset:14px 12px -6px;background:#fff;border:1px solid #d5dee6;border-radius:8px;overflow:hidden}
+  .t-crm i:before{content:"";position:absolute;left:0;top:0;bottom:0;width:40px;background:#1b2b3a}
+  .t-crm i:after{content:"";position:absolute;left:52px;right:10px;top:12px;height:8px;border-radius:3px;background:#dbe4ec;
+    box-shadow:0 18px 0 #eef3f7,0 32px 0 #eef3f7,0 46px 0 #eef3f7,0 60px 0 #eef3f7,0 74px 0 #eef3f7}
+
+  .t-appr{background:linear-gradient(160deg,#f0f3f1,#dfe7e2)}
+  .t-appr i{position:absolute;left:20px;right:20px;top:26px;bottom:12px;background:#fff;border:1px solid #d9e0db;border-radius:8px}
+  .t-appr i:before{content:"";position:absolute;left:16px;right:16px;top:18px;bottom:18px;
+    background:radial-gradient(circle 7px at 8px 8px,#2f7d5e 98%,transparent 100%),radial-gradient(circle 7px at 8px 44px,#c9b06a 98%,transparent 100%),radial-gradient(circle 7px at 8px 80px,#b9c3c9 98%,transparent 100%);
+    background-repeat:no-repeat}
+  .t-appr i:after{content:"";position:absolute;left:8px;top:28px;width:1px;height:52px;background:#dbe2dd}
+
+  .t-dash{background:linear-gradient(160deg,#eef3f8,#dee8f1)}
+  .t-dash i{position:absolute;inset:14px 12px -6px;background:#fff;border:1px solid #d6e0e9;border-radius:8px;padding:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .t-dash i b{display:block;height:22px;border-radius:4px;background:#eaf1f7;border:1px solid #dde7f0}
+  .t-dash i:after{content:"";grid-column:1/-1;height:56px;border-radius:4px;background:#f4f8fb;border:1px solid #dde7f0;
+    background-image:linear-gradient(180deg,rgba(47,109,160,.22),rgba(47,109,160,0));clip-path:polygon(0 70%,18% 52%,36% 62%,54% 30%,72% 42%,88% 20%,100% 28%,100% 100%,0 100%)}
+
+  .t-itdesk{background:#0e1519}
+  .t-itdesk i{position:absolute;inset:14px 12px -6px;background:#151d23;border:1px solid #22313b;border-radius:8px;display:grid;grid-template-columns:38px 1fr;overflow:hidden}
+  .t-itdesk i:before{content:"";background:#101a20;border-right:1px solid #1e2c35;background-image:linear-gradient(#2b4552 0 6px,transparent 6px);background-size:calc(100% - 14px) 20px;background-position:7px 12px;background-repeat:repeat-y}
+  .t-itdesk i:after{content:"";margin:10px;border-radius:4px;
+    background:
+      linear-gradient(#e2685f 0 6px,transparent 6px) 0 0/58% 6px no-repeat,
+      linear-gradient(#22313b 0 5px,transparent 5px) 0 14px/100% 5px no-repeat,
+      linear-gradient(#22313b 0 5px,transparent 5px) 0 26px/100% 5px no-repeat,
+      linear-gradient(#3ddc97 0 5px,transparent 5px) 0 38px/72% 5px no-repeat,
+      linear-gradient(#22313b 0 5px,transparent 5px) 0 50px/100% 5px no-repeat,
+      linear-gradient(#e6b555 0 5px,transparent 5px) 0 62px/48% 5px no-repeat}
+
+  .t-inter{background:linear-gradient(160deg,#eef4f1,#dbe6e1)}
+  .t-inter i{position:absolute;inset:18px 16px -6px;background:#fff;border:1px solid #cfded7;border-radius:8px;padding:12px;
+    background-image:
+      linear-gradient(#0f7a5f 0 6px,transparent 6px),
+      linear-gradient(#dfeae5 0 5px,transparent 5px),
+      linear-gradient(#dfeae5 0 5px,transparent 5px),
+      linear-gradient(#dfeae5 0 5px,transparent 5px),
+      linear-gradient(#cfe6dc 0 20px,transparent 20px);
+    background-size:44% 6px,100% 5px,100% 5px,86% 5px,100% 20px;
+    background-position:12px 14px,12px 32px,12px 44px,12px 56px,12px 72px;
+    background-repeat:no-repeat}
+  .t-inter i:before{content:"";position:absolute;left:12px;right:12px;bottom:14px;height:4px;border-radius:2px;background:#e8f1ed;
+    box-shadow:0 -10px 0 #e8f1ed,0 -20px 0 #e8f1ed}
+  .t-inter i:after{content:"";position:absolute;right:14px;top:14px;width:9px;height:9px;border-radius:50%;background:#12916f;box-shadow:14px 0 0 #c9d6cf}
+
+  .t-game{background:linear-gradient(150deg,#3a1838,#1d0c24)}
+  .t-game i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:112px;height:112px;border-radius:50%;
+    background:conic-gradient(#7a3150 0 45deg,#5e2a52 45deg 90deg,#833552 90deg 135deg,#5e2a52 135deg 180deg,#7a3150 180deg 225deg,#5e2a52 225deg 270deg,#833552 270deg 315deg,#5e2a52 315deg 360deg);
+    box-shadow:0 0 0 5px rgba(242,200,107,.55),0 10px 26px rgba(0,0,0,.45)}
+  .t-game i:before{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fff3d4,#d8a63c);box-shadow:0 2px 6px rgba(0,0,0,.4)}
+  .t-game i:after{content:"";position:absolute;left:50%;top:-14px;transform:translateX(-50%);width:0;height:0;
+    border-left:8px solid transparent;border-right:8px solid transparent;border-top:14px solid #f2c86b}
+
+  footer{border-top:1px solid var(--line);padding:26px 0 40px;color:var(--mut);font-size:12.5px}
+  .footin{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hd">
+    <a class="brand" href="../index.html"><span class="mark">KS</span>昆山软件开发</a>
+    <a class="back" href="../index.html">← 返回首页</a>
+  </div>
+</header>
+
+<div class="wrap hero">
+  <div class="kicker">CASE LIBRARY</div>
+  <h1>案例库：按行业看能做什么</h1>
+  <p class="lead">每一张卡都是一套可以点开操作的演示系统，覆盖企业官网、后台管理系统、小程序、电商零售、制造业、接口对接、云与运维、IT 支持、企业系统对接与 H5 互动。按行业筛选，直接进 Demo 体验交互。</p>
+  <div class="disclaimer"><span>说明</span><div><b>以下为能力演示，非真实客户项目。</b>所有页面、数据、图表均为模拟，不代表任何已上线客户；部分行业分类持续补充中。</div></div>
+</div>
+
+<div class="filters">
+  <div class="wrap chips" id="chips">
+    <button class="chip on" data-cat="all">全部</button>
+    <button class="chip" data-cat="site">企业官网</button>
+    <button class="chip" data-cat="admin">后台管理系统</button>
+    <button class="chip" data-cat="mini">小程序</button>
+    <button class="chip" data-cat="retail">电商零售</button>
+    <button class="chip" data-cat="manufacturing">制造业</button>
+    <button class="chip" data-cat="finance">金融</button>
+    <button class="chip" data-cat="local">本地服务</button>
+    <button class="chip" data-cat="api">接口与集成</button>
+    <button class="chip" data-cat="cloud">云与运维</button>
+    <button class="chip" data-cat="itsupport">运维与 IT 支持</button>
+    <button class="chip" data-cat="integration">企业系统对接</button>
+    <button class="chip" data-cat="game">游戏与互动</button>
+    <span class="count" id="count"></span>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none">该分类下的演示正在补充，先看「全部」。</div>
+</main>
+
+<footer>
+  <div class="wrap footin">
+    <div>© 2026 昆山软件开发 · 案例库（演示样例 · Demo）</div>
+    <a href="../index.html#contact" style="color:#14523f">联系我们 →</a>
+  </div>
+</footer>
+
+<script>
+var CASES = [
+  {
+    id:'site-brand', kind:'brand', href:'../demos/site-brand/', cats:['site'],
+    title:'设计工作室品牌官网',
+    problem:'服务型公司只有一页简介，讲不清能做什么、做过什么，客户看完还是不敢联系。',
+    tags:['留白排版','滚动叙事','响应式'],
+    label:'企业官网'
+  },
+  {
+    id:'site-manufacturing', kind:'factory', href:'../demos/site-manufacturing/', cats:['site','manufacturing'],
+    title:'精密制造企业官网',
+    problem:'工厂有产能、有资质，官网却只有几张图，海外与本地采购方拿不到参数和证书。',
+    tags:['产品参数表','车间展示位','资质证书'],
+    label:'制造业'
+  },
+  {
+    id:'site-trade', kind:'trade', href:'../demos/site-trade/', cats:['site','manufacturing'],
+    title:'外贸 B2B 英文站',
+    problem:'中文站给海外客户看，产品目录看不懂，询盘全靠邮件来回问参数。',
+    tags:['英文排版','产品目录','询盘表单'],
+    label:'企业官网'
+  },
+  {
+    id:'crm', kind:'crm', href:'../demos/crm/', cats:['admin','local'],
+    title:'CRM 客户管理系统',
+    problem:'客户资料散在微信、Excel 和业务员手里，跟进记录丢失，商机卡在哪个阶段没人知道。',
+    tags:['客户列表','跟进记录','销售漏斗'],
+    label:'后台管理'
+  },
+  {
+    id:'approval', kind:'appr', href:'../demos/approval/', cats:['admin','manufacturing'],
+    title:'审批流系统',
+    problem:'报销、采购还在走纸质单，单据卡在谁手里、批到第几步，发起人只能挨个问。',
+    tags:['流程节点','待办已办','驳回留痕'],
+    label:'后台管理'
+  },
+  {
+    id:'dashboard', kind:'dash', href:'../demos/dashboard/', cats:['admin','cloud','finance'],
+    title:'经营数据看板',
+    problem:'订单、回款、库存分散在几个系统里，管理层想看一眼当月经营情况要等财务出表。',
+    tags:['多图表','筛选联动','导出 CSV'],
+    label:'后台管理'
+  },
+  {
+    id:'itdesk', kind:'itdesk', href:'../demos/itdesk/', cats:['itsupport','cloud'],
+    title:'IT 运维服务台',
+    problem:'报修靠电话和微信，工单归谁、SLA 还剩多少、哪台服务器在告警，没人说得清。',
+    tags:['工单流转','SLA 计时','告警列表'],
+    label:'运维与 IT 支持'
+  },
+  {
+    id:'integration', kind:'inter', href:'../demos/integration/', cats:['integration','api'],
+    title:'接口对接看板',
+    problem:'ERP、CRM、MES 各存一份数据，同步失败只能等业务发现，对账差异靠人工翻表。',
+    tags:['字段映射','同步日志','失败重试','对账差异'],
+    label:'企业系统对接'
+  },
+  {
+    id:'ecommerce', kind:'shop', href:'../demos/ecommerce/', cats:['retail'],
+    title:'移动端商城',
+    problem:'商品规格多、库存与价格联动复杂，购物车和结算经常算错，订单状态也不透明。',
+    tags:['SKU 矩阵','购物车计价','订单状态机'],
+    label:'电商零售'
+  },
+  {
+    id:'miniprogram', kind:'phone', href:'../demos/miniprogram/', cats:['mini','local'],
+    title:'门店小程序（预约 + 会员）',
+    problem:'门店的预约、会员积分、优惠券只能靠人工登记，客户复购没有抓手。',
+    tags:['Tabbar','预约校验','积分会员'],
+    label:'小程序'
+  },
+  {
+    id:'cloudops', kind:'ops', href:'../demos/cloudops/', cats:['cloud'],
+    title:'云服务器部署面板',
+    problem:'上环境靠手工敲命令，装了什么、证书哪天到期、上次备份是否成功，全靠记忆。',
+    tags:['资源监控','一键部署','证书提醒'],
+    label:'云与运维'
+  },
+  {
+    id:'email', kind:'mail', href:'../demos/email/', cats:['api','cloud'],
+    title:'企业邮箱配置台',
+    problem:'企业域名邮箱配了发不出去，MX/SPF/DKIM/DMARC 少一条就进垃圾箱，排查全靠猜。',
+    tags:['DNS 记录','逐条检测','收件箱界面'],
+    label:'接口与集成'
+  },
+  {
+    id:'lottery', kind:'game', href:'../demos/lottery/', cats:['game'],
+    title:'H5 活动抽奖',
+    problem:'做活动只有一张海报，转发没互动；抽奖又怕超发、刷单、库存对不上。',
+    tags:['转盘交互','概率配置','库存扣减','中奖记录'],
+    label:'游戏与互动'
+  }
+];
+
+var grid = document.getElementById('grid');
+var countEl = document.getElementById('count');
+var emptyEl = document.getElementById('empty');
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function cardHTML(c){
+  var tags = c.tags.map(function(t){ return '<span>'+esc(t)+'</span>'; }).join('');
+  return '<article class="card">'
+    + '<div class="thumb t-'+c.kind+'"><span class="badge">'+esc(c.label)+'</span><i></i>'
+    + (c.kind==='shop' ? '<u></u><u></u>' : '')
+    + (c.kind==='brand' ? '<u></u>' : '')
+    + (c.kind==='factory' ? '<u></u><u></u>' : '')
+    + (c.kind==='trade' ? '<u></u><s><b></b><b></b><b></b></s>' : '')
+    + (c.kind==='dash' ? '' : '')
+    + '</div>'
+    + '<div class="body">'
+    + '<h2>'+esc(c.title)+'</h2>'
+    + '<p class="prob"><b>解决：</b>'+esc(c.problem)+'</p>'
+    + '<div class="tags">'+tags+'</div>'
+    + '<div class="enter"><a href="'+c.href+'">进入 Demo →</a><small>演示样例 · Demo</small></div>'
+    + '</div></article>';
+}
+
+var active = 'all';
+function render(){
+  var list = CASES.filter(function(c){
+    return active === 'all' || c.cats.indexOf(active) > -1;
+  });
+  grid.innerHTML = list.map(cardHTML).join('');
+  countEl.textContent = list.length + ' / ' + CASES.length + ' 个演示';
+  emptyEl.style.display = list.length ? 'none' : 'block';
+}
+
+document.getElementById('chips').addEventListener('click', function(e){
+  var btn = e.target.closest('.chip');
+  if(!btn) return;
+  active = btn.getAttribute('data-cat');
+  var all = this.querySelectorAll('.chip');
+  for(var i=0;i<all.length;i++) all[i].classList.toggle('on', all[i] === btn);
+  render();
+  if(history.replaceState){
+    history.replaceState(null, '', active === 'all' ? location.pathname : '?cat=' + active);
+  }
+});
+
+var init = (location.search.match(/[?&]cat=([a-z]+)/) || [])[1];
+if(init){
+  var target = document.querySelector('.chip[data-cat="'+init+'"]');
+  if(target){ active = init; target.classList.add('on'); document.querySelector('.chip[data-cat="all"]').classList.remove('on'); }
+}
+render();
+</script>
+</body>
+</html>
