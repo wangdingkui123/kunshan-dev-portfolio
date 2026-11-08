@@ -388,6 +388,9 @@
           </select>
         </div>
       </div>
+      <label>图纸上传（STEP / DWG / PDF）</label>
+      <input type="file" id="rfqFile" accept=".step,.stp,.dwg,.pdf" style="width:100%;padding:9px 10px;border:1px dashed rgba(255,255,255,.35);border-radius:4px;background:rgba(255,255,255,.06);color:inherit;font-size:12.5px">
+      <div class="tip" id="fileTip" style="margin-top:-4px">演示环境不会上传文件，仅显示文件名。</div>
       <label>需求说明</label>
       <textarea placeholder="材质、公差要求、表面处理、期望交期"></textarea>
       <button type="submit">提交询价</button>
@@ -481,6 +484,13 @@ tabs.addEventListener('click', function(e){
   renderProd(+btn.getAttribute('data-p'));
 });
 renderProd(0);
+
+document.getElementById('rfqFile').addEventListener('change', function(){
+  var tip = document.getElementById('fileTip');
+  tip.textContent = this.files && this.files[0]
+    ? '已选择：' + this.files[0].name + '（演示环境不会上传）'
+    : '演示环境不会上传文件，仅显示文件名。';
+});
 
 document.getElementById('rfq').addEventListener('submit', function(e){
   e.preventDefault();
