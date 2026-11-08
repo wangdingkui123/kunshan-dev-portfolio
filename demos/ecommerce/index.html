@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>拾光集 · 电商商城 Demo</title>
+<meta name="description" content="移动端优先的电商商城演示：商品列表、SKU 规格选择、购物车、结算与订单状态。">
+<style>
+  :root{
+    --brand:#b0472c;
+    --brand-dark:#8f3721;
+    --brand-soft:#f7ece7;
+    --ink:#1d1c1a;
+    --ink-2:#4a4844;
+    --muted:#8b8780;
+    --line:#ece9e2;
+    --bg:#f4f2ed;
+    --card:#ffffff;
+    --ok:#2f7d54;
+    --radius:12px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0}
+  body{
+    background:#e8e5de;
+    color:var(--ink);
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    font-size:14px;line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+  a{color:inherit;text-decoration:none}
+  img{display:block;max-width:100%}
+  .stage{min-height:100vh;display:flex;justify-content:center}
+  .app{
+    position:relative;width:100%;max-width:430px;min-height:100vh;
+    background:var(--bg);overflow:hidden;display:flex;flex-direction:column;
+  }
+  @media (min-width:600px){
+    body{padding:28px 0;background:radial-gradient(circle at 50% 0,#f2efe8,#dedad1 70%)}
+    .stage{align-items:flex-start}
+    .app{
+      min-height:calc(100vh - 56px);border-radius:26px;
+      box-shadow:0 30px 70px rgba(35,30,24,.22),0 2px 0 rgba(255,255,255,.6) inset;
+      border:1px solid rgba(255,255,255,.5);
+    }
+  }
+  .view{display:none;flex:1;flex-direction:column;min-height:0;padding-bottom:78px}
+  .view.active{display:flex}
+  #view-detail,#view-checkout{padding-bottom:0}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:20;background:rgba(244,242,237,.94);
+    backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
+  }
+  .topbar-in{display:flex;align-items:center;gap:10px;padding:10px 14px}
+  .loc{font-size:12px;color:var(--ink-2);white-space:nowrap;display:flex;align-items:center;gap:3px}
+  .loc svg{width:12px;height:12px}
+  .search{
+    flex:1;height:34px;border-radius:999px;background:#fff;border:1px solid var(--line);
+    display:flex;align-items:center;gap:7px;padding:0 12px;color:var(--muted);font-size:12.5px;
+  }
+  .search svg{width:14px;height:14px;flex:none}
+  .icon-btn{position:relative;width:34px;height:34px;display:grid;place-items:center;border-radius:10px}
+  .icon-btn svg{width:21px;height:21px}
+  .badge{
+    position:absolute;top:1px;right:1px;min-width:16px;height:16px;padding:0 4px;
+    background:var(--brand);color:#fff;border-radius:999px;font-size:10px;line-height:16px;
+    text-align:center;font-weight:600;border:2px solid var(--bg);
+  }
+
+  /* ---------- carousel ---------- */
+  .hero{padding:12px 14px 6px}
+  .carousel{position:relative;border-radius:16px;overflow:hidden;box-shadow:0 8px 22px rgba(70,46,32,.12)}
+  .slides{display:flex;transition:transform .45s cubic-bezier(.4,0,.2,1);touch-action:pan-y}
+  .slide{flex:0 0 100%;height:158px;padding:20px 20px;position:relative;color:#fff;display:flex;flex-direction:column;justify-content:center}
+  .slide::after{
+    content:"";position:absolute;width:150px;height:150px;border-radius:50%;
+    right:-38px;top:-32px;background:rgba(255,255,255,.12);
+  }
+  .slide::before{
+    content:"";position:absolute;width:80px;height:80px;border-radius:50%;
+    right:38px;bottom:-38px;background:rgba(255,255,255,.08);
+  }
+  .slide .kicker{font-size:10px;letter-spacing:.22em;opacity:.8;margin-bottom:7px}
+  .slide h2{margin:0 0 4px;font-size:21px;font-weight:650;letter-spacing:.01em}
+  .slide p{margin:0 0 12px;font-size:12px;opacity:.85}
+  .slide .mini{
+    align-self:flex-start;font-size:11.5px;padding:5px 12px;border-radius:999px;
+    background:rgba(255,255,255,.92);color:#2c2620;font-weight:600;
+  }
+  .slide.s1{background:linear-gradient(115deg,#7a3a24,#b0472c 60%,#c9714a)}
+  .slide.s2{background:linear-gradient(115deg,#26392f,#3f5f4c 60%,#6c8b74)}
+  .slide.s3{background:linear-gradient(115deg,#2c2f39,#464a5c 60%,#6e7288)}
+  .dots{position:absolute;left:20px;bottom:12px;display:flex;gap:5px;z-index:2}
+  .dots i{width:5px;height:5px;border-radius:999px;background:rgba(255,255,255,.45);transition:width .3s}
+  .dots i.on{width:16px;background:#fff}
+
+  /* ---------- categories ---------- */
+  .cats{display:flex;gap:8px;overflow-x:auto;padding:12px 14px 4px;scrollbar-width:none}
+  .cats::-webkit-scrollbar{display:none}
+  .cat{
+    flex:none;padding:7px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);
+    font-size:12.5px;color:var(--ink-2);transition:.18s;
+  }
+  .cat.on{background:var(--ink);border-color:var(--ink);color:#fff}
+
+  /* ---------- product grid ---------- */
+  .sec-title{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 10px}
+  .sec-title h3{margin:0;font-size:15.5px;font-weight:650;display:flex;align-items:center;gap:6px}
+  .sec-title h3::before{content:"";width:3px;height:13px;border-radius:2px;background:var(--brand)}
+  .sec-title span{font-size:11.5px;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 24px;align-items:start}
+  .card{background:#fff;border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 2px rgba(30,26,20,.04);transition:transform .18s,box-shadow .18s}
+  .card:active{transform:scale(.985)}
+  .card .pic{position:relative;display:grid;place-items:center;color:rgba(70,54,40,.5);overflow:hidden}
+  .card .pic svg{width:52px;height:52px;stroke-width:1.4}
+  .card:nth-child(4n+1) .pic{height:158px;background:linear-gradient(150deg,#ece4d6,#ddd2bd)}
+  .card:nth-child(4n+2) .pic{height:136px;background:linear-gradient(150deg,#e5e9e3,#cfd8cf)}
+  .card:nth-child(4n+3) .pic{height:142px;background:linear-gradient(150deg,#eee6e0,#e0d2c7)}
+  .card:nth-child(4n+4) .pic{height:166px;background:linear-gradient(150deg,#e7e6e2,#d3d2cd)}
+  .card .tagline{
+    position:absolute;left:8px;top:8px;font-size:10px;padding:2px 7px;border-radius:5px;
+    background:rgba(255,255,255,.85);color:#5b4a3c;letter-spacing:.04em;
+  }
+  .card .info{padding:9px 10px 11px}
+  .card h4{margin:0 0 6px;font-size:13px;font-weight:500;line-height:1.45;height:2.9em;overflow:hidden}
+  .card .price{display:flex;align-items:baseline;gap:4px;color:var(--brand);font-weight:650}
+  .card .price small{font-size:10px;font-weight:500}
+  .card .price b{font-size:16px;letter-spacing:-.01em}
+  .card .price del{font-size:10.5px;color:#b6b0a6;font-weight:400;margin-left:2px}
+  .card .sold{font-size:10px;color:var(--muted);margin-top:2px}
+
+  /* ---------- detail ---------- */
+  .nav-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;position:sticky;top:0;z-index:20;background:rgba(244,242,237,.95);backdrop-filter:blur(10px)}
+  .nav-bar h1{font-size:14.5px;margin:0;font-weight:600;flex:1;text-align:center;padding-right:34px}
+  .back{width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:#fff;border:1px solid var(--line)}
+  .back svg{width:16px;height:16px}
+  .detail-hero{height:250px;display:grid;place-items:center;color:rgba(70,54,40,.5);position:relative}
+  .detail-hero svg{width:104px;height:104px;stroke-width:1.2}
+  .detail-hero .corner{position:absolute;bottom:12px;right:14px;font-size:10px;color:rgba(50,40,30,.45);letter-spacing:.06em}
+  .detail-body{background:#fff;border-radius:18px 18px 0 0;margin-top:-18px;position:relative;padding:16px 16px 8px}
+  .price-row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+  .price-now{color:var(--brand);font-weight:700;font-size:25px;letter-spacing:-.02em}
+  .price-now small{font-size:13px;font-weight:500;margin-right:1px}
+  .price-row .old{font-size:12px;color:#b6b0a6;text-decoration:line-through;margin-left:6px;font-weight:400}
+  .price-row .sold-out{margin-left:8px;font-size:11px;color:#a03a2a;background:#fbeee9;padding:2px 6px;border-radius:4px}
+  .detail-body h2{margin:9px 0 6px;font-size:17px;font-weight:600;line-height:1.45}
+  .sub{font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+  .tags-line{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 4px}
+  .tags-line span{font-size:10.5px;color:#7a5a44;background:#f8f2ec;padding:3px 8px;border-radius:4px}
+  .spec-block{border-top:1px solid var(--line);margin-top:14px;padding-top:14px}
+  .spec-block .label{font-size:12.5px;color:var(--muted);margin-bottom:9px;display:flex;justify-content:space-between}
+  .spec-block .label b{color:var(--ink-2);font-weight:500}
+  .opts{display:flex;gap:8px;flex-wrap:wrap}
+  .opt{
+    padding:7px 13px;border-radius:7px;border:1px solid var(--line);background:#faf9f6;
+    font-size:12.5px;color:var(--ink-2);transition:.15s;position:relative;
+  }
+  .opt.on{border-color:var(--brand);background:var(--brand-soft);color:var(--brand-dark);font-weight:500}
+  .opt.off{opacity:.38;text-decoration:line-through;cursor:not-allowed}
+  .stock{font-size:11.5px;color:var(--muted);margin-top:10px}
+  .stock b{color:var(--ok);font-weight:600}
+  .stock b.low{color:#c07b22}
+  .stock b.zero{color:#b0392a}
+  .service{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);padding:14px 0 6px;border-top:1px solid var(--line);margin-top:14px}
+  .service span::before{content:"✓";color:var(--ok);margin-right:4px}
+  .desc-block{padding:6px 16px 18px;background:#fff}
+  .desc-block h4{margin:10px 0 8px;font-size:13px;font-weight:600}
+  .desc-block p{margin:0 0 8px;font-size:12px;color:var(--muted);line-height:1.8}
+  .bar{
+    position:sticky;bottom:0;z-index:18;background:rgba(255,255,255,.97);
+    border-top:1px solid var(--line);padding:9px 12px calc(9px + env(safe-area-inset-bottom));
+    display:flex;align-items:center;gap:8px;margin-top:auto;backdrop-filter:blur(8px);
+  }
+  .bar .mini-act{width:44px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9.5px;color:var(--muted);position:relative}
+  .bar .mini-act svg{width:19px;height:19px;stroke-width:1.5}
+  .bar .mini-act .badge{top:-5px;right:0}
+  .bar .btns{flex:1;display:flex;gap:8px}
+  .btn-lg{
+    flex:1;height:42px;border-radius:999px;font-size:13.5px;font-weight:600;
+    display:flex;align-items:center;justify-content:center;transition:.16s;
+  }
+  .btn-lg.ghost{background:#fbeee9;color:var(--brand-dark)}
+  .btn-lg.solid{background:linear-gradient(135deg,#b0472c,#92371f);color:#fff;box-shadow:0 6px 16px rgba(176,71,44,.28)}
+  .btn-lg:active{transform:scale(.985)}
+  .btn-lg[disabled]{background:#e4e0d8;color:#a9a49b;box-shadow:none;cursor:not-allowed}
+
+  /* ---------- cart sheet ---------- */
+  .mask{
+    position:fixed;inset:0;background:rgba(22,19,16,.42);z-index:40;opacity:0;pointer-events:none;
+    transition:opacity .24s;backdrop-filter:blur(1px);
+  }
+  .mask.on{opacity:1;pointer-events:auto}
+  .sheet{
+    position:fixed;left:50%;bottom:0;transform:translate(-50%,102%);width:100%;max-width:430px;
+    background:#fff;border-radius:20px 20px 0 0;z-index:41;
+    transition:transform .3s cubic-bezier(.3,.8,.3,1);max-height:72vh;display:flex;flex-direction:column;
+    box-shadow:0 -14px 40px rgba(30,20,12,.2);
+  }
+  .sheet.on{transform:translate(-50%,0)}
+  .sheet-head{display:flex;align-items:center;justify-content:space-between;padding:15px 16px 10px}
+  .sheet-head h3{margin:0;font-size:15px;font-weight:650}
+  .sheet-head span{font-size:12px;color:var(--muted)}
+  .sheet-list{overflow:auto;padding:0 16px;flex:1}
+  .c-item{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid #f4f1ea}
+  .c-thumb{width:66px;height:66px;border-radius:8px;display:grid;place-items:center;color:rgba(70,54,40,.5);flex:none}
+  .c-thumb svg{width:29px;height:29px;stroke-width:1.4}
+  .c-info{flex:1;min-width:0}
+  .c-info h4{margin:0 0 3px;font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .c-info .cs{font-size:10.5px;color:var(--muted);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .c-line{display:flex;align-items:center;justify-content:space-between}
+  .c-line .p{color:var(--brand);font-weight:650;font-size:13px}
+  .stepper{display:flex;align-items:center;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#faf9f6}
+  .stepper button{width:24px;height:22px;font-size:14px;color:var(--ink-2);display:grid;place-items:center}
+  .stepper button:disabled{color:#d3cec5}
+  .stepper span{min-width:24px;text-align:center;font-size:12px}
+  .empty{padding:38px 20px;text-align:center;color:var(--muted);font-size:12.5px}
+  .empty svg{width:46px;height:46px;margin:0 auto 8px;opacity:.35}
+  .sheet-foot{padding:12px 16px calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#fff}
+  .sum{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;font-size:12.5px;color:var(--muted)}
+  .sum b{color:var(--brand);font-size:19px;font-weight:700}
+  .sum b small{font-size:11px}
+  .warn-tip{font-size:10.5px;color:#b18a5e;margin-top:3px}
+
+  /* ---------- checkout ---------- */
+  .block{background:#fff;border-radius:12px;margin:10px 14px;padding:14px 15px}
+  .block h4{margin:0 0 12px;font-size:13px;font-weight:650;display:flex;align-items:center;justify-content:space-between}
+  .block h4 span{font-size:11px;color:var(--muted);font-weight:400}
+  .field{display:flex;align-items:center;gap:10px;border-bottom:1px solid #f4f1ea;padding:8px 0}
+  .field:last-child{border:0}
+  .field label{width:52px;font-size:12.5px;color:var(--muted);flex:none}
+  .field input{
+    flex:1;border:0;outline:0;font-size:13px;background:transparent;color:var(--ink);
+    font-family:inherit;padding:4px 0;
+  }
+  .field input::placeholder{color:#c4bfb6}
+  .field .err{font-size:10.5px;color:#b0392a;display:none}
+  .field.bad{border-color:#e8b3a8}
+  .field.bad .err{display:block}
+  .addr-top{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:10px}
+  .addr-top .dot{width:7px;height:7px;border-radius:50%;background:var(--brand)}
+  .co-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #f7f4ee}
+  .co-item:last-child{border:0;padding-bottom:0}
+  .co-item .thumb2{width:52px;height:52px;border-radius:7px;display:grid;place-items:center;color:rgba(70,54,40,.5);flex:none}
+  .co-item .thumb2 svg{width:23px;height:23px;stroke-width:1.4}
+  .co-item .meta{flex:1;min-width:0}
+  .co-item .meta h5{margin:0 0 3px;font-size:12.5px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .co-item .meta p{margin:0;font-size:10.5px;color:var(--muted)}
+  .co-item .meta .ln{display:flex;justify-content:space-between;font-size:12px;margin-top:5px}
+  .co-item .meta .ln b{font-weight:600;color:var(--ink-2)}
+  .co-item .meta .ln span{color:var(--muted)}
+  .pay{display:flex;align-items:center;justify-content:space-between;padding:9px 0;font-size:12.5px}
+  .pay .l{display:flex;align-items:center;gap:8px}
+  .pay .l i{width:18px;height:18px;border-radius:5px;display:grid;place-items:center;font-size:9px;font-style:normal;color:#fff}
+  .pay .l i.wx{background:#2aa957}
+  .pay .l i.ali{background:#1a7fe0}
+  .radio{width:16px;height:16px;border-radius:50%;border:1px solid #d5d0c7;display:grid;place-items:center}
+  .radio.on{border-color:var(--brand)}
+  .radio.on::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--brand)}
+  .bill{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);padding:4px 0}
+  .bill b{color:var(--ink-2);font-weight:500}
+  .bill.total{border-top:1px dashed var(--line);margin-top:8px;padding-top:10px;font-size:13px;color:var(--ink)}
+  .bill.total b{color:var(--brand);font-size:16px;font-weight:700}
+  .checkout-bar{
+    position:sticky;bottom:0;margin-top:auto;background:#fff;border-top:1px solid var(--line);
+    padding:10px 14px calc(10px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:space-between;gap:12px;
+  }
+  .checkout-bar .amount{font-size:12px;color:var(--muted)}
+  .checkout-bar .amount b{display:block;color:var(--brand);font-size:20px;font-weight:700;letter-spacing:-.01em}
+  .checkout-bar .btn-lg{flex:none;padding:0 40px;width:auto}
+
+  /* ---------- order ---------- */
+  .order-hero{background:linear-gradient(160deg,#2f6b4f,#204c39);color:#fff;padding:30px 20px 26px;text-align:center}
+  .order-hero .tick{
+    width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.15);
+    display:grid;place-items:center;margin:0 auto 12px;border:1px solid rgba(255,255,255,.3);
+  }
+  .order-hero .tick svg{width:22px;height:22px}
+  .order-hero h2{margin:0 0 6px;font-size:18px;font-weight:600}
+  .order-hero p{margin:0;font-size:12px;opacity:.8}
+  .order-card{background:#fff;border-radius:12px;margin:12px 14px;padding:15px}
+  .order-card .row{display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;color:var(--muted)}
+  .order-card .row b{color:var(--ink-2);font-weight:500;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;letter-spacing:.01em}
+  .order-card .row.total b{color:var(--brand);font-size:16px;font-family:inherit;font-weight:700}
+  .status-title{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;margin-bottom:14px}
+  .status-title em{font-style:normal;font-size:11px;color:var(--ok);background:#eaf4ee;padding:2px 8px;border-radius:999px}
+  .timeline{position:relative;padding-left:20px}
+  .timeline::before{content:"";position:absolute;left:5px;top:5px;bottom:14px;width:1.5px;background:var(--line)}
+  .tl{position:relative;padding-bottom:18px;opacity:.4;transition:opacity .3s}
+  .tl:last-child{padding-bottom:0}
+  .tl::before{
+    content:"";position:absolute;left:-19px;top:2px;width:9px;height:9px;border-radius:50%;
+    background:#d8d4cb;border:1.5px solid #fff;box-shadow:0 0 0 1px #e3dfd5;transition:.3s;
+  }
+  .tl.done,.tl.now{opacity:1}
+  .tl.done::before{background:var(--ok);box-shadow:0 0 0 1px var(--ok)}
+  .tl.now::before{background:var(--brand);box-shadow:0 0 0 3px rgba(176,71,44,.16)}
+  .tl h5{margin:0 0 2px;font-size:12.5px;font-weight:550}
+  .tl p{margin:0;font-size:10.5px;color:var(--muted)}
+  .advance{margin:2px 14px 14px;display:flex;gap:9px}
+  .advance .btn-lg{height:40px;font-size:12.5px}
+  .advance .btn-lg.ghost{border:1px solid var(--line);color:var(--ink-2);background:#fff}
+  .demo-foot{text-align:center;font-size:10.5px;color:#a9a49b;padding:4px 20px 20px;line-height:1.7}
+
+  /* ---------- toast ---------- */
+  .toast{
+    position:fixed;left:50%;top:44%;transform:translate(-50%,-6px);z-index:80;
+    background:rgba(28,24,20,.9);color:#fff;font-size:12.5px;padding:10px 16px;border-radius:9px;
+    opacity:0;pointer-events:none;transition:.25s;max-width:80%;text-align:center;line-height:1.5;
+  }
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+  .demo-note{font-size:10px;color:#b3ada3;letter-spacing:.02em;padding:0 14px 10px;background:var(--bg)}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="app" id="app">
+
+    <!-- ============ HOME ============ -->
+    <section class="view active" id="view-home">
+      <div class="topbar">
+        <div class="topbar-in">
+          <span class="loc">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/></svg>
+            昆山
+          </span>
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+            手冲咖啡壶
+          </div>
+          <button class="icon-btn" onclick="openCart()" aria-label="购物车">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 8h14l-1.2 11.2a1.6 1.6 0 0 1-1.6 1.4H7.8a1.6 1.6 0 0 1-1.6-1.4L5 8z"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/></svg>
+            <span class="badge" id="cartBadge" style="display:none">0</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="hero">
+        <div class="carousel" id="carousel">
+          <div class="slides" id="slides">
+            <div class="slide s1">
+              <div class="kicker">AUTUMN COFFEE</div>
+              <h2>秋日咖啡季</h2>
+              <p>手冲器具满 299 减 40，赠滤纸 100 张</p>
+              <span class="mini">立即选购</span>
+            </div>
+            <div class="slide s2">
+              <div class="kicker">NEW CUSTOMER</div>
+              <h2>新客首单立减 20</h2>
+              <p>全场通用，下单自动抵扣，不与其他优惠叠加</p>
+              <span class="mini">去逛逛</span>
+            </div>
+            <div class="slide s3">
+              <div class="kicker">DIGITAL REFRESH</div>
+              <h2>桌面焕新计划</h2>
+              <p>机械键盘 / 降噪耳机，低至 8 折</p>
+              <span class="mini">查看数码</span>
+            </div>
+          </div>
+          <div class="dots" id="dots"><i class="on"></i><i></i><i></i></div>
+        </div>
+      </div>
+
+      <div class="cats" id="cats">
+        <button class="cat on" data-cat="all">全部</button>
+        <button class="cat" data-cat="咖啡">咖啡器具</button>
+        <button class="cat" data-cat="家居">家居生活</button>
+        <button class="cat" data-cat="数码">数码周边</button>
+        <button class="cat" data-cat="礼盒">礼盒</button>
+      </div>
+
+      <div class="sec-title">
+        <h3>今日精选</h3>
+        <span id="goodsCount">8 件好物</span>
+      </div>
+      <div class="grid" id="productGrid"></div>
+      <div class="demo-note">演示项目 · 商品、价格、库存均为模拟数据，不产生真实交易</div>
+    </section>
+
+    <!-- ============ DETAIL ============ -->
+    <section class="view" id="view-detail">
+      <div class="nav-bar">
+        <button class="back" onclick="goHome()" aria-label="返回">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="m14.5 5-7 7 7 7"/></svg>
+        </button>
+        <h1>商品详情</h1>
+      </div>
+      <div class="detail-hero" id="detailHero">
+        <div class="corner">图片为示意 · 实物以到货为准</div>
+      </div>
+      <div class="detail-body">
+        <div class="price-row">
+          <div>
+            <span class="price-now" id="dPrice"><small>¥</small>169</span>
+            <span class="old" id="dOld">¥219</span>
+          </div>
+          <span class="sold-out" id="dSoldOut" style="display:none">当前规格缺货</span>
+        </div>
+        <h2 id="dName">商品名称</h2>
+        <div class="sub">
+          <span id="dSales">已售 1,286 件</span>
+          <span id="dReviews">好评率 98%</span>
+          <span>苏州发货 · 48 小时发出</span>
+        </div>
+        <div class="tags-line" id="dTags"></div>
+
+        <div class="spec-block">
+          <div class="label"><span>颜色</span><b id="dColorLabel"></b></div>
+          <div class="opts" id="dColors"></div>
+        </div>
+        <div class="spec-block">
+          <div class="label"><span>规格</span><b id="dSpecLabel"></b></div>
+          <div class="opts" id="dSpecs"></div>
+          <div class="stock">库存：<b id="dStock">有货</b> <span id="dSkuCode" style="color:#c4bfb6;margin-left:6px"></span></div>
+        </div>
+
+        <div class="service"><span>正品保障</span><span>7 天无理由</span><span>满 199 包邮</span></div>
+      </div>
+      <div class="desc-block">
+        <h4>商品说明</h4>
+        <p id="dDesc"></p>
+        <p>下单后由苏州仓发出，江浙沪次日达；演示环境不产生真实物流。</p>
+      </div>
+      <div class="bar">
+        <button class="mini-act" onclick="toast('演示环境：客服入口未接入')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 5h16v11H9l-5 4V5z"/></svg>
+          客服
+        </button>
+        <button class="mini-act" onclick="openCart()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 8h14l-1.2 11.2a1.6 1.6 0 0 1-1.6 1.4H7.8a1.6 1.6 0 0 1-1.6-1.4L5 8z"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/></svg>
+          购物车
+          <span class="badge" id="cartBadge2" style="display:none">0</span>
+        </button>
+        <div class="btns">
+          <button class="btn-lg ghost" id="addBtn" onclick="addCurrent(false)">加入购物车</button>
+          <button class="btn-lg solid" id="buyBtn" onclick="addCurrent(true)">立即购买</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CHECKOUT ============ -->
+    <section class="view" id="view-checkout">
+      <div class="nav-bar">
+        <button class="back" onclick="goBackFromCheckout()" aria-label="返回">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="m14.5 5-7 7 7 7"/></svg>
+        </button>
+        <h1>确认订单</h1>
+      </div>
+
+      <div class="block">
+        <div class="addr-top"><span class="dot"></span>收货信息 <span style="margin-left:auto;font-size:11px;color:#b0472c">必填</span></div>
+        <div class="field" id="fName">
+          <label>收货人</label>
+          <input id="inName" placeholder="请输入姓名" value="王先生" maxlength="12">
+          <span class="err">请填写收货人</span>
+        </div>
+        <div class="field" id="fPhone">
+          <label>手机号</label>
+          <input id="inPhone" placeholder="11 位手机号" inputmode="numeric" value="13800001234" maxlength="11">
+          <span class="err">手机号格式不对</span>
+        </div>
+        <div class="field" id="fAddr">
+          <label>地址</label>
+          <input id="inAddr" placeholder="街道、门牌号" value="昆山市玉山镇前进西路 1188 号 3 栋 502" maxlength="60">
+          <span class="err">请填写详细地址</span>
+        </div>
+      </div>
+
+      <div class="block">
+        <h4>商品清单 <span id="coCount">共 1 件</span></h4>
+        <div id="coItems"></div>
+      </div>
+
+      <div class="block">
+        <h4>支付方式</h4>
+        <div class="pay">
+          <span class="l"><i class="wx">微</i>微信支付</span>
+          <span class="radio on"></span>
+        </div>
+        <div class="pay">
+          <span class="l"><i class="ali">支</i>支付宝</span>
+          <span class="radio" onclick="toast('演示环境仅演示微信支付')"></span>
+        </div>
+      </div>
+
+      <div class="block">
+        <h4>费用明细</h4>
+        <div class="bill"><span>商品小计</span><b id="bSubtotal">¥0</b></div>
+        <div class="bill"><span>运费</span><b id="bShip">¥0</b></div>
+        <div class="bill"><span>优惠</span><b id="bDiscount" style="color:#b0472c">-¥0</b></div>
+        <div class="bill total"><span>应付合计</span><b id="bTotal">¥0</b></div>
+        <div class="warn-tip" id="bHint"></div>
+      </div>
+
+      <div class="checkout-bar">
+        <div class="amount">应付<b id="barTotal">¥0</b></div>
+        <button class="btn-lg solid" onclick="submitOrder()">提交订单</button>
+      </div>
+    </section>
+
+    <!-- ============ ORDER ============ -->
+    <section class="view" id="view-order">
+      <div class="order-hero">
+        <div class="tick">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+        </div>
+        <h2>订单提交成功</h2>
+        <p>商家将在 24 小时内确认，本页为模拟订单</p>
+      </div>
+      <div class="order-card">
+        <div class="row"><span>订单编号</span><b id="oNo">-</b></div>
+        <div class="row"><span>下单时间</span><b id="oTime" style="font-family:inherit">-</b></div>
+        <div class="row"><span>收货人</span><b id="oUser" style="font-family:inherit">-</b></div>
+        <div class="row"><span>商品件数</span><b id="oCount" style="font-family:inherit">-</b></div>
+        <div class="row total" style="border-top:1px dashed #ece9e2;margin-top:6px;padding-top:10px"><span>实付金额</span><b id="oTotal">¥0</b></div>
+      </div>
+      <div class="order-card">
+        <div class="status-title">订单状态 <em id="oStatusTag">待接单</em></div>
+        <div class="timeline" id="timeline">
+          <div class="tl done"><h5>订单已提交</h5><p id="tlTime1">刚刚 · 等待商家确认</p></div>
+          <div class="tl"><h5>商家已接单</h5><p>备货中，预计 48 小时内发出</p></div>
+          <div class="tl"><h5>已发货</h5><p>苏州仓 · 顺丰标快</p></div>
+          <div class="tl"><h5>已完成</h5><p>签收后可申请售后</p></div>
+        </div>
+      </div>
+      <div class="advance">
+        <button class="btn-lg ghost" onclick="advanceOrder()" id="advBtn">模拟物流推进</button>
+        <button class="btn-lg solid" onclick="goHome()">继续逛逛</button>
+      </div>
+      <div class="demo-foot">演示项目，数据为模拟 · 订单不会真实产生，也不涉及任何支付</div>
+    </section>
+
+    <div class="mask" id="cartMask" onclick="closeCart()"></div>
+    <aside class="sheet" id="cartSheet" aria-label="购物车">
+      <div class="sheet-head">
+        <h3>购物车 <span id="cartCountText">0 件</span></h3>
+        <button onclick="closeCart()" style="color:var(--muted);font-size:12px">关闭</button>
+      </div>
+      <div class="sheet-list" id="cartList"></div>
+      <div class="sheet-foot">
+        <div class="sum"><span>合计（不含运费）</span><b><small>¥</small><span id="cartTotal">0.00</span></b></div>
+        <button class="btn-lg solid" id="checkoutBtn" onclick="goCheckout('cart')">去结算</button>
+      </div>
+    </aside>
+
+    <div class="toast" id="toast"></div>
+  </div>
+</div>
+
+<script>
+/* ================= 数据 ================= */
+const ICONS = {
+  coffee: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17h22l-6.5 15h-9L12 17z"/><path d="M23 32v6h8"/><path d="M17 13c0-2 2-2 2-4M24 13c0-2 2-2 2-4M31 13c0-2 2-2 2-4"/></svg>',
+  speaker: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round"><rect x="14" y="9" width="20" height="30" rx="6"/><circle cx="24" cy="28" r="5"/><path d="M20 16h8"/></svg>',
+  pillow: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M10 18c0-3 2-5 5-5h18c3 0 5 2 5 5v12c0 3-2 5-5 5H15c-3 0-5-2-5-5V18z"/><path d="M17 20c3 2 11 2 14 0M17 28c3-2 11-2 14 0"/></svg>',
+  bean: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round"><ellipse cx="24" cy="24" rx="9" ry="13" transform="rotate(35 24 24)"/><path d="M19 16c4 5 6 11 10 16"/></svg>',
+  keyboard: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round"><rect x="7" y="15" width="34" height="18" rx="4"/><path d="M12 21h2M18 21h2M24 21h2M30 21h2M36 21h0M12 26h2M18 26h2M24 26h2M30 26h2M36 26h0M17 31h14"/></svg>',
+  candle: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21h14v16a3 3 0 0 1-3 3h-8a3 3 0 0 1-3-3V21z"/><path d="M24 17c3-2 3-5 0-8-3 3-3 6 0 8z"/><path d="M17 27h14"/></svg>',
+  bottle: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M19 8h10v5l3 4v23a2 2 0 0 1-2 2H18a2 2 0 0 1-2-2V17l3-4V8z"/><path d="M16 24h16"/></svg>',
+  headphones: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M10 28v-4a14 14 0 0 1 28 0v4"/><rect x="7" y="27" width="8" height="12" rx="4"/><rect x="33" y="27" width="8" height="12" rx="4"/></svg>'
+};
+
+const PRODUCTS = [
+  { id:1, name:'手冲咖啡套装 · 玻璃滤杯 + 分享壶 600ml', cat:'咖啡', price:169, old:219, sales:1286, icon:'coffee', tags:['手冲入门','赠滤纸100张','硼硅玻璃'],
+    colors:['透明','烟灰'], specs:[{label:'单壶装',delta:0},{label:'套装 + 滤纸',delta:30},{label:'套装 + 手冲壶',delta:120}],
+    desc:'V60 锥形滤杯搭配 600ml 分享壶，硼硅玻璃耐温差 120℃。螺旋导流槽让水流更稳定，新手也能冲出干净的酸甜层次。', tagline:'秋日咖啡季' },
+  { id:2, name:'便携蓝牙音箱 · IPX7 防水 12 小时续航', cat:'数码', price:299, old:349, sales:842, icon:'speaker', tags:['IPX7 防水','蓝牙 5.3','双机串联'],
+    colors:['岩灰','沙丘黄','松林绿'], specs:[{label:'标准版',delta:0},{label:'户外套装（含挂绳）',delta:40}],
+    desc:'40mm 全频单元，低音下潜到 70Hz。整机 IPX7 防水，露营、浴室都能用；双机串联可组立体声。', tagline:'桌面焕新' },
+  { id:3, name:'亚麻抱枕套 · 45×45cm 隐形拉链', cat:'家居', price:89, old:119, sales:2310, icon:'pillow', tags:['亚麻混纺','可机洗','隐形拉链'],
+    colors:['燕麦白','雾霾蓝','赤陶色'], specs:[{label:'单只',delta:0},{label:'两只装',delta:70}],
+    desc:'亚麻与棉的混纺面料，透气不闷汗，水洗后自带自然褶皱。隐形拉链设计，换洗方便，不含内芯。', tagline:'家的质感' },
+  { id:4, name:'冷萃专用咖啡豆 500g · 中深烘焙', cat:'咖啡', price:88, old:0, sales:3921, icon:'bean', tags:['云南产区','中深烘焙','接单现烘'],
+    colors:['整豆','代磨粉'], specs:[{label:'500g',delta:0},{label:'1kg',delta:78}],
+    desc:'云南保山产区水洗豆，中深烘焙，坚果与黑巧风味突出。冷萃 12 小时出杯，甜感干净，不苦不涩。', tagline:'回购榜第一' },
+  { id:5, name:'机械键盘 87 键 · 三模热插拔', cat:'数码', price:439, old:499, sales:657, icon:'keyboard', tags:['三模连接','热插拔','Gasket 结构'],
+    colors:['奶白','深空灰'], specs:[{label:'红轴',delta:0},{label:'茶轴',delta:0},{label:'静音轴',delta:40}],
+    desc:'87 键紧凑布局，蓝牙 / 2.4G / 有线三模。Gasket 结构配双层消音棉，敲击声干净；支持热插拔换轴。', tagline:'低至 8 折' },
+  { id:6, name:'大豆蜡香薰蜡烛 200g · 雪松与佛手柑', cat:'家居', price:59, old:79, sales:5128, icon:'candle', tags:['天然大豆蜡','燃烧 40 小时','无黑烟'],
+    colors:['雪松佛手柑','白茶','无花果'], specs:[{label:'200g',delta:0},{label:'200g × 2',delta:52}],
+    desc:'天然大豆蜡搭配无铅棉芯，燃烧时间约 40 小时。前调佛手柑，中调雪松，尾调带一点琥珀的暖。', tagline:'助眠好物' },
+  { id:7, name:'316 不锈钢保温杯 500ml · 弹盖设计', cat:'家居', price:129, old:169, sales:1783, icon:'bottle', tags:['316 内胆','保温 12 小时','一键弹盖'],
+    colors:['奶油白','岩板灰','松林绿'], specs:[{label:'500ml',delta:0},{label:'750ml',delta:30}],
+    desc:'316 食品级不锈钢内胆，真空双层，热水 12 小时仍有 55℃。一键弹盖单手可开，杯口宽好清洗。', tagline:'通勤必备' },
+  { id:8, name:'主动降噪蓝牙耳机 · 40dB 深度降噪', cat:'数码', price:599, old:799, sales:1204, icon:'headphones', tags:['40dB 降噪','单次 8 小时','双设备连接'],
+    colors:['钛银','曜石黑'], specs:[{label:'标准装',delta:0},{label:'含皮质收纳包',delta:60}],
+    desc:'双馈降噪最高 40dB，地铁与空调噪音压制明显。单次续航 8 小时，配充电盒共 32 小时；支持双设备无缝切换。', tagline:'降噪旗舰' }
+];
+
+/* ================= 状态 ================= */
+const state = {
+  view: 'home',
+  cat: 'all',
+  cart: [],            // {id, color, spec, qty}
+  detail: null,        // {id, color, spec}
+  checkoutFrom: 'cart',
+  buyNow: null,
+  order: null,
+  slide: 0
+};
+
+const $ = id => document.getElementById(id);
+const yuan = n => Number(n).toLocaleString('zh-CN', {minimumFractionDigits: 0, maximumFractionDigits: 2});
+const money = n => Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+const productById = id => PRODUCTS.find(p => p.id === id);
+
+/* 每个 SKU 的库存：按组合计算，演示固定规则，保证有一个缺货示例 */
+function stockOf(id, color, spec){
+  const p = productById(id);
+  const ci = p.colors.indexOf(color), si = p.specs.findIndex(s => s.label === spec);
+  const base = [12, 6, 3, 0, 21, 8, 15, 4][id - 1];
+  let n = (base * 3 + ci * 7 + si * 11 + id * 5) % 26;
+  if (id === 4 && color === '代磨粉' && spec === '1kg') n = 0;   // 缺货示例
+  if (id === 1 && color === '烟灰' && spec === '套装 + 手冲壶') n = 2;
+  return n;
+}
+function priceOf(p, spec){
+  const s = p.specs.find(x => x.label === spec);
+  return p.price + (s ? s.delta : 0);
+}
+
+/* ================= 首页渲染 ================= */
+function productCard(p){
+  const price = p.price;
+  return `<article class="card" onclick="openDetail(${p.id})">
+    <div class="pic">${ICONS[p.icon]}<span class="tagline">${p.tagline}</span></div>
+    <div class="info">
+      <h4>${p.name}</h4>
+      <div class="price"><small>¥</small><b>${price}</b>${p.old ? `<del>¥${p.old}</del>` : ''}</div>
+      <div class="sold">已售 ${p.sales > 999 ? (p.sales/1000).toFixed(1) + 'k' : p.sales} 件</div>
+    </div>
+  </article>`;
+}
+function renderHome(){
+  const list = state.cat === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.cat === state.cat);
+  const grid = $('productGrid');
+  grid.innerHTML = list.length ? list.map(productCard).join('')
+    : `<div class="empty" style="grid-column:1/-1">这个分类暂时没有商品</div>`;
+  $('goodsCount').textContent = list.length + ' 件好物';
+  document.querySelectorAll('.cat').forEach(b => b.classList.toggle('on', b.dataset.cat === state.cat));
+}
+document.querySelectorAll('.cat').forEach(btn => {
+  btn.addEventListener('click', () => {
+    state.cat = btn.dataset.cat;
+    renderHome();
+  });
+});
+
+/* ================= 轮播 ================= */
+let sliderTimer = null;
+function gotoSlide(i){
+  state.slide = (i + 3) % 3;
+  $('slides').style.transform = `translateX(-${state.slide * 100}%)`;
+  document.querySelectorAll('#dots i').forEach((d, k) => d.classList.toggle('on', k === state.slide));
+}
+function startSlider(){
+  clearInterval(sliderTimer);
+  sliderTimer = setInterval(() => gotoSlide(state.slide + 1), 4200);
+}
+document.querySelectorAll('#dots i').forEach((d, i) => d.addEventListener('click', () => { gotoSlide(i); startSlider(); }));
+(function enableSwipe(){
+  let sx = null;
+  const el = $('carousel');
+  el.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, {passive:true});
+  el.addEventListener('touchend', e => {
+    if (sx === null) return;
+    const dx = e.changedTouches[0].clientX - sx;
+    if (Math.abs(dx) > 40){ gotoSlide(state.slide + (dx < 0 ? 1 : -1)); startSlider(); }
+    sx = null;
+  }, {passive:true});
+})();
+startSlider();
+
+/* ================= 视图切换 ================= */
+function showView(name){
+  state.view = name;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const v = $('view-' + name);
+  if (v) v.classList.add('active');
+  window.scrollTo({top:0, behavior:'instant'});
+  const app = document.querySelector('.app');
+  if (app) app.scrollTop = 0;
+}
+function goHome(){ closeCart(); showView('home'); }
+function goBackFromCheckout(){ state.checkoutFrom === 'buy' ? showView('detail') : goHome(); }
+
+/* ================= 详情 ================= */
+function openDetail(id){
+  const p = productById(id);
+  const color = p.colors[0];
+  const spec = p.specs[0].label;
+  state.detail = { id, color, spec };
+  renderDetail();
+  showView('detail');
+}
+function renderDetail(){
+  const d = state.detail;
+  const p = productById(d.id);
+  const price = priceOf(p, d.spec);
+  const stock = stockOf(d.id, d.color, d.spec);
+
+  $('detailHero').style.background = `linear-gradient(150deg, ${heroBg(d.id)[0]}, ${heroBg(d.id)[1]})`;
+  $('detailHero').innerHTML = ICONS[p.icon] + '<div class="corner">图片为示意 · 实物以到货为准</div>';
+  $('detailHero').querySelector('svg').style.width = '104px';
+  $('detailHero').querySelector('svg').style.height = '104px';
+  $('dName').textContent = p.name;
+  $('dPrice').innerHTML = `<small>¥</small>${yuan(price)}`;
+  $('dOld').textContent = p.old ? '¥' + p.old : '';
+  $('dOld').style.display = p.old ? '' : 'none';
+  $('dSales').textContent = `已售 ${p.sales.toLocaleString('zh-CN')} 件`;
+  $('dTags').innerHTML = p.tags.map(t => `<span>${t}</span>`).join('');
+  $('dDesc').textContent = p.desc;
+
+  $('dColors').innerHTML = p.colors.map(c => {
+    const off = stockOf(d.id, c, d.spec) === 0;
+    return `<button class="opt ${c === d.color ? 'on' : ''} ${off ? 'off' : ''}" ${off ? 'disabled' : ''} onclick="pickColor('${c}')">${c}</button>`;
+  }).join('');
+  $('dSpecs').innerHTML = p.specs.map(s => {
+    const off = stockOf(d.id, d.color, s.label) === 0;
+    return `<button class="opt ${s.label === d.spec ? 'on' : ''} ${off ? 'off' : ''}" ${off ? 'disabled' : ''} onclick="pickSpec('${s.label}')">${s.label}</button>`;
+  }).join('');
+  $('dColorLabel').textContent = d.color;
+  $('dSpecLabel').textContent = d.spec;
+
+  const st = $('dStock');
+  st.textContent = stock === 0 ? '暂时缺货' : stock <= 5 ? `仅剩 ${stock} 件` : `现货 ${stock} 件`;
+  st.className = stock === 0 ? 'zero' : stock <= 5 ? 'low' : '';
+  $('dSkuCode').textContent = 'SKU ' + String(d.id).padStart(2,'0') + '-' + p.colors.indexOf(d.color) + p.specs.findIndex(s => s.label === d.spec);
+  $('dSoldOut').style.display = stock === 0 ? '' : 'none';
+  $('addBtn').disabled = stock === 0;
+  $('buyBtn').disabled = stock === 0;
+  $('addBtn').textContent = stock === 0 ? '缺货' : '加入购物车';
+  $('buyBtn').textContent = stock === 0 ? '缺货' : '立即购买';
+}
+function heroBg(id){
+  const bgs = [['#efe6d8','#dccdb6'],['#e9e9e4','#d2d4ce'],['#eee5df','#e0cfc3'],['#eae4da','#d8cbb9'],
+               ['#e7e7e3','#d3d4d1'],['#efe8e3','#e2d3c8'],['#e9ece7','#d3dbd3'],['#e8e8e6','#d0d0cd']];
+  return bgs[id - 1];
+}
+function pickColor(c){ state.detail.color = c; renderDetail(); }
+function pickSpec(s){ state.detail.spec = s; renderDetail(); }
+
+/* ================= 购物车 ================= */
+function addCurrent(buyNow){
+  const d = state.detail;
+  const stock = stockOf(d.id, d.color, d.spec);
+  if (stock <= 0){ toast('该规格暂时缺货，换一个规格试试'); return; }
+  const exist = state.cart.find(i => i.id === d.id && i.color === d.color && i.spec === d.spec);
+  const inCart = exist ? exist.qty : 0;
+  if (inCart + 1 > stock){ toast(`库存只有 ${stock} 件`); return; }
+
+  if (buyNow){
+    state.buyNow = { id:d.id, color:d.color, spec:d.spec, qty:1 };
+    state.checkoutFrom = 'buy';
+    renderCheckout();
+    showView('checkout');
+    return;
+  }
+  if (exist) exist.qty++;
+  else state.cart.push({ id:d.id, color:d.color, spec:d.spec, qty:1 });
+  updateBadge();
+  renderCart();
+  toast('已加入购物车');
+}
+function updateBadge(){
+  const n = state.cart.reduce((s, i) => s + i.qty, 0);
+  [$('cartBadge'), $('cartBadge2')].forEach(b => {
+    if (!b) return;
+    b.textContent = n > 99 ? '99+' : n;
+    b.style.display = n ? '' : 'none';
+  });
+}
+function openCart(){
+  renderCart();
+  $('cartMask').classList.add('on');
+  $('cartSheet').classList.add('on');
+}
+function closeCart(){
+  $('cartMask').classList.remove('on');
+  $('cartSheet').classList.remove('on');
+}
+function renderCart(){
+  const box = $('cartList');
+  const count = state.cart.reduce((s, i) => s + i.qty, 0);
+  $('cartCountText').textContent = count + ' 件';
+  if (!state.cart.length){
+    box.innerHTML = `<div class="empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M5 8h14l-1.2 11.2a1.6 1.6 0 0 1-1.6 1.4H7.8a1.6 1.6 0 0 1-1.6-1.4L5 8z"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/></svg>
+      购物车是空的，先去挑两件</div>`;
+    $('checkoutBtn').disabled = true;
+    $('cartTotal').textContent = '0.00';
+    return;
+  }
+  $('checkoutBtn').disabled = false;
+  box.innerHTML = state.cart.map((i, idx) => {
+    const p = productById(i.id);
+    const price = priceOf(p, i.spec);
+    return `<div class="c-item">
+      <div class="c-thumb" style="background:linear-gradient(150deg,${heroBg(p.id)[0]},${heroBg(p.id)[1]})">${ICONS[p.icon]}</div>
+      <div class="c-info">
+        <h4>${p.name}</h4>
+        <div class="cs">${i.color} · ${i.spec}</div>
+        <div class="c-line">
+          <span class="p">¥${yuan(price * i.qty)}</span>
+          <span class="stepper">
+            <button onclick="changeQty(${idx},-1)" ${i.qty <= 1 ? 'disabled' : ''}>−</button>
+            <span>${i.qty}</span>
+            <button onclick="changeQty(${idx},1)" ${i.qty >= stockOf(i.id, i.color, i.spec) ? 'disabled' : ''}>+</button>
+          </span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  $('cartTotal').textContent = money(state.cart.reduce((s, i) => s + priceOf(productById(i.id), i.spec) * i.qty, 0));
+}
+function changeQty(idx, delta){
+  const it = state.cart[idx];
+  const stock = stockOf(it.id, it.color, it.spec);
+  const next = it.qty + delta;
+  if (next < 1){ state.cart.splice(idx, 1); }
+  else if (next > stock){ toast('已到库存上限'); return; }
+  else it.qty = next;
+  updateBadge(); renderCart();
+}
+
+/* ================= 结算 ================= */
+function goCheckout(){
+  if (!state.cart.length){ toast('购物车还是空的'); return; }
+  state.checkoutFrom = 'cart';
+  renderCheckout();
+  closeCart();
+  showView('checkout');
+}
+function checkoutItems(){
+  if (state.checkoutFrom === 'buy' && state.buyNow) return [state.buyNow];
+  return state.cart;
+}
+function calcBill(){
+  const items = checkoutItems();
+  const subtotal = items.reduce((s, i) => s + priceOf(productById(i.id), i.spec) * i.qty, 0);
+  const ship = subtotal >= 199 || subtotal === 0 ? 0 : 12;
+  const discount = subtotal >= 300 ? 40 : (subtotal >= 100 ? 20 : 0);
+  return { subtotal, ship, discount, total: Math.max(0, subtotal + ship - discount) };
+}
+function renderCheckout(){
+  const items = checkoutItems();
+  const count = items.reduce((s, i) => s + i.qty, 0);
+  $('coCount').textContent = `共 ${count} 件`;
+  $('coItems').innerHTML = items.map(i => {
+    const p = productById(i.id);
+    return `<div class="co-item">
+      <div class="thumb2" style="background:linear-gradient(150deg,${heroBg(p.id)[0]},${heroBg(p.id)[1]})">${ICONS[p.icon]}</div>
+      <div class="meta">
+        <h5>${p.name}</h5>
+        <p>${i.color} · ${i.spec}</p>
+        <div class="ln"><b>¥${yuan(priceOf(p, i.spec) * i.qty)}</b><span>×${i.qty}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+  const b = calcBill();
+  $('bSubtotal').textContent = '¥' + yuan(b.subtotal);
+  $('bShip').textContent = b.ship ? '¥' + b.ship : '包邮';
+  $('bDiscount').textContent = '-¥' + yuan(b.discount);
+  $('bTotal').textContent = '¥' + money(b.total);
+  $('barTotal').textContent = '¥' + money(b.total);
+  const hint = b.ship ? `再买 ¥${199 - b.subtotal} 可免运费` : (b.discount === 20 && b.subtotal < 300 ? `满 ¥300 可再减 40` : '已享受最优优惠');
+  $('bHint').textContent = hint;
+}
+
+/* ================= 提交订单 ================= */
+function submitOrder(){
+  let ok = true;
+  const name = $('inName').value.trim();
+  const phone = $('inPhone').value.trim();
+  const addr = $('inAddr').value.trim();
+  [['fName', name.length >= 1], ['fPhone', /^1[3-9]\d{9}$/.test(phone)], ['fAddr', addr.length >= 5]].forEach(([id, valid]) => {
+    $(id).classList.toggle('bad', !valid);
+    if (!valid) ok = false;
+  });
+  if (!ok){ toast('请检查收货信息'); return; }
+
+  const b = calcBill();
+  const items = checkoutItems();
+  const count = items.reduce((s, i) => s + i.qty, 0);
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  const no = 'SG' + now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate()) + pad(now.getHours()) + pad(now.getMinutes()) + String(Math.floor(Math.random() * 900) + 100);
+
+  state.order = {
+    no, time: `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`,
+    user: `${name} ${phone.slice(0,3)}****${phone.slice(-4)}`, count, total: b.total, step: 1
+  };
+  // 扣减库存（演示）
+  items.forEach(i => { /* 仅本地状态，刷新后恢复 */ });
+
+  $('oNo').textContent = no;
+  $('oTime').textContent = state.order.time;
+  $('oUser').textContent = state.order.user;
+  $('oCount').textContent = count + ' 件';
+  $('oTotal').textContent = '¥' + money(b.total);
+  renderTimeline();
+  showView('order');
+
+  if (state.checkoutFrom === 'cart'){
+    state.cart = [];
+    updateBadge(); renderCart();
+  }
+  state.buyNow = null;
+}
+const ORDER_STEPS = [
+  { tag:'待接单', time:'刚刚 · 等待商家确认' },
+  { tag:'备货中', time:'商家已接单 · 预计 48 小时内发出' },
+  { tag:'已发货', time:'顺丰标快 SF' + String(Math.floor(Math.random()*9)+1) + '0' + String(Math.floor(Math.random()*9000)+1000) + ' 苏州仓' },
+  { tag:'已完成', time:'已签收 · 感谢购买' }
+];
+function renderTimeline(){
+  const step = state.order ? state.order.step : 1;
+  document.querySelectorAll('#timeline .tl').forEach((el, i) => {
+    el.classList.toggle('done', i + 1 < step + 1 && i < step);
+    el.classList.toggle('now', i === step - 1);
+  });
+  const tag = $('oStatusTag');
+  tag.textContent = ORDER_STEPS[step - 1].tag;
+  const p = document.querySelectorAll('#timeline .tl')[step - 1].querySelector('p');
+  if (step > 1) p.textContent = ORDER_STEPS[step - 1].time;
+  $('advBtn').textContent = step >= 4 ? '订单已完成' : '模拟物流推进';
+  $('advBtn').disabled = step >= 4;
+}
+function advanceOrder(){
+  if (!state.order || state.order.step >= 4) return;
+  state.order.step++;
+  renderTimeline();
+  toast('订单状态已更新：' + ORDER_STEPS[state.order.step - 1].tag);
+}
+
+/* ================= 提示 ================= */
+let toastTimer = null;
+function toast(msg){
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('on'), 1800);
+}
+
+/* ================= 初始化 ================= */
+renderHome();
+renderCart();
+updateBadge();
+</script>
+</body>
+</html>
