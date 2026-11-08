@@ -136,9 +136,18 @@
   .svc ul li{margin:2px 0}
 
   /* cases */
-  .case-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-  @media (max-width:980px){.case-grid{grid-template-columns:repeat(2,1fr)}}
-  @media (max-width:640px){.case-grid{grid-template-columns:1fr}}
+  .ind-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
+  @media (max-width:920px){.ind-nav{grid-template-columns:repeat(2,1fr)}}
+  .ind-item{
+    border:1px solid var(--line);border-radius:9px;padding:11px 13px;background:var(--card);
+    transition:transform .16s,border-color .16s,box-shadow .16s;
+  }
+  .ind-item:hover{transform:translateY(-1px);border-color:var(--line-strong);box-shadow:0 6px 14px rgba(20,30,25,.05)}
+  .ind-item b{display:block;font-size:13.5px;font-weight:650}
+  .ind-item small{display:block;font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.45}
+
+  .case-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  @media (max-width:860px){.case-grid{grid-template-columns:1fr}}
   .case{
     background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;
     display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s;
@@ -146,22 +155,22 @@
   .case:hover{transform:translateY(-2px);box-shadow:0 16px 34px rgba(24,32,28,.08)}
 
   .fthumb{
-    height:148px;position:relative;overflow:hidden;border-bottom:1px solid var(--line);
+    height:118px;position:relative;overflow:hidden;border-bottom:1px solid var(--line);
     background:var(--tb);display:grid;place-items:center;
   }
   .fthumb .fwin{
-    width:198px;height:114px;background:#fff;border-radius:8px;overflow:hidden;
+    width:186px;height:96px;background:#fff;border-radius:7px;overflow:hidden;
     box-shadow:0 10px 22px rgba(20,30,25,.16);transform:translateY(8px);
   }
-  .fthumb .fwin .bar{height:16px;background:var(--tc);display:flex;align-items:center;gap:4px;padding:0 7px}
+  .fthumb .fwin .bar{height:14px;background:var(--tc);display:flex;align-items:center;gap:3px;padding:0 6px}
   .fthumb .fwin .bar s{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.62);display:block}
-  .fthumb .fwin .bar em{margin-left:auto;display:block;width:26px;height:4px;border-radius:2px;background:rgba(255,255,255,.4)}
-  .fthumb .fwin .bd{padding:9px;display:grid;gap:5px}
-  .fthumb .fwin .bd s{display:block;height:6px;border-radius:3px;background:#edebe3}
-  .fthumb .fwin .bd .h{height:24px;border-radius:4px;background:var(--tb2,#efeee7)}
-  .fthumb .fwin .bd .r{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
-  .fthumb .fwin .bd .r s{height:20px;border-radius:4px;background:#f2f0e9}
-  .fthumb .fl{position:absolute;left:11px;top:10px;font-size:10.5px;color:rgba(0,0,0,.5);background:rgba(255,255,255,.78);border:1px solid rgba(0,0,0,.05);padding:2px 7px;border-radius:4px;letter-spacing:.02em}
+  .fthumb .fwin .bar em{margin-left:auto;display:block;width:24px;height:4px;border-radius:2px;background:rgba(255,255,255,.4)}
+  .fthumb .fwin .bd{padding:8px;display:grid;gap:4px}
+  .fthumb .fwin .bd s{display:block;height:5px;border-radius:3px;background:#edebe3}
+  .fthumb .fwin .bd .h{height:18px;border-radius:4px;background:var(--tb2,#efeee7)}
+  .fthumb .fwin .bd .r{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+  .fthumb .fwin .bd .r s{height:16px;border-radius:4px;background:#f2f0e9}
+  .fthumb .fl{position:absolute;left:11px;top:10px;font-size:10.5px;color:rgba(0,0,0,.5);background:rgba(255,255,255,.8);border:1px solid rgba(0,0,0,.05);padding:2px 7px;border-radius:4px;letter-spacing:.02em}
   .t-steel{--tb:linear-gradient(160deg,#e2e8ec,#c9d5db);--tc:#16394f;--tb2:#e7edf1}
   .t-export{--tb:linear-gradient(160deg,#f2f5f5,#e0e7e7);--tc:#0b4f7a;--tb2:#eaf1f5}
   .t-crm2{--tb:linear-gradient(160deg,#e9f0f6,#d9e5ef);--tc:#1e3a52;--tb2:#e9f0f6}
@@ -170,21 +179,60 @@
   .t-shop2{--tb:linear-gradient(160deg,#f1ece2,#e6e4d9);--tc:#7a4a2b;--tb2:#f0ece3}
   .t-mini2{--tb:linear-gradient(160deg,#e9f0e9,#dbe7dd);--tc:#14523f;--tb2:#e8efe9}
   .t-it2{--tb:linear-gradient(160deg,#16212a,#0e151a);--tc:#0f5f52;--tb2:#e6ebe7}
+  .t-inter2{--tb:linear-gradient(160deg,#e8f3ee,#d6e8df);--tc:#0f7a5f;--tb2:#e6f2ec}
 
-  .case-body{padding:18px 19px 20px;display:flex;flex-direction:column;gap:9px;flex:1}
-  .case-body h3{margin:0;font-size:16px;font-weight:650}
-  .case-body .did{font-size:13px;color:var(--ink-2);margin:0}
-  .case-body .did b{color:var(--accent);font-weight:600}
-  .case-meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:auto;padding-top:6px}
-  .case-meta span{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:2px 7px;background:#fbfaf6}
+  .case-body{padding:15px 17px 17px;display:flex;flex-direction:column;gap:7px;flex:1}
+  .case-top{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)}
+  .dtag{color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:2px 7px;font-size:10.5px}
+  .case-top .upd{margin-left:auto}
+  .case-body h3{margin:0;font-size:16px;font-weight:650;line-height:1.45}
+  .case-scale{font-size:12px;color:var(--muted);margin:0}
+  .case-fields{display:grid;gap:4px;margin:2px 0 0}
+  .case-fields div{display:grid;grid-template-columns:74px 1fr;gap:8px;font-size:12.2px;line-height:1.6}
+  .case-fields dt{color:var(--muted)}
+  .case-fields dd{margin:0;color:var(--ink-2)}
+  .case-fields dd b{color:var(--accent);font-weight:600}
   .case-link{
-    display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--accent);
-    margin-top:4px;width:fit-content;border-bottom:1px solid rgba(20,82,63,.3);padding-bottom:2px;
+    display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:var(--accent);
+    margin-top:auto;padding-top:10px;border-top:1px solid var(--line);
   }
-  .case-link:hover{border-color:var(--accent)}
+  .case-link small{font-size:11px;font-weight:400;color:var(--muted)}
   .cases-foot{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
   .demo-note{font-size:12px;color:var(--muted);margin:0;max-width:46em}
   .demo-note b{color:var(--ink-2)}
+
+  .cap-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px}
+  @media (max-width:1000px){.cap-strip{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:620px){.cap-strip{grid-template-columns:1fr}}
+  .cap-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:17px 18px;transition:border-color .16s,transform .16s}
+  .cap-card:hover{border-color:var(--line-strong);transform:translateY(-1px)}
+  .cap-card .ck{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10.5px;letter-spacing:.13em;color:var(--muted)}
+  .cap-card h3{font-size:15px;margin:5px 0 5px;font-weight:650}
+  .cap-card p{font-size:12.5px;color:var(--ink-2);margin:0 0 9px;line-height:1.65}
+  .cap-card .num{display:block;font-size:17px;font-weight:700;color:var(--accent);letter-spacing:-.01em;margin-bottom:4px}
+  .cap-card .go{font-size:12.5px;font-weight:600;color:var(--accent)}
+
+  .ai-band{
+    display:grid;grid-template-columns:1.15fr .85fr;gap:22px;align-items:center;
+    background:#111b24;border:1px solid #1f2c38;border-radius:14px;padding:22px 24px;margin-bottom:16px;
+  }
+  @media (max-width:820px){.ai-band{grid-template-columns:1fr;gap:14px;padding:20px}}
+  .ai-band .ak{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10.5px;letter-spacing:.16em;color:#2fd4a7}
+  .ai-band h3{margin:7px 0 8px;font-size:clamp(17px,2vw,21px);color:#f1f5f8;letter-spacing:-.01em;line-height:1.45}
+  .ai-band h3 em{font-style:normal;color:#2fd4a7}
+  .ai-band p{margin:0 0 13px;font-size:13px;color:#a9b8c6;line-height:1.7;max-width:40em}
+  .ai-band ol{margin:0;padding-left:17px;font-size:12.5px;color:#c6d2db;line-height:1.9}
+  .ai-band .acts{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}
+  .ai-band .go-main{background:#2fd4a7;color:#06231b;border-radius:999px;padding:9px 17px;font-size:13px;font-weight:700}
+  .ai-band .go-sub{border:1px solid #33465a;color:#cfdbe4;border-radius:999px;padding:9px 15px;font-size:12.5px}
+  .ai-band .go-sub:hover{border-color:#4a6379;color:#fff}
+  .ai-demo{border:1px solid #24323f;background:#0c141b;border-radius:10px;padding:12px 13px}
+  .ai-demo .row{display:flex;align-items:center;gap:8px;font-size:11.8px;color:#9fb0bf;padding:5px 0}
+  .ai-demo .row b{color:#e6eef4;font-weight:600}
+  .ai-demo .row u{text-decoration:none;margin-left:auto;font-size:10px;color:#6f8294}
+  .ai-demo .pill{font-size:10px;border-radius:4px;padding:1px 6px;background:#173a30;color:#57e0b8}
+  .ai-demo .bar{height:1px;background:#1e2a35;margin:7px 0}
+  .ai-demo .meta{font-size:10.5px;color:#6f8294;line-height:1.6}
 
   /* process */
   .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-top:1px solid var(--line)}
@@ -357,137 +405,217 @@
       <div class="sec-head">
         <div>
           <div class="sec-kicker">CASES / 02</div>
-          <h2>案例 Demo</h2>
+          <h2>按行业看案例</h2>
         </div>
-        <p class="sec-desc">8 套可以直接点开的系统，覆盖企业官网、后台管理、小程序、电商与运维 IT。完整清单在案例库，按行业筛选。</p>
+        <p class="sec-desc">8 个有本地客户基础的行业入口，13 个可点 Demo。每张卡写清客户类型、交付内容、周期与演示口径，不写“服务过 XX 家”。</p>
+      </div>
+
+      <div class="ind-nav">
+        <a class="ind-item" href="cases/?cat=retail"><b>电商与零售</b><small>含跨境电商 / 外贸子类</small></a>
+        <a class="ind-item" href="cases/?cat=manufacturing"><b>制造业与工厂</b><small>汽零 / 精密加工 / 装备</small></a>
+        <a class="ind-item" href="cases/?cat=finance"><b>金融</b><small>分支机构 / 类金融</small></a>
+        <a class="ind-item" href="cases/?cat=local"><b>本地生活服务</b><small>餐饮 / 美业 / 门店</small></a>
+        <a class="ind-item" href="cases/?cat=edu"><b>教育培训</b><small>职教 / 艺培 / 企业内训</small></a>
+        <a class="ind-item" href="cases/?cat=medical"><b>医疗健康</b><small>诊所 / 口腔 / 药械</small></a>
+        <a class="ind-item" href="cases/?cat=logistics"><b>物流仓储</b><small>货代 / 报关 / 轻 WMS</small></a>
+        <a class="ind-item" href="cases/?cat=office"><b>企业通用办公</b><small>OA / CRM / 报表 / 工单</small></a>
+      </div>
+
+      <div class="ai-band">
+        <div>
+          <div class="ak">AI AGENT / 新增方向</div>
+          <h3>客户发了询盘，<em>多久能回第一封？</em></h3>
+          <p>外贸 SOHO 和小贸易团队最真实的痛点：回得慢、报价靠手打、跟着跟着就丢了。这个 Demo 把分类、抽字段、起草稿串成一条，最后一封仍由人确认再发。</p>
+          <ol>
+            <li>邮件 / 表单进来，先分询价、样品、投诉、合作</li>
+            <li>抽取产品、数量、目的国、交期，并高亮命中原文</li>
+            <li>生成英文回复草稿，人工改完点确认</li>
+          </ol>
+          <div class="acts">
+            <a class="go-main" href="demos/ai-inquiry/">打开询盘助手 →</a>
+            <a class="go-sub" href="demos/ai-kb/">知识库问答</a>
+            <a class="go-sub" href="demos/ai-workflow/">自动化工作流</a>
+          </div>
+        </div>
+        <div class="ai-demo">
+          <div class="row"><b>INQUIRY</b> 200 pcs brackets <u>2 分钟前</u></div>
+          <div class="row"><span class="pill">询价</span><span>Spain · FOB · 4 weeks</span></div>
+          <div class="bar"></div>
+          <div class="row"><b>Draft</b> 英文草稿已生成 <u>待确认</u></div>
+          <div class="meta">演示样例：分类、字段与草稿均为本地预设，未接入真实模型，也不会真的发信。</div>
+        </div>
       </div>
 
       <div class="case-grid">
         <article class="case reveal">
           <div class="fthumb t-steel">
-            <span class="fl">企业官网</span>
+            <span class="fl">制造业与工厂</span>
             <div class="fwin"><div class="bar"><s></s><s></s><s></s><em></em></div>
               <div class="bd"><div class="h"></div><div class="r"><s></s><s></s><s></s></div><s style="width:88%"></s><s style="width:58%"></s></div>
             </div>
           </div>
           <div class="case-body">
-            <h3>精密制造企业官网</h3>
-            <p class="did">工厂有产能有资质，官网却只有几张图：<b>产品参数表 + 车间与证书展示位</b>，采购方能直接看懂。</p>
-            <div class="case-meta"><span>参数表</span><span>车间实拍</span><span>资质证书</span></div>
-            <a class="case-link" href="demos/site-manufacturing/">查看 Demo →</a>
+            <div class="case-top"><span class="dtag">企业官网</span><span class="upd">2026-11 更新</span></div>
+            <h3>汽车零部件制造型官网</h3>
+            <p class="case-scale">客户类型 / 规模：一级 / 二级汽零供应商 · 300–800 人</p>
+            <dl class="case-fields">
+              <div><dt>解决问题</dt><dd>采购方先看认证、设备与能不能做我这个件，官网只有公司简介</dd></div>
+              <div><dt>做了什么</dt><dd>参数表按车型筛选 / IATF 16949 认证墙 / RFQ 图纸询价</dd></div>
+              <div><dt>技术栈</dt><dd>原生 JS · SVG 参数表 · 零依赖</dd></div>
+              <div><dt>交付周期</dt><dd>3–4 周</dd></div>
+              <div><dt>成果 / 数字</dt><dd><b>演示口径：</b>4 类产品 20+ 参数项；询价 4 字段</dd></div>
+            </dl>
+            <a class="case-link" href="demos/site-manufacturing/">进入 Demo →<small>演示样例 · Demo</small></a>
           </div>
         </article>
 
         <article class="case reveal">
           <div class="fthumb t-export">
-            <span class="fl">企业官网</span>
+            <span class="fl">电商与零售（含外贸）</span>
             <div class="fwin"><div class="bar"><s></s><s></s><s></s><em></em></div>
               <div class="bd"><s style="width:52%;height:9px"></s><div class="r"><s></s><s></s><s></s></div><s style="width:74%"></s><s style="width:40%"></s></div>
             </div>
           </div>
           <div class="case-body">
-            <h3>外贸 B2B 英文站</h3>
-            <p class="did">中文站给海外客户看，目录看不懂、询盘全靠邮件：<b>英文首屏 + 产品目录 + 询盘表单</b>，带 WhatsApp 浮标。</p>
-            <div class="case-meta"><span>英文排版</span><span>产品目录</span><span>询盘表单</span></div>
-            <a class="case-link" href="demos/site-trade/">查看 Demo →</a>
+            <div class="case-top"><span class="dtag">企业官网</span><span class="upd">2026-11 更新</span></div>
+            <h3>跨境电商 / 外贸英文站</h3>
+            <p class="case-scale">客户类型 / 规模：外贸工厂 / 工贸一体 · 50–300 人</p>
+            <dl class="case-fields">
+              <div><dt>解决问题</dt><dd>海外买家看不懂中文站，询盘全靠邮件来回，WhatsApp 找不到入口</dd></div>
+              <div><dt>做了什么</dt><dd>英文首屏 / 8 产品可筛目录 / 询盘表单 + WhatsApp 浮标</dd></div>
+              <div><dt>技术栈</dt><dd>原生 JS · 英文排版系统 · 表单校验</dd></div>
+              <div><dt>交付周期</dt><dd>2–3 周</dd></div>
+              <div><dt>成果 / 数字</dt><dd><b>演示口径：</b>8 个产品、4 类筛选；询盘 6 字段</dd></div>
+            </dl>
+            <a class="case-link" href="demos/site-trade/">进入 Demo →<small>演示样例 · Demo</small></a>
           </div>
         </article>
 
         <article class="case reveal">
           <div class="fthumb t-crm2">
-            <span class="fl">后台管理</span>
+            <span class="fl">企业通用办公</span>
             <div class="fwin"><div class="bar"><s></s><s></s><s></s><em></em></div>
               <div class="bd"><div class="r"><s></s><s></s><s></s></div><s style="width:100%"></s><s style="width:100%"></s><s style="width:100%"></s><s style="width:64%"></s></div>
             </div>
           </div>
           <div class="case-body">
-            <h3>CRM 客户管理</h3>
-            <p class="did">客户资料散在微信和 Excel：<b>客户列表 + 详情 + 跟进记录 + 销售漏斗</b>，商机卡在哪一步一目了然。</p>
-            <div class="case-meta"><span>客户列表</span><span>跟进记录</span><span>销售漏斗</span></div>
-            <a class="case-link" href="demos/crm/">查看 Demo →</a>
-          </div>
-        </article>
-
-        <article class="case reveal">
-          <div class="fthumb t-appr2">
-            <span class="fl">后台管理</span>
-            <div class="fwin"><div class="bar"><s></s><s></s><s></s><em></em></div>
-              <div class="bd"><s style="width:46%"></s><s style="width:100%"></s><s style="width:84%"></s><s style="width:92%"></s><s style="width:70%"></s></div>
-            </div>
-          </div>
-          <div class="case-body">
-            <h3>审批流系统</h3>
-            <p class="did">报销采购还在走纸质单：<b>发起 / 待办 / 已办 + 流程节点图</b>，单据在谁手里、批到第几步都能查。</p>
-            <div class="case-meta"><span>流程节点</span><span>待办已办</span><span>驳回留痕</span></div>
-            <a class="case-link" href="demos/approval/">查看 Demo →</a>
+            <div class="case-top"><span class="dtag">后台管理系统</span><span class="upd">2026-11 更新</span></div>
+            <h3>制造业 CRM</h3>
+            <p class="case-scale">客户类型 / 规模：B2B 销售团队 · 5–30 人</p>
+            <dl class="case-fields">
+              <div><dt>解决问题</dt><dd>客户资料散在微信和 Excel，商机卡在哪一步没人说得清</dd></div>
+              <div><dt>做了什么</dt><dd>客户列表 / 跟进时间线 / 销售漏斗 / CSV 导出</dd></div>
+              <div><dt>技术栈</dt><dd>原生 JS · CSS Grid · Blob 导出</dd></div>
+              <div><dt>交付周期</dt><dd>4–6 周</dd></div>
+              <div><dt>成果 / 数字</dt><dd><b>演示口径：</b>24 条示例客户；5 阶段漏斗</dd></div>
+            </dl>
+            <a class="case-link" href="demos/crm/">进入 Demo →<small>演示样例 · Demo</small></a>
           </div>
         </article>
 
         <article class="case reveal">
           <div class="fthumb t-dash2">
-            <span class="fl">后台管理</span>
+            <span class="fl">企业通用办公</span>
             <div class="fwin"><div class="bar"><s></s><s></s><s></s><em></em></div>
               <div class="bd"><div class="r"><s></s><s></s><s></s></div><div class="h"></div><s style="width:78%"></s></div>
             </div>
           </div>
           <div class="case-body">
-            <h3>经营数据看板</h3>
-            <p class="did">订单、回款、库存分散在几个系统：<b>多图表 + 筛选联动 + 导出</b>，月度经营情况不用等财务出表。</p>
-            <div class="case-meta"><span>多图表</span><span>筛选联动</span><span>导出 CSV</span></div>
-            <a class="case-link" href="demos/dashboard/">查看 Demo →</a>
+            <div class="case-top"><span class="dtag">数据看板</span><span class="upd">2026-11 更新</span></div>
+            <h3>老板经营数据看板</h3>
+            <p class="case-scale">客户类型 / 规模：总经理 / 厂长 · 中小制造与贸易</p>
+            <dl class="case-fields">
+              <div><dt>解决问题</dt><dd>订单、回款、库存分散在几个系统，月底等财务出表</dd></div>
+              <div><dt>做了什么</dt><dd>多图表 / 筛选联动 / 区域渠道对比 / CSV 导出</dd></div>
+              <div><dt>技术栈</dt><dd>手写 SVG 图表 · 模拟数据 · 响应式</dd></div>
+              <div><dt>交付周期</dt><dd>2–4 周（不含数据源接入）</dd></div>
+              <div><dt>成果 / 数字</dt><dd><b>演示口径：</b>7 / 30 / 90 天切换；4 组图表</dd></div>
+            </dl>
+            <a class="case-link" href="demos/dashboard/">进入 Demo →<small>演示样例 · Demo</small></a>
           </div>
         </article>
 
         <article class="case reveal">
-          <div class="fthumb t-it2">
-            <span class="fl">运维与 IT 支持</span>
+          <div class="fthumb t-inter2">
+            <span class="fl">电商与零售（含外贸）</span>
             <div class="fwin"><div class="bar"><s></s><s></s><s></s><em></em></div>
-              <div class="bd"><s style="width:52%;background:#f0cfcb"></s><s style="width:100%"></s><s style="width:88%"></s><s style="width:100%"></s><s style="width:66%;background:#d6ede2"></s></div>
+              <div class="bd"><div class="r"><s></s><s></s><s></s></div><s style="width:100%"></s><s style="width:92%"></s><s style="width:70%"></s></div>
             </div>
           </div>
           <div class="case-body">
-            <h3>IT 运维服务台</h3>
-            <p class="did">报修靠电话微信，工单归谁说不清：<b>工单流转 + SLA 倒计时 + 告警列表</b>，接单、处理、解决全程留痕。</p>
-            <div class="case-meta"><span>工单流转</span><span>SLA 计时</span><span>告警列表</span></div>
-            <a class="case-link" href="demos/itdesk/">查看 Demo →</a>
-          </div>
-        </article>
-
-        <article class="case reveal">
-          <div class="fthumb t-shop2">
-            <span class="fl">电商零售</span>
-            <div class="fwin"><div class="bar"><s></s><s></s><s></s><em></em></div>
-              <div class="bd"><div class="h"></div><div class="r"><s></s><s></s><s></s></div><s style="width:72%"></s></div>
-            </div>
-          </div>
-          <div class="case-body">
-            <h3>移动端商城</h3>
-            <p class="did">规格多、库存与价格联动复杂：<b>SKU 选规格 → 库存联动 → 购物车 → 结算 → 订单状态</b>，全流程可走通。</p>
-            <div class="case-meta"><span>SKU 矩阵</span><span>购物车计价</span><span>订单状态机</span></div>
-            <a class="case-link" href="demos/ecommerce/">查看 Demo →</a>
+            <div class="case-top"><span class="dtag">系统对接</span><span class="upd">2026-11 更新</span></div>
+            <h3>跨境电商 ERP 对接看板</h3>
+            <p class="case-scale">客户类型 / 规模：有 ERP 的贸易 / 工厂 · 财务与仓管</p>
+            <dl class="case-fields">
+              <div><dt>解决问题</dt><dd>订单靠手工导 Excel，库存对不上，同步失败没人发现</dd></div>
+              <div><dt>做了什么</dt><dd>字段映射 / 同步日志 / 失败重试 / 对账差异</dd></div>
+              <div><dt>技术栈</dt><dd>原生 JS · 接口状态模拟 · 等宽视图</dd></div>
+              <div><dt>交付周期</dt><dd>6–10 周</dd></div>
+              <div><dt>成果 / 数字</dt><dd><b>演示口径：</b>6 个数据源；10 条字段映射</dd></div>
+            </dl>
+            <a class="case-link" href="demos/integration/">进入 Demo →<small>演示样例 · Demo</small></a>
           </div>
         </article>
 
         <article class="case reveal">
           <div class="fthumb t-mini2">
-            <span class="fl">小程序</span>
+            <span class="fl">本地生活服务</span>
             <div class="fwin"><div class="bar"><s></s><s></s><s></s><em></em></div>
               <div class="bd"><div class="h"></div><div class="r"><s></s><s></s><s></s></div><s style="width:80%"></s></div>
             </div>
           </div>
           <div class="case-body">
+            <div class="case-top"><span class="dtag">商城 / 小程序</span><span class="upd">2026-10 更新</span></div>
             <h3>门店小程序（鹿野生活）</h3>
-            <p class="did">门店预约、会员积分、优惠券靠人工登记：<b>小程序原生视觉 + 预约校验 + 会员积分</b>，复购有抓手。</p>
-            <div class="case-meta"><span>Tabbar</span><span>预约校验</span><span>积分会员</span></div>
-            <a class="case-link" href="demos/miniprogram/">查看 Demo →</a>
+            <p class="case-scale">客户类型 / 规模：单店 / 3–5 店连锁</p>
+            <dl class="case-fields">
+              <div><dt>解决问题</dt><dd>顾客看不到项目与价格，预约只能打电话，忙起来就漏单</dd></div>
+              <div><dt>做了什么</dt><dd>手机壳与 tabbar / 会员与预约 / 门店信息</dd></div>
+              <div><dt>技术栈</dt><dd>原生 JS · 移动端布局 · 无框架</dd></div>
+              <div><dt>交付周期</dt><dd>2–4 周</dd></div>
+              <div><dt>成果 / 数字</dt><dd><b>演示口径：</b>4 个 tab；预约时段可选</dd></div>
+            </dl>
+            <a class="case-link" href="demos/miniprogram/">进入 Demo →<small>演示样例 · Demo</small></a>
           </div>
         </article>
       </div>
 
       <div class="cases-foot">
-        <p class="demo-note"><b>以下为能力演示，非真实客户项目。</b>页面、数据与图表均为模拟，不代表任何已上线客户；完整分类（含接口对接、企业系统对接、云与运维、H5 互动）见案例库。</p>
+        <p class="demo-note"><b>以下为能力演示，非真实客户项目。</b>页面、数据与指标均为模拟，不代表任何已上线客户。完整分类（含金融、教育、医疗、物流等待补行业）见案例库。</p>
         <a class="btn btn-dark" href="cases/">查看全部案例 →</a>
       </div>
+
+      <div class="cap-strip">
+        <a class="cap-card" href="cases/#integration">
+          <span class="ck">CORE / 主力能力</span>
+          <h3>企业系统对接</h3>
+          <span class="num">2–10 万元 / 项目</span>
+          <p>ERP / CRM / OA / MES 打通，支付、短信、物流、电子发票、报关接口。客单价最高的一块。</p>
+          <span class="go">看对接看板 →</span>
+        </a>
+        <a class="cap-card" href="cases/#ai">
+          <span class="ck">CORE / 新增方向</span>
+          <h3>AI 智能体与自动化</h3>
+          <span class="num">1.5–6 万元 / 项目</span>
+          <p>知识库问答、询盘分流、报表同步。答不上来走兜底转人工，不承诺准确率。</p>
+          <span class="go">看 3 个 Demo →</span>
+        </a>
+        <a class="cap-card" href="cases/#ops">
+          <span class="ck">SERVICE / 服务保障</span>
+          <h3>运维年框</h3>
+          <span class="num">0.6–6 万元 / 年</span>
+          <p>监控告警、备份恢复、证书域名、月度巡检。远程 + 云上为主，不做 7×24 与驻场。</p>
+          <span class="go">看年框档位 →</span>
+        </a>
+        <a class="cap-card" href="cases/#h5">
+          <span class="ck">ADD-ON / 增值服务</span>
+          <h3>H5 互动营销</h3>
+          <span class="num">0.5–2 万元 / 次</span>
+          <p>抽奖、签到、答题活动页 + 核销后台，概率、库存、限次可配，2–5 天交付。</p>
+          <span class="go">看抽奖 Demo →</span>
+        </a>
+      </div>
+
     </div>
   </section>
 
