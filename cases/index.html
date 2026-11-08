@@ -86,6 +86,8 @@
   .t-kb{--tb:linear-gradient(160deg,#eceefe,#dde0fa);--tc:#4b4ee0;--tb2:#eef0ff}
   .t-inq{--tb:linear-gradient(160deg,#f7ece2,#eee0d1);--tc:#a9521f;--tb2:#f7ece2}
   .t-flow{--tb:linear-gradient(160deg,#0f1a20,#0a1116);--tc:#1c8c72;--tb2:#16242b}
+  .t-off{--tb:linear-gradient(160deg,#1a1f24,#10151a);--tc:#8a5f22;--tb2:#1d242a}
+  .t-insp{--tb:linear-gradient(160deg,#e8f0ec,#d8e5de);--tc:#1b7a52;--tb2:#eaf2ee}
 
   .body{padding:15px 17px 17px;display:flex;flex-direction:column;gap:7px;flex:1}
   .top{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--mut)}
@@ -151,7 +153,7 @@
 <div class="wrap hero">
   <div class="kicker">CASE LIBRARY</div>
   <h1>按行业看案例，按交付物看能力</h1>
-  <p class="lead">先确认你是不是这类客户，再看我们能交付什么。行业入口只放有本地客户基础的 8 个方向；企业官网、商城与小程序、后台系统、数据看板、系统对接、AI 智能体并列展示，运维与互动单独归类。</p>
+  <p class="lead">先确认你是不是这类客户，再看我们能交付什么。行业入口只放有本地客户基础的 8 个方向；企业官网、商城与小程序、后台系统、数据看板、系统对接、AI 智能体与 AI 私有化并列展示，运维与互动单独归类。</p>
   <div class="disclaimer"><span>说明</span><div><b>以下为能力演示，非真实客户项目。</b>页面、数据、图表与指标均为模拟，不代表任何已上线客户；分类中的空缺行业会在后续批次补充。</div></div>
 </div>
 
@@ -175,6 +177,7 @@
       <button class="chip" data-type="bi">数据看板</button>
       <button class="chip" data-type="api">系统对接</button>
       <button class="chip" data-type="ai">AI 智能体</button>
+      <button class="chip" data-type="priv">AI 私有化部署</button>
       <span class="count" id="count"></span>
     </div>
   </div>
@@ -240,11 +243,59 @@
     </div>
   </section>
 
+  <!-- AI 私有化 -->
+  <section class="cap" id="offline">
+    <div class="cap-head">
+      <div>
+        <div class="cap-kicker">CORE CAPABILITY / 03</div>
+        <h2>AI 私有化 / 离线部署</h2>
+      </div>
+      <p>数据不出厂、断网可用。卖点不是“我们懂 AI”，而是设备数据、工艺文件、客户图纸只能在自己机房里跑。</p>
+    </div>
+    <div class="tiers">
+      <div class="tier">
+        <h4>入门档</h4>
+        <div class="p">按配置报价<small> 工控机</small></div>
+        <ul>
+          <li>纯 CPU 工控机</li>
+          <li>7B 以下量化模型</li>
+          <li>SOP / 设备手册问答</li>
+          <li>单机部署，断网可用</li>
+        </ul>
+      </div>
+      <div class="tier mid">
+        <h4>标准档</h4>
+        <div class="p">按配置报价<small> 单卡工作站</small></div>
+        <ul>
+          <li>单卡 24G 工作站</li>
+          <li>故障诊断问答</li>
+          <li>报表自动生成</li>
+          <li>图纸检索</li>
+        </ul>
+      </div>
+      <div class="tier">
+        <h4>进阶档</h4>
+        <div class="p">按配置报价<small> 双卡 / 边缘盒子</small></div>
+        <ul>
+          <li>双卡工作站或边缘盒子</li>
+          <li>多场景并发</li>
+          <li>视觉质检配合</li>
+          <li>与产线系统对接</li>
+        </ul>
+      </div>
+    </div>
+    <div class="excl"><b>说明：</b>硬件按现场条件选型（有无独立机房、供电与散热、是否需要断网运行），价格随配置浮动，最终以报价单为准。视觉质检属另一套技术栈，我们配合实施，不宣称全部自研。不承诺准确率，验收用厂内真实手册与故障记录做样本。</div>
+    <div class="mini">
+      <a class="demo-link" href="../demos/ai-offline/">打开离线设备诊断 →</a>
+      <a class="demo-link" href="../demos/ai-inspect/">打开产线巡检与报工 →</a>
+    </div>
+  </section>
+
   <!-- 服务保障 -->
   <section class="cap" id="ops">
     <div class="cap-head">
       <div>
-        <div class="cap-kicker">SERVICE / 03</div>
+        <div class="cap-kicker">SERVICE / 04</div>
         <h2>服务保障：运维年框</h2>
       </div>
       <p>交付完不是结束。按年收费，远程 + 云上为主，把“出事再找人”变成“每年有人管”。</p>
@@ -292,7 +343,7 @@
   <section class="cap" id="h5">
     <div class="cap-head">
       <div>
-        <div class="cap-kicker">ADD-ON / 04</div>
+        <div class="cap-kicker">ADD-ON / 05</div>
         <h2>增值服务：H5 互动营销</h2>
       </div>
       <p>开业、展会、年庆用的抽奖、签到、答题页，配一个核销后台。只做轻互动，不做游戏研发。</p>
@@ -326,14 +377,14 @@
 
 <script>
 var IND = [
-  {key:'retail',  name:'电商与零售', note:'含跨境电商 / 外贸子类', extra:'4'},
-  {key:'manufacturing', name:'制造业与工厂', note:'汽零 / 精密加工 / 装备', extra:'3'},
+  {key:'retail',  name:'电商与零售', note:'含跨境电商 / 外贸子类', extra:'5'},
+  {key:'manufacturing', name:'制造业与工厂', note:'汽零 / 精密加工 / 装备', extra:'7'},
   {key:'finance', name:'金融', note:'分支机构 / 类金融', extra:'待补'},
   {key:'local',  name:'本地生活服务', note:'餐饮 / 美业 / 门店', extra:'2'},
   {key:'edu',    name:'教育培训', note:'职教 / 艺培 / 企业内训', extra:'待补'},
   {key:'medical',name:'医疗健康', note:'诊所 / 口腔 / 药械', extra:'待补'},
   {key:'logistics', name:'物流仓储', note:'货代 / 报关 / 轻 WMS', extra:'待补'},
-  {key:'office', name:'企业通用办公', note:'OA / CRM / 报表 / 工单', extra:'4'}
+  {key:'office', name:'企业通用办公', note:'OA / CRM / 报表 / 工单', extra:'6'}
 ];
 
 var CASES = [
@@ -439,7 +490,7 @@ var CASES = [
   },
   {
     id:'ai-inq', kind:'t-inq', title:'询盘自动分流助手',
-    ind:'电商与零售（含外贸）', cats:['retail'], delivery:'AI 智能体', dkey:'ai',
+    ind:'电商与零售（含外贸）', cats:['retail'], delivery:'AI 智能体', dkey:'ai', priv:true,
     scale:'外贸 SOHO / 小贸易团队 · 1–10 人',
     problem:'客户发了询盘，业务员在展会或路上，第一封回复常常拖到第二天。',
     did:['邮件自动分类 + 字段抽取','命中原文高亮','回复草稿 + 人工确认'],
@@ -449,7 +500,7 @@ var CASES = [
   },
   {
     id:'ai-kb', kind:'t-kb', title:'企业知识库问答智能体',
-    ind:'企业通用办公', cats:['office'], delivery:'AI 智能体', dkey:'ai',
+    ind:'企业通用办公', cats:['office'], delivery:'AI 智能体', dkey:'ai', priv:true,
     scale:'有产品手册与售后团队的企业 · 20–200 人',
     problem:'产品手册、报价单、FAQ 散在网盘，新人回答客户全靠问老员工。',
     did:['资料上传 / 删除与索引状态','问答气泡 + 引用片段','查不到时兜底转人工'],
@@ -459,13 +510,33 @@ var CASES = [
   },
   {
     id:'ai-flow', kind:'t-flow', title:'报表与数据同步自动化',
-    ind:'企业通用办公', cats:['office','manufacturing','retail'], delivery:'AI 智能体', dkey:'ai',
+    ind:'企业通用办公', cats:['office','manufacturing','retail'], delivery:'AI 智能体', dkey:'ai', priv:true,
     scale:'同时有 ERP 与商城的贸易 / 工厂',
     problem:'每天手工导表对账，错了要等财务发现，同步失败也没人知道。',
     did:['多数据源拉取与清洗','对账失败即停止并告警','重试续跑与日报推送'],
     stack:['原生 JS','节点状态机','模拟日志流'],
     cycle:'4–6 周', result:'6 节点流程；失败可重试；日报 + 差异 CSV',
     updated:'2026-11', href:'../demos/ai-workflow/'
+  },
+  {
+    id:'ai-off', kind:'t-off', title:'离线设备诊断助手',
+    ind:'制造业与工厂', cats:['manufacturing'], delivery:'AI 私有化部署', dkey:'ai', priv:true,
+    scale:'机加工 / 注塑 / 装配厂 · 设备 20–200 台',
+    problem:'设备数据、工艺文件、客户图纸不能出厂房，云端问答用不了；老师傅的经验也没沉淀下来。',
+    did:['离线模式标识与本地设备列表','答案带手册章节引用片段','上传故障照片给诊断步骤','查不到故障码保守答复 + 转人工'],
+    stack:['单文件前端','本地预设知识库','零外网请求'],
+    cycle:'6–10 周（含知识库整理）', result:'4 台设备示例；4 组手册问答；未收录故障码走兜底',
+    updated:'2026-11', href:'../demos/ai-offline/'
+  },
+  {
+    id:'ai-insp', kind:'t-insp', title:'产线巡检与报工',
+    ind:'制造业与工厂', cats:['manufacturing'], delivery:'AI 私有化部署', dkey:'ai', priv:true,
+    scale:'有班组长与巡检制度的工厂 · 产线 3–20 条',
+    problem:'巡检靠纸单，回办公室再敲进 Excel；工人手上有机油，不愿意在手机上打长字。',
+    did:['扫码带出工单与模板','大按钮勾选巡检项','按住说话转文字','自动拼装日报并可提交'],
+    stack:['移动端单页','录音波形动画','本地预设转写'],
+    cycle:'4–8 周', result:'6 项巡检模板；语音转写可改；日报自动汇总',
+    updated:'2026-11', href:'../demos/ai-inspect/'
   }
 ];
 
@@ -532,7 +603,8 @@ function emptyText(){
 function render(){
   var list = CASES.filter(function(c){
     var okInd = activeInd === 'all' || c.cats.indexOf(activeInd) > -1;
-    var okType = activeType === 'all' || c.dkey === activeType;
+    var okType = activeType === 'all'
+      || (activeType === 'priv' ? !!c.priv : c.dkey === activeType);
     return okInd && okType;
   });
   grid.innerHTML = list.map(cardHTML).join('');
