@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>企业知识库问答智能体 · 演示样例</title>
+<style>
+  :root{
+    --bg:#f4f5f8;--card:#fff;--ink:#141821;--ink2:#3f4652;--mut:#7c8492;
+    --line:#e3e5ea;--line2:#d3d7df;--acc:#4b4ee0;--acc-soft:#eef0ff;--ok:#12805c;--warn:#a35a12;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 "PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit}
+  .ribbon{background:#111318;color:#cfd2da;font-size:12px;padding:7px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .ribbon b{color:#fff;background:#2a2d37;border-radius:4px;padding:1px 7px;font-weight:600}
+  .ribbon a{margin-left:auto;color:#9ea4b2}
+  .ribbon a:hover{color:#fff}
+
+  .shell{max-width:1180px;margin:0 auto;padding:18px 16px 26px}
+  .head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+  h1{font-size:20px;margin:0;letter-spacing:-.01em}
+  .head p{margin:3px 0 0;font-size:12.5px;color:var(--mut)}
+  .stats{display:flex;gap:8px;font-size:11.5px;color:var(--mut);flex-wrap:wrap}
+  .stats span{border:1px solid var(--line);background:#fff;border-radius:6px;padding:3px 9px}
+  .stats b{color:var(--ink2)}
+
+  .app{display:grid;grid-template-columns:280px 1fr;gap:14px;align-items:stretch}
+  @media (max-width:860px){.app{grid-template-columns:1fr}}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:13px;overflow:hidden;display:flex;flex-direction:column}
+  .phead{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;font-size:13px;font-weight:650}
+  .phead small{margin-left:auto;font-size:11.5px;color:var(--mut);font-weight:400}
+
+  /* files */
+  .side{min-height:520px}
+  .upload{margin:12px;border:1px dashed var(--line2);border-radius:9px;padding:13px;text-align:center;font-size:12.3px;color:var(--mut);cursor:pointer;transition:.15s}
+  .upload:hover{border-color:var(--acc);color:var(--acc);background:#fafaff}
+  .upload b{display:block;font-size:12.8px;color:var(--ink2);font-weight:600;margin-bottom:2px}
+  .files{list-style:none;margin:0;padding:0 8px 10px;display:grid;gap:4px;overflow:auto}
+  .file{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;padding:8px;border-radius:8px;border:1px solid transparent}
+  .file:hover{background:#f7f8fb;border-color:var(--line)}
+  .ft{width:28px;height:28px;border-radius:6px;display:grid;place-items:center;font-size:9.5px;font-weight:700;color:#fff;background:#7d8597;letter-spacing:.02em}
+  .ft.pdf{background:#c0392b}.ft.xls{background:#1e7a4d}.ft.md{background:#4b4ee0}.ft.doc{background:#2a5fa8}
+  .fname{font-size:12.3px;line-height:1.45;word-break:break-all}
+  .fmeta{font-size:10.5px;color:var(--mut);display:flex;gap:6px;align-items:center}
+  .fmeta i{font-style:normal;color:var(--ok)}
+  .fmeta i.pending{color:var(--warn)}
+  .fdel{border:none;background:none;color:var(--mut);cursor:pointer;font-size:14px;line-height:1;padding:3px 5px;border-radius:4px}
+  .fdel:hover{background:#fbeceb;color:#c0392b}
+  .side-note{margin:0 12px 12px;font-size:11px;color:var(--mut);line-height:1.6;border-top:1px solid var(--line);padding-top:10px}
+
+  /* chat */
+  .chat{padding:14px;display:flex;flex-direction:column;gap:12px;overflow:auto;height:100%;min-height:420px;max-height:520px;background:linear-gradient(180deg,#fbfbfe,#fff 40%)}
+  .msg{display:flex;gap:9px;max-width:88%}
+  .msg.me{margin-left:auto;flex-direction:row-reverse}
+  .av{width:28px;height:28px;border-radius:8px;flex:0 0 auto;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;background:var(--acc)}
+  .me .av{background:#2f3542}
+  .bubble{background:#f5f6fa;border:1px solid var(--line);border-radius:11px;padding:10px 12px;font-size:13.3px;color:var(--ink2);line-height:1.7}
+  .me .bubble{background:var(--acc);border-color:var(--acc);color:#fff}
+  .bubble b{color:var(--ink);font-weight:600}
+  .cite{margin-top:9px;border:1px solid #dfe2ff;background:#f8f9ff;border-radius:8px;padding:8px 10px;font-size:11.8px;color:#454b6b}
+  .cite .cf{display:flex;align-items:center;gap:6px;font-weight:600;color:var(--acc);margin-bottom:3px;font-size:11.5px}
+  .cite .cf u{text-decoration:none;font-size:9.5px;padding:1px 5px;border-radius:3px;background:#e6e8ff;color:#3d40b8}
+  .cite p{margin:0;line-height:1.55;color:#555c78}
+  .hit{background:#fff1c9;border-radius:2px;padding:0 2px;color:#6a4a00}
+  .sys{text-align:center;font-size:11.5px;color:var(--mut);margin:2px 0}
+  .sys span{background:#eef0f5;border-radius:999px;padding:3px 10px}
+  .handoff{margin-top:9px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .handoff button{border:1px solid var(--acc);background:#fff;color:var(--acc);border-radius:7px;padding:6px 11px;font-size:12px;cursor:pointer}
+  .handoff button:hover{background:var(--acc);color:#fff}
+  .handoff small{font-size:11px;color:var(--mut)}
+  .typing{display:flex;gap:4px;align-items:center;padding:10px 12px}
+  .typing s{width:5px;height:5px;border-radius:50%;background:#b6bbc7;display:block;animation:bl 1s infinite}
+  .typing s:nth-child(2){animation-delay:.15s}.typing s:nth-child(3){animation-delay:.3s}
+  @keyframes bl{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-2px)}}
+  @media (prefers-reduced-motion:reduce){.typing s{animation:none}}
+
+  .compose{border-top:1px solid var(--line);padding:10px 12px 12px;background:#fff}
+  .quick{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+  .quick button{border:1px solid var(--line2);background:#fff;border-radius:999px;padding:5px 10px;font-size:11.5px;color:var(--ink2);cursor:pointer}
+  .quick button:hover{border-color:var(--acc);color:var(--acc)}
+  .inputrow{display:flex;gap:8px;align-items:flex-end}
+  textarea{flex:1;resize:none;border:1px solid var(--line2);border-radius:9px;padding:9px 11px;font:13.3px/1.5 inherit;height:42px;max-height:110px;outline:none}
+  textarea:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(75,78,224,.1)}
+  .send{border:none;background:var(--acc);color:#fff;border-radius:9px;padding:10px 16px;font-size:13px;cursor:pointer}
+  .send:disabled{opacity:.45;cursor:default}
+  .hint{font-size:10.8px;color:var(--mut);margin-top:6px}
+
+  .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,10px);background:#1b1f2a;color:#eef0f5;font-size:12.5px;padding:9px 15px;border-radius:8px;opacity:0;pointer-events:none;transition:.2s;z-index:50}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="ribbon">
+  <b>演示样例 · DEMO</b>
+  <span>智能体回复为本地预设，未接入真实模型；文件不会真正上传或索引。</span>
+  <a href="../../cases/">← 返回案例库</a>
+</div>
+
+<div class="shell">
+  <div class="head">
+    <div>
+      <h1>企业知识库问答智能体</h1>
+      <p>产品手册、报价单、售后 FAQ 变成可问答的知识库；答不上来时明确兜底转人工。</p>
+    </div>
+    <div class="stats">
+      <span>知识库 <b id="docCount">5</b> 份</span>
+      <span>索引状态 <b>模拟</b></span>
+      <span>模型 <b>未接入</b></span>
+    </div>
+  </div>
+
+  <div class="app">
+    <section class="panel side">
+      <div class="phead">知识库文件 <small>仅本次演示</small></div>
+      <div class="upload" id="uploadBox">
+        <b>上传资料</b>
+        PDF / Excel / Markdown / Word（演示不会真正解析）
+      </div>
+      <input type="file" id="fileInput" hidden accept=".pdf,.xlsx,.xls,.md,.docx">
+      <ul class="files" id="fileList"></ul>
+      <p class="side-note">回复中的「引用来源」来自下方文件的关键词命中。知识库里没有的内容会走兜底，不会编答案。</p>
+    </section>
+
+    <section class="panel">
+      <div class="phead">产品资料助手 <small><span style="color:#12805c">● 在线</span> · 仅演示</small></div>
+      <div class="chat" id="chat"></div>
+      <div class="compose">
+        <div class="quick" id="quick"></div>
+        <div class="inputrow">
+          <textarea id="input" placeholder="问点什么，例如：整机保修多久？"></textarea>
+          <button class="send" id="send">发送</button>
+        </div>
+        <div class="hint">Enter 发送 · Shift + Enter 换行 · 所有回复为本地预设文本</div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var FILES = [
+  {name:'产品手册 v3.pdf', type:'pdf', size:'4.2 MB', pages:'38 页'},
+  {name:'报价规则 2026.xlsx', type:'xls', size:'86 KB', pages:'3 个工作表'},
+  {name:'售后 FAQ.md', type:'md', size:'12 KB', pages:'24 条'},
+  {name:'安装与调试指南.pdf', type:'pdf', size:'1.8 MB', pages:'16 页'},
+  {name:'退换货政策.docx', type:'doc', size:'240 KB', pages:'2 页'}
+];
+
+var ANSWERS = [
+  {
+    keys:['保修','质保','保修期','坏了'],
+    a:'整机保修 <b>12 个月</b>，核心电机 <b>24 个月</b>，从发货日算，需要机身序列号。非人为损坏免费换件；进液、私自拆机不在保修范围。',
+    src:'产品手册 v3.pdf',
+    snip:'第 4.2 条 保修政策：整机保修期 12 个月，核心电机 24 个月，自发货之日起计算…'
+  },
+  {
+    keys:['报价','价格','多少钱','折扣','便宜'],
+    a:'阶梯价：1–9 台 <b>1,280 元/台</b>；10–49 台 <b>1,150 元/台</b>；50 台以上另议。含税不含运，运费按目的地另算。',
+    src:'报价规则 2026.xlsx',
+    snip:'阶梯价表：1-9 台 1280；10-49 台 1150；50 台以上另议。报价含 13% 增值税，不含运费。'
+  },
+  {
+    keys:['安装','调试','上门','装'],
+    a:'整机免安装，通电即可使用。需要上门调试：江浙沪 <b>48 小时内响应</b>，其他地区 3–5 个工作日，差旅费另计。',
+    src:'安装与调试指南.pdf',
+    snip:'第 2 章 安装与调试：整机出厂前完成调试，用户通电即可；上门服务需提前 2 个工作日预约…'
+  },
+  {
+    keys:['退货','退款','换货','退'],
+    a:'未拆封 <b>7 天内可退</b>；拆封后仅支持换货；定制机型不支持无理由退货。验收后 3 个工作日内原路退款。',
+    src:'退换货政策.docx',
+    snip:'第 3 条 退换货：未拆封商品 7 日内可申请退货；拆封商品仅支持同型号换货；定制机型除外。'
+  },
+  {
+    keys:['发票','开票','专票','税率'],
+    a:'默认开增值税普通发票，税率 <b>13%</b>；需要专票请在下单时提供开票信息与开户行账号。',
+    src:'报价规则 2026.xlsx',
+    snip:'开票说明：默认开具增值税普通发票（13%）；专用发票需客户提供公司名称、税号、地址电话、开户行及账号。'
+  }
+];
+
+var QUICK = ['整机保修多久？','50 台以上怎么报价？','能上门安装吗？','可以开专票吗？'];
+
+var fileList = document.getElementById('fileList');
+var chat = document.getElementById('chat');
+var input = document.getElementById('input');
+var sendBtn = document.getElementById('send');
+var toastEl = document.getElementById('toast');
+var docCount = document.getElementById('docCount');
+
+function toast(t){
+  toastEl.textContent = t;
+  toastEl.classList.add('on');
+  clearTimeout(toastEl._t);
+  toastEl._t = setTimeout(function(){ toastEl.classList.remove('on'); }, 2200);
+}
+
+function renderFiles(){
+  fileList.innerHTML = FILES.map(function(f, i){
+    return '<li class="file">'
+      + '<span class="ft ' + f.type + '">' + (f.type === 'pdf' ? 'PDF' : f.type === 'xls' ? 'XLS' : f.type === 'md' ? 'MD' : 'DOC') + '</span>'
+      + '<div><div class="fname">' + f.name + '</div>'
+      + '<div class="fmeta">' + f.size + ' · ' + f.pages + ' · <i class="' + (f.pending ? 'pending' : '') + '">' + (f.pending ? '待索引' : '已索引') + '</i></div></div>'
+      + '<button class="fdel" data-i="' + i + '" title="从知识库移除">×</button>'
+      + '</li>';
+  }).join('');
+  docCount.textContent = FILES.length;
+}
+
+fileList.addEventListener('click', function(e){
+  var b = e.target.closest('.fdel');
+  if (!b) return;
+  var i = +b.getAttribute('data-i');
+  var name = FILES[i].name;
+  FILES.splice(i, 1);
+  renderFiles();
+  toast('已从知识库移除：' + name + '（演示）');
+});
+
+document.getElementById('uploadBox').addEventListener('click', function(){
+  document.getElementById('fileInput').click();
+});
+
+document.getElementById('fileInput').addEventListener('change', function(){
+  if (!this.files || !this.files[0]) return;
+  var name = this.files[0].name;
+  var ext = (name.split('.').pop() || '').toLowerCase();
+  FILES.push({
+    name:name,
+    type: ext === 'pdf' ? 'pdf' : (ext === 'xlsx' || ext === 'xls') ? 'xls' : ext === 'md' ? 'md' : 'doc',
+    size: Math.max(1, Math.round(this.files[0].size / 1024)) + ' KB',
+    pages:'演示文件',
+    pending:true
+  });
+  renderFiles();
+  var idx = FILES.length - 1;
+  toast('已加入待索引队列（演示，不会解析内容）');
+  setTimeout(function(){
+    if (FILES[idx]) { FILES[idx].pending = false; renderFiles(); toast(name + ' 已索引（模拟）'); }
+  }, 1200);
+  this.value = '';
+});
+
+function addMsg(who, html){
+  var d = document.createElement('div');
+  d.className = 'msg ' + (who === 'me' ? 'me' : '');
+  d.innerHTML = '<span class="av">' + (who === 'me' ? '我' : 'AI') + '</span><div class="bubble">' + html + '</div>';
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
+  return d;
+}
+
+function addSys(text){
+  var d = document.createElement('div');
+  d.className = 'sys';
+  d.innerHTML = '<span>' + text + '</span>';
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function typing(){
+  var d = document.createElement('div');
+  d.className = 'msg';
+  d.innerHTML = '<span class="av">AI</span><div class="bubble typing"><s></s><s></s><s></s></div>';
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
+  return d;
+}
+
+function answerFor(q){
+  var text = q.toLowerCase();
+  for (var i = 0; i < ANSWERS.length; i++){
+    for (var k = 0; k < ANSWERS[i].keys.length; k++){
+      if (text.indexOf(ANSWERS[i].keys[k]) > -1) return ANSWERS[i];
+    }
+  }
+  return null;
+}
+
+function reply(q){
+  if (!FILES.length){
+    addMsg('ai', '当前知识库是空的，我没法回答。请先在左侧上传资料，或把问题转给人工。'
+      + '<div class="handoff"><button id="ho0">转人工</button><small>演示：不会真的创建工单</small></div>');
+    bindHandoff('ho0');
+    return;
+  }
+  var hit = answerFor(q);
+  if (!hit){
+    addMsg('ai', '知识库里没有找到能直接回答这条问题的内容。我可以把问题转给人工，或你换个问法（带上型号与使用场景）。'
+      + '<div class="handoff"><button id="ho' + Date.now() + '">转人工</button><small>兜底：不编造答案</small></div>');
+    var btns = chat.querySelectorAll('.handoff button');
+    bindHandoff(btns[btns.length - 1].id);
+    return;
+  }
+  addMsg('ai', hit.a
+    + '<div class="cite"><div class="cf">' + hit.src + '<u>引用片段</u></div><p>' + hit.snip + '</p></div>');
+}
+
+function bindHandoff(id){
+  var b = document.getElementById(id);
+  if (!b) return;
+  b.addEventListener('click', function(){
+    b.disabled = true;
+    b.textContent = '已转人工';
+    addSys('已转人工 · 演示工单 #A-2041 · 预计 10 分钟响应');
+  });
+}
+
+function send(){
+  var q = input.value.trim();
+  if (!q) return;
+  addMsg('me', q.replace(/</g, '&lt;'));
+  input.value = '';
+  input.style.height = '42px';
+  sendBtn.disabled = true;
+  var t = typing();
+  setTimeout(function(){
+    t.remove();
+    reply(q);
+    sendBtn.disabled = false;
+    input.focus();
+  }, 620);
+}
+
+sendBtn.addEventListener('click', send);
+input.addEventListener('keydown', function(e){
+  if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); send(); }
+});
+
+var quick = document.getElementById('quick');
+QUICK.forEach(function(q){
+  var b = document.createElement('button');
+  b.textContent = q;
+  b.addEventListener('click', function(){ input.value = q; send(); });
+  quick.appendChild(b);
+});
+
+renderFiles();
+addSys('演示开始 · 已加载 5 份示例资料');
+addMsg('ai', '你好，我是产品资料助手。可以问我保修、阶梯报价、安装、退换货和开票规则。答案会附上引用的文件片段；查不到时我会转人工。');
+</script>
+</body>
+</html>
