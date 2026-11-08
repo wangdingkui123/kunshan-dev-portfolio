@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>报表与数据同步自动化 · 演示样例</title>
+<style>
+  :root{
+    --bg:#0b0f14;--panel:#111820;--panel2:#0e151c;--ink:#e8eef4;--ink2:#b3c0cc;--mut:#76859a;
+    --line:#1e2a35;--line2:#2a3946;--acc:#2fd4a7;--acc-dim:#1c8c72;--warn:#e8a33d;--bad:#e4675c;--blue:#4a9eff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit}
+  .ribbon{background:#05080b;border-bottom:1px solid var(--line);color:#93a3b4;font-size:12px;padding:7px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .ribbon b{background:#1b2833;color:#cfe3dc;border-radius:4px;padding:1px 7px;font-weight:600}
+  .ribbon a{margin-left:auto;color:#7f91a3}
+  .ribbon a:hover{color:#fff}
+
+  .shell{max-width:1280px;margin:0 auto;padding:18px 16px 30px}
+  .head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+  h1{font-size:20px;margin:0;letter-spacing:-.01em}
+  .head p{margin:3px 0 0;font-size:12.5px;color:var(--mut)}
+  .head-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .chip{font-size:11.5px;color:var(--ink2);border:1px solid var(--line2);border-radius:999px;padding:5px 11px;background:var(--panel)}
+  .chip b{color:var(--acc);font-weight:600}
+  .run{border:none;background:var(--acc);color:#06231b;font-weight:700;font-size:13px;border-radius:8px;padding:9px 18px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+  .run:hover{background:#4de5ba}
+  .run:disabled{background:#2a3b42;color:#7d909a;cursor:default}
+  .run svg{width:13px;height:13px;fill:currentColor}
+
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px;align-items:start}
+  @media (max-width:1000px){.grid{grid-template-columns:1fr}}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .phead{padding:11px 13px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink2);font-weight:600}
+  .phead small{margin-left:auto;font-size:10.5px;color:var(--mut);font-weight:400}
+  .phead .live{width:6px;height:6px;border-radius:50%;background:var(--acc);display:inline-block;margin-right:1px}
+
+  .canvas-wrap{overflow-x:auto;background:
+    radial-gradient(circle at 18% 8%,rgba(47,212,167,.06),transparent 40%),
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px) 0 0/24px 24px,
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px) 0 0/24px 24px}
+  .canvas{position:relative;width:920px;height:420px;min-width:920px}
+  .edges{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .edges path{fill:none;stroke:#26353f;stroke-width:1.6;transition:stroke .25s}
+  .edges path.on{stroke:var(--acc);stroke-width:2}
+  .edges path.err{stroke:var(--bad)}
+
+  .node{position:absolute;width:150px;border:1px solid var(--line2);background:#141d26;border-radius:9px;padding:9px 10px;transition:.2s}
+  .node .nt{display:flex;align-items:center;gap:6px;font-size:12.4px;font-weight:600;line-height:1.35}
+  .node .ni{width:16px;height:16px;border-radius:5px;background:#22313d;display:grid;place-items:center;font-size:9px;color:#8ea1b2;flex:0 0 auto}
+  .node .ns{font-size:10.5px;color:var(--mut);margin-top:3px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .node .st{position:absolute;right:9px;top:9px;width:6px;height:6px;border-radius:50%;background:#39454f}
+  .node.run{border-color:var(--acc);box-shadow:0 0 0 3px rgba(47,212,167,.12)}
+  .node.run .st{background:var(--acc);animation:pulse 1s infinite}
+  .node.done{border-color:#2a5a4b}
+  .node.done .st{background:var(--acc)}
+  .node.err{border-color:var(--bad);box-shadow:0 0 0 3px rgba(228,103,92,.14)}
+  .node.err .st{background:var(--bad)}
+  @keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+  @media (prefers-reduced-motion:reduce){.node.run .st{animation:none}}
+
+  .n1{left:20px;top:178px}.n2{left:200px;top:40px}.n3{left:200px;top:316px}
+  .n4{left:390px;top:178px}.n5{left:580px;top:178px}.n6{left:760px;top:178px;width:140px}
+
+  .legend{display:flex;gap:14px;padding:9px 13px;border-top:1px solid var(--line);font-size:10.5px;color:var(--mut);flex-wrap:wrap}
+  .legend i{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;font-style:normal}
+
+  .side .blk{padding:11px 13px;border-bottom:1px solid var(--line)}
+  .side .blk:last-child{border-bottom:none}
+  .side h4{margin:0 0 5px;font-size:11px;letter-spacing:.08em;color:var(--mut);font-weight:600}
+  .side p{margin:0;font-size:11.8px;color:var(--ink2);line-height:1.65}
+  .side code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;background:#0a1218;border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:#9fd8c8}
+  .src{display:flex;align-items:center;gap:7px;font-size:11.8px;color:var(--ink2);padding:4px 0}
+  .src u{text-decoration:none;width:5px;height:5px;border-radius:50%;background:var(--acc);flex:0 0 auto}
+  .src em{margin-left:auto;font-style:normal;font-size:10px;color:var(--mut)}
+
+  .alert{display:none;margin:10px 13px 13px;border:1px solid rgba(228,103,92,.45);background:rgba(228,103,92,.1);border-radius:8px;padding:10px 11px;font-size:11.5px;color:#f0b5b0;line-height:1.6}
+  .alert.on{display:block}
+  .alert b{display:block;color:#fff;font-size:12px;margin-bottom:2px}
+  .alert button{margin-top:7px;border:1px solid var(--bad);color:#ffd9d5;background:transparent;border-radius:6px;padding:5px 10px;font-size:11.5px;cursor:pointer}
+  .alert button:hover{background:rgba(228,103,92,.2)}
+
+  .logs{margin-top:12px}
+  .logbody{height:170px;overflow:auto;padding:8px 12px;background:#070c10;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.3px;line-height:1.9}
+  .logline{display:flex;gap:8px;color:#93a3b4;white-space:pre-wrap}
+  .logline .t{color:#4d5c6b;flex:0 0 auto}
+  .logline.ok{color:#7fd9c0}.logline.warn{color:#f0c27a}.logline.err{color:#f08a82}
+  .logline .lv{flex:0 0 42px;color:#5d7b8d}
+  .logline.ok .lv{color:#3a9e84}.logline.warn .lv{color:#b98a3c}.logline.err .lv{color:#c05b53}
+
+  .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,10px);background:#1b2833;color:#e8eef4;font-size:12.5px;padding:9px 15px;border-radius:8px;opacity:0;pointer-events:none;transition:.2s;z-index:50;border:1px solid var(--line2)}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="ribbon">
+  <b>演示样例 · DEMO</b>
+  <span>「运行」只在前端模拟节点状态与日志，没有连接 ERP、商城或任何外部系统。</span>
+  <a href="../../cases/">← 返回案例库</a>
+</div>
+
+<div class="shell">
+  <div class="head">
+    <div>
+      <h1>报表与数据同步自动化</h1>
+      <p>定时拉取多个数据源 → 清洗 → 对账 → 生成日报；失败自动重试并告警。先看失败时能不能兜住。</p>
+    </div>
+    <div class="head-actions">
+      <span class="chip">调度 <b>每天 08:00</b></span>
+      <span class="chip">上次运行 <b id="lastRun">昨天 08:00 成功</b></span>
+      <button class="run" id="runBtn"><svg viewBox="0 0 16 16"><path d="M4 2.5v11l9-5.5z"/></svg>运行工作流</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <section class="panel">
+        <div class="phead"><span class="live"></span>工作流画布 <small>6 个节点 · 模拟执行</small></div>
+        <div class="canvas-wrap">
+          <div class="canvas" id="canvas">
+            <svg class="edges" viewBox="0 0 920 420" preserveAspectRatio="none">
+              <path id="e12" d="M170,210 C185,210 185,72 200,72"/>
+              <path id="e13" d="M170,210 C185,210 185,348 200,348"/>
+              <path id="e24" d="M350,72 C370,72 370,210 390,210"/>
+              <path id="e34" d="M350,348 C370,348 370,210 390,210"/>
+              <path id="e45" d="M540,210 L580,210"/>
+              <path id="e56" d="M730,210 L760,210"/>
+            </svg>
+
+            <div class="node n1" id="n1"><span class="st"></span><div class="nt"><span class="ni">⏱</span>定时触发</div><div class="ns">每天 08:00 · 或手动</div></div>
+            <div class="node n2" id="n2"><span class="st"></span><div class="nt"><span class="ni">DB</span>拉取 ERP 订单</div><div class="ns">MySQL · 昨日订单</div></div>
+            <div class="node n3" id="n3"><span class="st"></span><div class="nt"><span class="ni">API</span>拉取商城订单</div><div class="ns">REST · 分页 500 条</div></div>
+            <div class="node n4" id="n4"><span class="st"></span><div class="nt"><span class="ni">FX</span>清洗与去重</div><div class="ns">统一金额 / 时间 / SKU</div></div>
+            <div class="node n5" id="n5"><span class="st"></span><div class="nt"><span class="ni">=</span>对账</div><div class="ns">订单号 + 金额比对</div></div>
+            <div class="node n6" id="n6"><span class="st"></span><div class="nt"><span class="ni">↑</span>生成日报并推送</div><div class="ns">企微群 + 邮件</div></div>
+          </div>
+        </div>
+        <div class="legend">
+          <span><i style="background:#39454f"></i>待运行</span>
+          <span><i style="background:#2fd4a7"></i>运行 / 成功</span>
+          <span><i style="background:#e4675c"></i>失败</span>
+          <span style="margin-left:auto">首次运行会在「对账」步骤模拟失败，可点重试</span>
+        </div>
+      </section>
+
+      <section class="panel logs">
+        <div class="phead">运行日志 <small>自动滚动 · 模拟输出</small></div>
+        <div class="logbody" id="logBody"></div>
+      </section>
+    </div>
+
+    <aside class="panel side">
+      <div class="blk">
+        <h4>调度</h4>
+        <p><code>0 8 * * *</code> 每天 08:00 · Asia/Shanghai<br>也可手动触发，用于补跑。</p>
+      </div>
+      <div class="blk">
+        <h4>数据源</h4>
+        <div class="src"><u></u>ERP 订单库<em>MySQL</em></div>
+        <div class="src"><u></u>商城订单接口<em>REST</em></div>
+        <div class="src"><u></u>日报模板<em>本地</em></div>
+      </div>
+      <div class="blk">
+        <h4>失败兜底</h4>
+        <p>失败重试 3 次，间隔 5 分钟；仍失败推送企业微信，并保留当日批次，不覆盖上一次成功结果。</p>
+      </div>
+      <div class="blk">
+        <h4>产出</h4>
+        <p>每日订单数、回款额、差异清单（CSV）与一段摘要，推送到群里。</p>
+      </div>
+      <div class="alert" id="alert">
+        <b>对账失败 · 批次 2026-11-08</b>
+        商城有 2 条订单金额与 ERP 不一致（模拟）。已停止后续推送，未覆盖昨日成功结果。
+        <button id="retryBtn">重试对账</button>
+      </div>
+      <div class="blk">
+        <h4>说明</h4>
+        <p style="color:var(--mut)">本页不发起任何网络请求，节点状态、日志与差异均为本地预设。</p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var logBody = document.getElementById('logBody');
+var runBtn = document.getElementById('runBtn');
+var alertEl = document.getElementById('alert');
+var retryBtn = document.getElementById('retryBtn');
+var lastRun = document.getElementById('lastRun');
+var busy = false;
+
+function now(){
+  var d = new Date();
+  function p(n){ return n < 10 ? '0' + n : n; }
+  return p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+}
+
+function log(msg, level){
+  var d = document.createElement('div');
+  d.className = 'logline ' + (level || '');
+  d.innerHTML = '<span class="t">' + now() + '</span><span class="lv">' + (level === 'ok' ? 'OK' : level === 'warn' ? 'WARN' : level === 'err' ? 'ERROR' : 'INFO') + '</span><span>' + msg + '</span>';
+  logBody.appendChild(d);
+  logBody.scrollTop = logBody.scrollHeight;
+}
+
+function resetNodes(){
+  ['n1','n2','n3','n4','n5','n6'].forEach(function(id){
+    document.getElementById(id).className = 'node ' + id;
+  });
+  ['e12','e13','e24','e34','e45','e56'].forEach(function(id){
+    document.getElementById(id).setAttribute('class', '');
+  });
+}
+
+function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+
+function setNode(id, cls){ document.getElementById(id).className = 'node ' + id + ' ' + cls; }
+function setEdge(id, cls){ document.getElementById(id).setAttribute('class', cls || ''); }
+
+async function runFlow(){
+  if (busy) return;
+  busy = true;
+  runBtn.disabled = true;
+  alertEl.classList.remove('on');
+  resetNodes();
+  logBody.innerHTML = '';
+  log('开始运行 · 批次 2026-11-08 · 触发方式：手动');
+  lastRun.textContent = '运行中…';
+
+  setNode('n1','run'); log('触及定时任务，准备拉取 2 个数据源'); await sleep(700);
+  setNode('n1','done'); setEdge('e12','on'); setEdge('e13','on');
+
+  setNode('n2','run'); log('ERP：执行 SELECT ... WHERE created_at >= 昨日 00:00'); await sleep(750);
+  setNode('n2','done'); log('ERP：读取 1,284 条订单', 'ok'); setEdge('e24','on');
+
+  setNode('n3','run'); log('商城：GET /orders?page=1&size=500'); await sleep(700);
+  setNode('n3','done'); log('商城：读取 1,331 条订单（3 页）', 'ok'); setEdge('e34','on');
+
+  setNode('n4','run'); log('清洗：统一币种、时间戳与 SKU 编码'); await sleep(800);
+  setNode('n4','done'); log('清洗：去重 47 条，剩余 2,568 条', 'ok'); setEdge('e45','on');
+
+  setNode('n5','run'); log('对账：按订单号与金额比对'); await sleep(800);
+  setNode('n5','err'); setEdge('e45','err');
+  log('对账失败：2 条订单金额不一致（SO-88213 / SO-88240）', 'err');
+  log('已停止后续推送，保留昨日成功结果，等待重试', 'warn');
+  alertEl.classList.add('on');
+  lastRun.textContent = '08:00 运行失败';
+  toast('对账失败（模拟）· 可点重试');
+  busy = false;
+  runBtn.disabled = false;
+  runBtn.innerHTML = '<svg viewBox="0 0 16 16"><path d="M4 2.5v11l9-5.5z"/></svg>重新运行';
+}
+
+async function retryFlow(){
+  if (busy) return;
+  busy = true;
+  retryBtn.disabled = true;
+  retryBtn.textContent = '重试中…';
+  alertEl.classList.remove('on');
+  log('收到人工重试指令，从「对账」节点继续', 'warn');
+  setNode('n5','run'); await sleep(900);
+  log('对账重试：重新拉取差异订单并校正金额');
+  await sleep(700);
+  setNode('n5','done'); setEdge('e45','on'); setEdge('e56','on');
+  log('对账通过：2 条差异已标记待人工确认，其余 2,566 条一致', 'ok');
+
+  setNode('n6','run'); log('生成日报：PDF + 差异 CSV'); await sleep(750);
+  setNode('n6','done');
+  log('日报已生成，推送至企微「运营日报」群（模拟）', 'ok');
+  lastRun.textContent = '刚刚 成功（重试）';
+  toast('重试成功（演示）');
+  retryBtn.disabled = false;
+  retryBtn.textContent = '重试对账';
+  busy = false;
+  runBtn.disabled = false;
+  runBtn.innerHTML = '<svg viewBox="0 0 16 16"><path d="M4 2.5v11l9-5.5z"/></svg>再运行一次';
+}
+
+function toast(t){
+  var el = document.getElementById('toast');
+  el.textContent = t;
+  el.classList.add('on');
+  clearTimeout(el._t);
+  el._t = setTimeout(function(){ el.classList.remove('on'); }, 2200);
+}
+
+runBtn.addEventListener('click', runFlow);
+retryBtn.addEventListener('click', retryFlow);
+
+resetNodes();
+log('昨日 08:00 批次成功：2,540 条订单，0 条差异', 'ok');
+log('等待下一次触发或手动运行', '');
+</script>
+</body>
+</html>
