@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>昆山软件开发 · 案例集 | 商城 / 小程序 / 云服务器 / 企业邮箱</title>
+<meta name="description" content="昆山本地个人开发者，承接电商商城、微信小程序、云服务器部署与企业邮箱搭建。四个可直接操作的演示项目。">
+<style>
+  :root{
+    --paper:#f6f4ef;
+    --card:#fffefb;
+    --ink:#17191c;
+    --ink-2:#3c4046;
+    --muted:#71757c;
+    --line:#e3dfd4;
+    --line-strong:#cfcabd;
+    --accent:#14523f;
+    --accent-soft:#e6ede8;
+    --radius:14px;
+    --max:1080px;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    font-size:16px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(circle at 12% -10%, #efece2 0, transparent 45%),radial-gradient(circle at 92% 4%, #eceee7 0, transparent 40%);
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+
+  /* ---------- header ---------- */
+  header.top{
+    position:sticky;top:0;z-index:30;
+    backdrop-filter:blur(10px);
+    background:rgba(246,244,239,.86);
+    border-bottom:1px solid rgba(227,223,212,.8);
+  }
+  .top-in{display:flex;align-items:center;justify-content:space-between;height:68px;gap:24px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.02em}
+  .brand-mark{
+    width:30px;height:30px;border-radius:9px;background:var(--accent);color:#fff;
+    display:grid;place-items:center;font-size:12px;letter-spacing:.04em;font-family:ui-monospace,Menlo,Consolas,monospace;
+    box-shadow:0 2px 6px rgba(20,82,63,.25);
+  }
+  .brand-txt small{display:block;font-weight:400;font-size:11px;color:var(--muted);letter-spacing:.06em;line-height:1.3}
+  nav.links{display:flex;gap:26px;font-size:14px;color:var(--ink-2)}
+  nav.links a{padding:4px 0;border-bottom:1px solid transparent}
+  nav.links a:hover{border-color:var(--ink-2)}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:10px 18px;border-radius:999px;font-size:14px;font-weight:500;
+    border:1px solid var(--line-strong);background:var(--card);
+    transition:transform .16s ease, box-shadow .16s ease, background .16s ease;
+  }
+  .btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(23,25,28,.08)}
+  .btn.solid{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.solid:hover{box-shadow:0 8px 22px rgba(20,82,63,.28)}
+  .btn .arw{transition:transform .16s ease}
+  .btn:hover .arw{transform:translateX(3px)}
+  .top-cta{display:none}
+
+  /* ---------- hero ---------- */
+  .hero{padding:74px 0 46px}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12.5px;letter-spacing:.08em;color:var(--accent);
+    border:1px solid #cfded5;background:var(--accent-soft);
+    padding:5px 12px;border-radius:999px;margin-bottom:22px;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px rgba(20,82,63,.12)}
+  h1{
+    margin:0 0 20px;
+    font-size:clamp(30px,4.6vw,52px);
+    line-height:1.22;
+    letter-spacing:-.02em;
+    font-weight:650;
+    max-width:16em;
+  }
+  h1 em{font-style:normal;color:var(--accent);position:relative;white-space:nowrap}
+  h1 em::after{
+    content:"";position:absolute;left:0;right:0;bottom:6px;height:8px;
+    background:rgba(20,82,63,.12);border-radius:3px;z-index:-1;
+  }
+  .hero p.lead{max-width:38em;color:var(--ink-2);font-size:16.5px;margin:0 0 26px}
+  .tags{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:30px}
+  .tag{
+    font-size:12.5px;color:var(--ink-2);background:#fbfaf6;
+    border:1px solid var(--line);border-radius:8px;padding:5px 11px;
+  }
+  .hero-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .hero-note{font-size:12.5px;color:var(--muted)}
+  .hero-stats{
+    display:flex;gap:34px;flex-wrap:wrap;margin-top:44px;padding-top:26px;
+    border-top:1px solid var(--line);
+  }
+  .stat b{display:block;font-size:22px;font-weight:650;letter-spacing:-.01em}
+  .stat span{font-size:12.5px;color:var(--muted)}
+
+  /* ---------- section head ---------- */
+  .sec{padding:54px 0}
+  .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:26px;flex-wrap:wrap}
+  .sec-head h2{margin:0;font-size:24px;letter-spacing:-.01em;font-weight:650}
+  .sec-head p{margin:6px 0 0;color:var(--muted);font-size:14px;max-width:34em}
+  .sec-head .idx{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:var(--muted);letter-spacing:.1em}
+
+  /* ---------- case cards ---------- */
+  .cases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+  .case{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    display:flex;flex-direction:column;
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .case:hover{transform:translateY(-3px);box-shadow:0 16px 38px rgba(23,25,28,.09);border-color:var(--line-strong)}
+  .thumb{
+    position:relative;height:210px;overflow:hidden;
+    background:linear-gradient(150deg,#eeece4 0%,#e6e9e1 100%);
+    border-bottom:1px solid var(--line);
+  }
+  .thumb .pill{
+    position:absolute;top:12px;left:12px;z-index:4;
+    font-size:11px;letter-spacing:.06em;color:#4c5148;
+    background:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.9);
+    padding:3px 9px;border-radius:999px;backdrop-filter:blur(4px);
+  }
+  .body{padding:18px 20px 20px;display:flex;flex-direction:column;flex:1}
+  .body h3{margin:0 0 6px;font-size:17.5px;font-weight:650;letter-spacing:-.01em}
+  .body .desc{margin:0 0 14px;color:var(--muted);font-size:13.5px;line-height:1.6}
+  .points{list-style:none;margin:0 0 18px;padding:0;display:flex;flex-direction:column;gap:6px}
+  .points li{font-size:13px;color:var(--ink-2);padding-left:16px;position:relative}
+  .points li::before{
+    content:"";position:absolute;left:0;top:.62em;width:5px;height:5px;border-radius:50%;
+    background:var(--accent);opacity:.65;
+  }
+  .case-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px dashed var(--line)}
+  .tech{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--muted);letter-spacing:.02em}
+  .go{font-size:13.5px;font-weight:600;color:var(--accent);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+  .go .arw{transition:transform .16s ease}
+  .case:hover .go .arw{transform:translateX(3px)}
+
+  /* ---------- mini mockups inside thumbs ---------- */
+  .mock{position:absolute;inset:0;display:grid;place-items:center}
+  .phone{
+    width:126px;height:246px;background:#fff;border-radius:20px;
+    border:5px solid #23262a;position:relative;overflow:hidden;
+    box-shadow:0 16px 30px rgba(23,25,28,.16), translate:0 8px;
+    transform:translateY(26px);
+  }
+  .phone::before{
+    content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
+    width:52px;height:5px;background:#23262a;border-radius:0 0 6px 6px;z-index:5;
+  }
+  .phone .ph-top{height:20px;background:#faf8f3;border-bottom:1px solid #eeeadf}
+  .ph-banner{margin:6px;height:52px;border-radius:8px;background:linear-gradient(120deg,#1c5c46,#3c8b6d);display:grid;place-items:center;color:#e9f1ec;font-size:8px;letter-spacing:.14em}
+  .ph-grid{margin:6px;display:grid;grid-template-columns:1fr 1fr;gap:5px}
+  .ph-tile{background:#f4f1e8;border-radius:6px;height:44px;position:relative;overflow:hidden}
+  .ph-tile i{position:absolute;left:5px;bottom:4px;width:60%;height:3px;background:#d9d4c6;border-radius:2px}
+  .ph-tile b{position:absolute;left:5px;top:5px;width:12px;height:12px;border-radius:50%;background:#dfe7e0}
+  .ph-tile:nth-child(2){background:#efe9e2}
+  .ph-tile:nth-child(3){background:#e9eee9}
+  .ph-tile:nth-child(4){background:#f1eee6}
+
+  /* miniprogram phone */
+  .mp{width:150px;height:270px;transform:translateY(30px)}
+  .mp .capsule{position:absolute;top:7px;right:7px;width:44px;height:16px;border-radius:9px;border:1px solid #e3e3e3;background:#fff;display:flex;align-items:center;justify-content:space-around;z-index:6}
+  .mp .capsule s{width:2px;height:2px;background:#444;border-radius:50%;box-shadow:5px 0 #444,10px 0 #444;text-decoration:none}
+  .mp .capsule u{width:8px;height:8px;border:1px solid #444;border-radius:50%;position:relative;text-decoration:none}
+  .mp .capsule u::after{content:"";position:absolute;inset:2.5px;border:1px solid #444;border-radius:50%}
+  .mp .mp-status{height:24px;display:flex;align-items:center;padding-left:8px;font-size:7px;color:#333;background:#f7f7f7}
+  .mp .mp-hero{margin:4px 7px;height:56px;border-radius:8px;background:linear-gradient(120deg,#0e6b4f,#2f9e74);position:relative;overflow:hidden}
+  .mp .mp-hero::after{content:"会员日 · 到店礼";position:absolute;left:8px;bottom:6px;color:#eaf6ef;font-size:7px;letter-spacing:.08em}
+  .mp .mp-grid{margin:6px 7px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px 4px}
+  .mp .mp-grid span{display:flex;flex-direction:column;align-items:center;gap:3px}
+  .mp .mp-grid i{width:18px;height:18px;border-radius:6px;background:#eaf1ec}
+  .mp .mp-grid em{width:14px;height:2px;background:#dedede;border-radius:2px}
+  .mp .mp-list{margin:6px 7px}
+  .mp .mp-row{height:26px;border-radius:6px;background:#f6f6f6;margin-bottom:4px;position:relative}
+  .mp .mp-row::before{content:"";position:absolute;left:5px;top:5px;width:16px;height:16px;border-radius:4px;background:#e4e9e5}
+  .mp .mp-row::after{content:"";position:absolute;left:26px;top:9px;width:50%;height:3px;background:#e0e0e0;border-radius:2px;box-shadow:0 6px 0 -1px #e9e9e9}
+  .mp .mp-tab{position:absolute;left:0;right:0;bottom:0;height:24px;background:#fafafa;border-top:1px solid #eee;display:flex;align-items:center;justify-content:space-around}
+  .mp .mp-tab b{width:9px;height:9px;border-radius:2px;background:#dcdcdc}
+  .mp .mp-tab b.on{background:#07c160}
+
+  /* cloud dashboard */
+  .dash{
+    width:88%;max-width:340px;height:186px;background:#fff;border-radius:10px;border:1px solid #d9d6cc;
+    box-shadow:0 14px 30px rgba(23,25,28,.12);overflow:hidden;display:flex;
+  }
+  .dash .side{width:34px;background:#141b21;padding:8px 6px;display:flex;flex-direction:column;gap:6px}
+  .dash .side i{height:5px;border-radius:2px;background:#2b3742}
+  .dash .side i:first-child{background:#3ddc97}
+  .dash .main{flex:1;padding:8px;display:flex;flex-direction:column;gap:6px;background:#f8f9f8}
+  .dash .cards{display:flex;gap:5px}
+  .dash .cards span{flex:1;height:26px;background:#fff;border:1px solid #e8eae8;border-radius:5px;position:relative}
+  .dash .cards span::after{content:"";position:absolute;left:5px;bottom:5px;width:40%;height:3px;background:#dfe4e1;border-radius:2px}
+  .dash .cards span::before{content:"";position:absolute;left:5px;top:5px;width:24%;height:5px;background:#2f8f68;border-radius:2px}
+  .dash svg{background:#fff;border:1px solid #e8eae8;border-radius:5px;flex:1;width:100%}
+  .dash .rows{display:flex;flex-direction:column;gap:3px}
+  .dash .rows i{height:7px;background:#fff;border:1px solid #eceeec;border-radius:2px;display:block;position:relative}
+  .dash .rows i::after{content:"";position:absolute;left:4px;top:2px;width:18%;height:2px;background:#dde3df;border-radius:2px}
+
+  /* email */
+  .mail{
+    width:88%;max-width:340px;height:180px;background:#fff;border-radius:10px;border:1px solid #d9d6cc;
+    box-shadow:0 14px 30px rgba(23,25,28,.12);overflow:hidden;display:flex;flex-direction:column;
+  }
+  .mail .bar{height:22px;background:#f3f1ea;border-bottom:1px solid #e7e4da;display:flex;align-items:center;gap:3px;padding:0 7px}
+  .mail .bar i{width:5px;height:5px;border-radius:50%;background:#d3cfc4}
+  .mail .bar em{margin-left:6px;height:8px;width:40%;background:#eae7dd;border-radius:2px}
+  .mail .nm{margin:7px 8px 0;height:13px;border-radius:3px;background:#eef3ef;position:relative}
+  .mail .nm::after{content:"";position:absolute;left:4px;top:4px;width:26%;height:4px;background:#2f8f68;border-radius:2px}
+  .mail .split{flex:1;display:flex;margin:6px 8px 8px;gap:5px;min-height:0}
+  .mail .list{width:44%;display:flex;flex-direction:column;gap:3px}
+  .mail .list i{flex:1;background:#f7f6f2;border-radius:3px;position:relative}
+  .mail .list i::after{content:"";position:absolute;left:4px;top:3px;right:6px;height:2px;background:#e2ded2;border-radius:2px;box-shadow:0 4px 0 -1px #e9e6dc}
+  .mail .read{flex:1;background:#fbfaf6;border:1px solid #efede5;border-radius:3px;padding:5px}
+  .mail .read i{display:block;height:2px;background:#e6e2d7;border-radius:2px;margin-bottom:3px}
+  .mail .read i:nth-child(1){width:60%;height:4px;background:#d8d4c7;margin-bottom:5px}
+  .mail .read i:nth-child(4){width:70%}
+
+  /* ---------- process ---------- */
+  .process{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .step{background:var(--card);padding:22px 20px}
+  .step .n{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--accent);letter-spacing:.1em}
+  .step h4{margin:10px 0 6px;font-size:15px;font-weight:650}
+  .step p{margin:0;font-size:13px;color:var(--muted);line-height:1.6}
+
+  .deliver{display:grid;grid-template-columns:1.2fr 1fr;gap:22px;margin-top:22px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px 26px}
+  .panel h3{margin:0 0 14px;font-size:17px;font-weight:650}
+  .panel ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+  .panel li{font-size:13.5px;color:var(--ink-2);display:flex;gap:9px;align-items:flex-start;line-height:1.6}
+  .panel li .ck{flex:none;width:15px;height:15px;margin-top:3px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:9px;font-weight:700}
+  .panel.contact{background:linear-gradient(160deg,#173f31,#0f2f25);color:#eaf2ed;border-color:#123528}
+  .panel.contact h3{color:#fff}
+  .panel.contact p{color:#bdd2c7;font-size:13px;margin:0 0 16px}
+  .contact-row{display:flex;justify-content:space-between;gap:12px;font-size:13.5px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+  .contact-row span{color:#a8c1b3}
+  .contact-row b{font-weight:500;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.02em}
+  .ph-tip{margin-top:14px;font-size:11.5px;color:#8fa89b;line-height:1.6}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--line);padding:30px 0 42px;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:flex-start}
+  .foot .brand{font-size:14px}
+  .foot-note{font-size:12px;color:var(--muted);line-height:1.8;max-width:44em}
+  .foot-note b{color:var(--ink-2);font-weight:500}
+  .kbd{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;background:#efece3;border:1px solid var(--line);padding:1px 5px;border-radius:4px;color:var(--ink-2)}
+
+  @media (max-width:860px){
+    .cases{grid-template-columns:1fr}
+    .process{grid-template-columns:1fr 1fr}
+    .deliver{grid-template-columns:1fr}
+    .hero{padding:44px 0 30px}
+    .top-in{height:60px}
+    nav.links{display:none}
+    .top-cta{display:inline-flex;padding:8px 14px;font-size:13px}
+    .hero-stats{gap:24px}
+  }
+  @media (max-width:520px){
+    .wrap{padding:0 18px}
+    .process{grid-template-columns:1fr}
+    .thumb{height:190px}
+    .hero-actions .btn{flex:1;justify-content:center}
+    .hero-note{width:100%}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none !important;animation:none !important}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">KS</span>
+      <span class="brand-txt">昆山软件定制
+        <small>本地开发 · 独立交付</small>
+      </span>
+    </a>
+    <nav class="links">
+      <a href="#cases">案例 Demo</a>
+      <a href="#process">合作方式</a>
+      <a href="#contact">联系方式</a>
+    </nav>
+    <a class="btn solid top-cta" href="#contact">说说你的需求</a>
+  </div>
+</header>
+
+<main>
+  <section class="wrap hero">
+    <div class="eyebrow"><span class="dot"></span>昆山本地 · 软件开发 / 小程序 / 云服务器 / 企业邮箱</div>
+    <h1>把生意搬到线上，<br>做一个<em>真能用的</em>系统。</h1>
+    <p class="lead">个人开发者，一个人从需求梳理做到上线运维。下面四个 Demo 都是可以直接点开操作的完整交互版本，不是截图。</p>
+    <div class="tags">
+      <span class="tag">昆山及周边可面谈</span>
+      <span class="tag">远程协作</span>
+      <span class="tag">源码交付</span>
+      <span class="tag">按阶段验收</span>
+    </div>
+    <div class="hero-actions">
+      <a class="btn solid" href="#cases">看四个案例 <span class="arw">→</span></a>
+      <a class="btn" href="#contact">直接聊需求</a>
+      <span class="hero-note">微信 / 电话见页尾，通常当天回复</span>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><b>4</b><span>可交互 Demo</span></div>
+      <div class="stat"><b>1 人</b><span>从需求到上线</span></div>
+      <div class="stat"><b>7 天</b><span>出可点击原型</span></div>
+      <div class="stat"><b>100%</b><span>交付源码</span></div>
+    </div>
+  </section>
+
+  <section class="wrap sec" id="cases">
+    <div class="sec-head">
+      <div>
+        <span class="idx">01 / SELECTED WORK</span>
+        <h2>四个能点开的案例</h2>
+        <p>每个 Demo 都是纯前端实现，数据为本地模拟；结构和交互按真实项目做的，方便你判断交付水平。</p>
+      </div>
+      <a class="btn" href="#contact">需要类似的项目？</a>
+    </div>
+
+    <div class="cases">
+      <!-- 1 ecommerce -->
+      <article class="case">
+        <a class="thumb" href="demos/ecommerce/" aria-label="查看电商平台 Demo">
+          <span class="pill">移动端商城</span>
+          <div class="mock">
+            <div class="phone">
+              <div class="ph-top"></div>
+              <div class="ph-banner">SPRING SALE</div>
+              <div class="ph-grid">
+                <div class="ph-tile"><b></b><i></i></div>
+                <div class="ph-tile"><b></b><i></i></div>
+                <div class="ph-tile"><b></b><i></i></div>
+                <div class="ph-tile"><b></b><i></i></div>
+              </div>
+            </div>
+          </div>
+        </a>
+        <div class="body">
+          <h3>电商平台 · 商品到下单全流程</h3>
+          <p class="desc">移动端优先的商城首页、商品详情与购物车，价格和库存随规格实时变化。</p>
+          <ul class="points">
+            <li>轮播、分类筛选、双列商品瀑布流</li>
+            <li>SKU 规格联动，库存与价格实时计算</li>
+            <li>购物车加减、结算填单、订单状态流转</li>
+          </ul>
+          <div class="case-foot">
+            <span class="tech">HTML / CSS / 原生 JS · 本地 Mock</span>
+            <a class="go" href="demos/ecommerce/">查看 Demo <span class="arw">→</span></a>
+          </div>
+        </div>
+      </article>
+
+      <!-- 2 miniprogram -->
+      <article class="case">
+        <a class="thumb" href="demos/miniprogram/" aria-label="查看小程序 Demo">
+          <span class="pill">微信小程序</span>
+          <div class="mock">
+            <div class="phone mp">
+              <div class="mp-status">9:41</div>
+              <div class="capsule"><s></s><u></u></div>
+              <div class="mp-hero"></div>
+              <div class="mp-grid">
+                <span><i></i><em></em></span><span><i></i><em></em></span>
+                <span><i></i><em></em></span><span><i></i><em></em></span>
+                <span><i></i><em></em></span><span><i></i><em></em></span>
+                <span><i></i><em></em></span><span><i></i><em></em></span>
+              </div>
+              <div class="mp-list">
+                <div class="mp-row"></div>
+                <div class="mp-row"></div>
+              </div>
+              <div class="mp-tab"><b class="on"></b><b></b><b></b><b></b></div>
+            </div>
+          </div>
+        </a>
+        <div class="body">
+          <h3>小程序示例 · 会员与预约</h3>
+          <p class="desc">用手机壳还原微信小程序界面：胶囊按钮、底部 tabbar、金刚区，一眼能认出是小程序。</p>
+          <ul class="points">
+            <li>首页轮播 + 金刚区 + 服务列表</li>
+            <li>会员卡、积分与优惠券展示</li>
+            <li>预约表单：选日期时段，提交出成功态</li>
+          </ul>
+          <div class="case-foot">
+            <span class="tech">小程序视觉规范 · 纯静态还原</span>
+            <a class="go" href="demos/miniprogram/">查看 Demo <span class="arw">→</span></a>
+          </div>
+        </div>
+      </article>
+
+      <!-- 3 cloudops -->
+      <article class="case">
+        <a class="thumb" href="demos/cloudops/" aria-label="查看云服务器运维面板 Demo">
+          <span class="pill">运维控制台</span>
+          <div class="mock">
+            <div class="dash">
+              <div class="side"><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="main">
+                <div class="cards"><span></span><span></span><span></span></div>
+                <svg viewBox="0 0 200 70" preserveAspectRatio="none">
+                  <polyline points="0,58 20,50 40,54 60,38 80,42 100,26 120,32 140,18 160,24 180,10 200,16"
+                            fill="none" stroke="#2f8f68" stroke-width="2"/>
+                  <polyline points="0,64 20,60 40,62 60,55 80,58 100,50 120,54 140,46 160,50 180,42 200,45"
+                            fill="none" stroke="#b9c7bf" stroke-width="1.5"/>
+                </svg>
+                <div class="rows"><i></i><i></i><i></i></div>
+              </div>
+            </div>
+          </div>
+        </a>
+        <div class="body">
+          <h3>云服务器部署面板</h3>
+          <p class="desc">把 ECS 实例、监控曲线和一键部署放进一个控制台，部署日志会真的往下滚。</p>
+          <ul class="points">
+            <li>实例列表、CPU / 内存 / 带宽手写 SVG 曲线</li>
+            <li>选择环境执行部署，进度与日志实时输出</li>
+            <li>SSL 证书到期提醒、备份记录</li>
+          </ul>
+          <div class="case-foot">
+            <span class="tech">SVG 图表 · 无 CDN · 实时日志流</span>
+            <a class="go" href="demos/cloudops/">查看 Demo <span class="arw">→</span></a>
+          </div>
+        </div>
+      </article>
+
+      <!-- 4 email -->
+      <article class="case">
+        <a class="thumb" href="demos/email/" aria-label="查看企业邮箱 Demo">
+          <span class="pill">企业邮箱</span>
+          <div class="mock">
+            <div class="mail">
+              <div class="bar"><i></i><i></i><i></i><em></em></div>
+              <div class="nm"></div>
+              <div class="split">
+                <div class="list"><i></i><i></i><i></i><i></i></div>
+                <div class="read"><i></i><i></i><i></i><i></i></div>
+              </div>
+            </div>
+          </div>
+        </a>
+        <div class="body">
+          <h3>企业邮箱搭建</h3>
+          <p class="desc">从域名解析到收发邮件：配置向导给出 MX / SPF / DKIM / DMARC 记录，可复制、可检测。</p>
+          <ul class="points">
+            <li>解析记录表格，一键复制到 DNS 后台</li>
+            <li>模拟解析检测进度，逐条变为「已生效」</li>
+            <li>配套网页邮箱：列表、阅读窗格、写邮件</li>
+          </ul>
+          <div class="case-foot">
+            <span class="tech">DNS 记录配置 · 邮箱三栏布局</span>
+            <a class="go" href="demos/email/">查看 Demo <span class="arw">→</span></a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="wrap sec" id="process">
+    <div class="sec-head">
+      <div>
+        <span class="idx">02 / HOW IT WORKS</span>
+        <h2>合作方式</h2>
+        <p>小项目不搞复杂流程，四步走完，每一步都有你能看到的东西。</p>
+      </div>
+    </div>
+    <div class="process">
+      <div class="step"><div class="n">STEP 01</div><h4>聊需求</h4><p>电话或微信沟通业务场景，确认功能清单、参考样式和预算范围。</p></div>
+      <div class="step"><div class="n">STEP 02</div><h4>出原型</h4><p>先给可点击的原型页面，确认页面结构和交互，再开始写代码。</p></div>
+      <div class="step"><div class="n">STEP 03</div><h4>开发联调</h4><p>按阶段交付可访问的测试地址，你随时能看到进度，随时提修改。</p></div>
+      <div class="step"><div class="n">STEP 04</div><h4>上线运维</h4><p>部署到你的服务器或云平台，配置域名、SSL、企业邮箱，交付源码。</p></div>
+    </div>
+
+    <div class="deliver">
+      <div class="panel">
+        <h3>能接的范围</h3>
+        <ul>
+          <li><span class="ck">✓</span>电商商城、企业官网、预约 / 报名类 H5 与后台管理</li>
+          <li><span class="ck">✓</span>微信小程序页面开发与接口联调</li>
+          <li><span class="ck">✓</span>云服务器选型、环境搭建、Nginx / Docker 部署、SSL 证书配置</li>
+          <li><span class="ck">✓</span>企业域名邮箱开通、MX / SPF / DKIM / DMARC 解析配置</li>
+          <li><span class="ck">✓</span>已有项目的问题排查、页面改版、性能优化</li>
+        </ul>
+      </div>
+      <div class="panel contact" id="contact">
+        <h3>聊聊你的项目</h3>
+        <p>把想做的功能、大概预算发我，当天给初步方案和报价范围。</p>
+        <div class="contact-row"><span>微信</span><b>your_wechat_id</b></div>
+        <div class="contact-row"><span>电话</span><b>138-0000-0000</b></div>
+        <div class="contact-row"><span>邮箱</span><b>hello@example.com</b></div>
+        <div class="ph-tip">以上为占位信息，替换成你的真实联系方式即可；建议同时留微信与电话，客户偏好不同。</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div class="foot-note">
+      <b>关于本站</b><br>
+      首页与 4 个 Demo 均为个人作品演示，数据全部为本地模拟，不含真实客户信息，也不连接任何后端服务。<br>
+      图标与图表均以 CSS / 内联 SVG 绘制，离线打开也能正常浏览。 · <span class="kbd">演示项目，数据为模拟</span>
+    </div>
+    <div class="foot-note" style="text-align:right">
+      <b>昆山软件定制</b><br>
+      商城 / 小程序 / 云服务器 / 企业邮箱<br>
+      © 2026 · 案例集 v1.0
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
