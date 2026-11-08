@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>邮企 MailSuite · 企业邮箱搭建 Demo</title>
+<meta name="description" content="企业邮箱演示：域名 MX / SPF / DKIM / DMARC 解析配置向导，配套网页邮箱收件箱。">
+<style>
+  :root{
+    --bg:#f4f6f8;
+    --panel:#fff;
+    --ink:#16202a;
+    --ink-2:#3f4d5a;
+    --muted:#7a8896;
+    --line:#e5e9ee;
+    --line-soft:#f0f3f6;
+    --blue:#1f6feb;
+    --blue-dark:#1858bd;
+    --blue-soft:#eaf2fe;
+    --green:#1c8c5a;
+    --green-soft:#e9f7f0;
+    --amber:#b5761a;
+    --amber-soft:#fdf2e0;
+    --radius:10px;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg);color:var(--ink);
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;font-size:inherit;color:inherit;border:0;background:none;cursor:pointer}
+  input,textarea,select{font-family:inherit;font-size:inherit;color:inherit}
+  a{color:inherit;text-decoration:none}
+
+  /* ---------- header ---------- */
+  header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
+  .head-in{max-width:1240px;margin:0 auto;padding:0 24px;height:58px;display:flex;align-items:center;gap:26px}
+  .brand{display:flex;align-items:center;gap:9px;flex:none}
+  .brand .logo{
+    width:30px;height:30px;border-radius:8px;background:linear-gradient(140deg,#1f6feb,#4b9bff);
+    display:grid;place-items:center;box-shadow:0 4px 12px rgba(31,111,235,.25);
+  }
+  .brand .logo svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:1.8}
+  .brand b{font-size:14.5px;letter-spacing:.01em}
+  .brand span{display:block;font-size:9.5px;color:var(--muted);letter-spacing:.12em;font-family:var(--mono);line-height:1.3}
+  .tabs{display:flex;gap:4px;background:#f2f5f8;border-radius:8px;padding:3px}
+  .tabs button{
+    padding:6px 14px;border-radius:6px;font-size:12.5px;color:var(--muted);transition:.15s;white-space:nowrap;
+  }
+  .tabs button.on{background:#fff;color:var(--ink);font-weight:500;box-shadow:0 1px 3px rgba(20,35,50,.1)}
+  .head-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+  .demo-chip{
+    font-size:10.5px;color:#8a6d3b;background:#fdf6e7;border:1px solid #f0e2c4;
+    border-radius:999px;padding:3px 9px;white-space:nowrap;
+  }
+  .avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(140deg,#2b4b66,#4d748f);color:#fff;display:grid;place-items:center;font-size:12px;flex:none}
+
+  .page{max-width:1240px;margin:0 auto;padding:24px}
+  .section{display:none}
+  .section.on{display:block}
+
+  .page-title{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:18px}
+  .page-title h1{margin:0 0 3px;font-size:20px;font-weight:600;letter-spacing:-.01em}
+  .page-title p{margin:0;font-size:12px;color:var(--muted)}
+  .hint-line{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .hint-line .dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+
+  /* ---------- config layout ---------- */
+  .config{display:grid;grid-template-columns:236px 1fr;gap:18px;align-items:start}
+  .steps{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:18px 16px;position:sticky;top:80px}
+  .steps h3{margin:0 0 14px;font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.04em}
+  .step-item{display:flex;gap:10px;padding-bottom:20px;position:relative}
+  .step-item:last-child{padding-bottom:0}
+  .step-item::before{content:"";position:absolute;left:11px;top:24px;bottom:0;width:1px;background:var(--line)}
+  .step-item:last-child::before{display:none}
+  .step-item .n{
+    width:23px;height:23px;border-radius:50%;border:1px solid var(--line);background:#fff;
+    display:grid;place-items:center;font-size:10.5px;font-family:var(--mono);color:var(--muted);
+    flex:none;position:relative;z-index:1;
+  }
+  .step-item.done .n{background:var(--green);border-color:var(--green);color:#fff}
+  .step-item.now .n{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 0 0 4px var(--blue-soft)}
+  .step-item b{display:block;font-size:12.5px;font-weight:500;margin-bottom:2px;color:var(--ink-2)}
+  .step-item span{font-size:10.5px;color:var(--muted);line-height:1.5;display:block}
+  .step-item.now b{color:var(--ink)}
+  .steps-foot{margin-top:18px;padding-top:14px;border-top:1px solid var(--line-soft);font-size:10.5px;color:var(--muted);line-height:1.7}
+
+  .cfg-main{display:flex;flex-direction:column;gap:14px;min-width:0}
+  .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius)}
+  .card-head{padding:14px 18px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .card-head h2{margin:0;font-size:14px;font-weight:600}
+  .card-head .meta{font-size:11px;color:var(--muted);margin-left:auto}
+  .card-body{padding:16px 18px}
+  .domain-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .domain-box{
+    display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;
+    padding:7px 12px;background:#fbfcfd;font-family:var(--mono);font-size:13px;
+  }
+  .domain-box svg{width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:1.6}
+  .verified{
+    display:inline-flex;align-items:center;gap:5px;font-size:10.5px;color:var(--green);
+    background:var(--green-soft);border-radius:999px;padding:3px 9px;
+  }
+  .verified i{width:5px;height:5px;border-radius:50%;background:var(--green)}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    border-radius:7px;border:1px solid var(--line);background:#fff;
+    padding:7px 13px;font-size:12px;color:var(--ink-2);transition:.15s;white-space:nowrap;
+  }
+  .btn:hover{border-color:#c9d3dd;background:#fafbfc}
+  .btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8}
+  .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+  .btn.primary:hover{background:var(--blue-dark)}
+  .btn.primary svg{stroke:#fff}
+  .btn.sm{padding:5px 10px;font-size:11px}
+  .btn[disabled]{opacity:.5;cursor:not-allowed}
+  .push-right{margin-left:auto}
+
+  .progress-box{padding:14px 18px;border-bottom:1px solid var(--line-soft);background:#fbfcfd;display:none}
+  .progress-box.on{display:block}
+  .pbar{height:5px;background:#e9eef3;border-radius:99px;overflow:hidden}
+  .pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#4b9bff,var(--blue));border-radius:99px;transition:width .4s}
+  .pmeta{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:6px;font-family:var(--mono)}
+
+  .rec-table{width:100%;border-collapse:collapse;font-size:11.5px}
+  .rec-table th{
+    text-align:left;font-weight:500;color:var(--muted);font-size:10px;letter-spacing:.04em;
+    padding:9px 10px;border-bottom:1px solid var(--line);background:#fafbfc;white-space:nowrap;
+  }
+  .rec-table td{padding:11px 10px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+  .rec-table tr:last-child td{border-bottom:0}
+  .type-badge{
+    display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.02em;
+    padding:2px 7px;border-radius:4px;background:#f1f5f9;color:#4a5b6b;border:1px solid #e3e9ef;
+  }
+  .type-badge.mx{background:#eef4ff;color:#2a5db0;border-color:#dbe7fb}
+  .type-badge.txt{background:#f3f0fa;color:#6552a3;border-color:#e6e1f3}
+  .type-badge.cname{background:#eef8f3;color:#237a54;border-color:#d9efe4}
+  .host{font-family:var(--mono);font-size:11px;color:var(--ink-2);word-break:break-all}
+  .host em{font-style:normal;color:var(--muted);font-size:10px;display:block}
+  .value{
+    font-family:var(--mono);font-size:10.5px;color:#52606d;line-height:1.55;
+    max-width:420px;word-break:break-all;
+  }
+  .value.clip{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .ttl{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+  .rec-status{
+    display:inline-flex;align-items:center;gap:5px;font-size:10.5px;white-space:nowrap;
+    padding:2px 8px;border-radius:999px;background:#f5f7f9;color:var(--muted);
+  }
+  .rec-status i{width:5px;height:5px;border-radius:50%;background:#b9c3cc}
+  .rec-status.ok{background:var(--green-soft);color:var(--green)}
+  .rec-status.ok i{background:var(--green)}
+  .rec-status.checking{background:var(--blue-soft);color:var(--blue)}
+  .rec-status.checking i{background:var(--blue);animation:blink 1s infinite}
+  @keyframes blink{50%{opacity:.25}}
+  .copy-btn{
+    width:26px;height:26px;border-radius:5px;border:1px solid var(--line);display:grid;place-items:center;
+    color:var(--muted);transition:.15s;
+  }
+  .copy-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-soft)}
+  .copy-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.7}
+  .copy-btn.copied{color:var(--green);border-color:#b7e2cd;background:var(--green-soft)}
+  .table-scroll{overflow-x:auto}
+  .cfg-foot{padding:12px 18px;border-top:1px solid var(--line-soft);display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+  .cfg-foot .note{font-size:10.5px;color:var(--muted);line-height:1.6}
+  .cfg-foot .spacer{margin-left:auto}
+
+  .tips{background:#fbfcfd;border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px}
+  .tips h4{margin:0 0 8px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}
+  .tips h4 svg{width:13px;height:13px;stroke:var(--amber);fill:none;stroke-width:1.8}
+  .tips ul{margin:0;padding-left:17px;font-size:11.5px;color:var(--muted);line-height:1.9}
+  .tips code{font-family:var(--mono);font-size:10.5px;background:#eef2f6;padding:1px 4px;border-radius:3px;color:#4a5b6b}
+
+  /* ---------- mailbox ---------- */
+  .mail-app{
+    display:grid;grid-template-columns:168px 330px 1fr;height:calc(100vh - 170px);min-height:540px;
+    background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;
+  }
+  .folders{border-right:1px solid var(--line);padding:14px 10px;background:#fbfcfd;display:flex;flex-direction:column}
+  .compose{
+    display:flex;align-items:center;justify-content:center;gap:6px;width:100%;
+    background:var(--blue);color:#fff;border-radius:7px;padding:8px 10px;font-size:12.5px;font-weight:500;
+    margin-bottom:14px;box-shadow:0 4px 12px rgba(31,111,235,.2);
+  }
+  .compose:hover{background:var(--blue-dark)}
+  .compose svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:1.9}
+  .folder{
+    display:flex;align-items:center;gap:8px;width:100%;padding:7px 9px;border-radius:6px;
+    font-size:12px;color:var(--ink-2);margin-bottom:2px;text-align:left;
+  }
+  .folder:hover{background:#eef3f8}
+  .folder.on{background:var(--blue-soft);color:var(--blue);font-weight:500}
+  .folder svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.6;flex:none;opacity:.9}
+  .folder .cnt{margin-left:auto;font-size:10px;font-family:var(--mono);color:var(--muted)}
+  .folder.on .cnt{color:var(--blue)}
+  .folder .unread{
+    margin-left:auto;font-size:9.5px;background:var(--blue);color:#fff;border-radius:99px;
+    padding:0 5px;min-width:16px;text-align:center;line-height:16px;
+  }
+  .storage{margin-top:auto;padding-top:12px;border-top:1px solid var(--line-soft);font-size:10px;color:var(--muted);line-height:1.7}
+  .storage .bar{height:3px;background:#e9eef3;border-radius:99px;margin:5px 0;overflow:hidden}
+  .storage .bar i{display:block;height:100%;width:34%;background:#9db4cb;border-radius:99px}
+
+  .maillist{border-right:1px solid var(--line);display:flex;flex-direction:column;min-width:0;background:#fff}
+  .list-top{padding:12px 14px 10px;border-bottom:1px solid var(--line-soft)}
+  .list-top h3{margin:0 0 8px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+  .list-top h3 span{font-size:10.5px;color:var(--muted);font-weight:400}
+  .search{
+    display:flex;align-items:center;gap:6px;background:#f4f6f8;border:1px solid transparent;
+    border-radius:6px;padding:5px 9px;
+  }
+  .search:focus-within{background:#fff;border-color:#c9d9ec}
+  .search svg{width:13px;height:13px;stroke:var(--muted);fill:none;stroke-width:1.8;flex:none}
+  .search input{border:0;background:none;outline:0;font-size:11.5px;width:100%;color:var(--ink)}
+  .search input::placeholder{color:#a9b4c0}
+  .mails{flex:1;overflow-y:auto;scrollbar-width:thin}
+  .mails::-webkit-scrollbar{width:6px}
+  .mails::-webkit-scrollbar-thumb{background:#e1e7ed;border-radius:3px}
+  .mail-item{
+    display:flex;gap:9px;padding:11px 14px;border-bottom:1px solid var(--line-soft);
+    cursor:pointer;transition:background .12s;position:relative;
+  }
+  .mail-item:hover{background:#fafbfd}
+  .mail-item.on{background:var(--blue-soft)}
+  .mail-item.unread .m-sub{font-weight:600;color:var(--ink)}
+  .m-ava{
+    width:30px;height:30px;border-radius:7px;flex:none;display:grid;place-items:center;
+    font-size:11px;color:#fff;font-weight:500;letter-spacing:.02em;
+  }
+  .m-body{flex:1;min-width:0}
+  .m-top{display:flex;align-items:baseline;gap:6px}
+  .m-from{font-size:11.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+  .m-time{font-size:9.5px;color:#a9b4c0;flex:none;font-family:var(--mono)}
+  .m-sub{font-size:12px;color:var(--ink-2);margin:2px 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .m-prev{font-size:10.5px;color:#98a4b1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:5px}
+  .m-prev svg{width:10px;height:10px;stroke:#a9b4c0;fill:none;stroke-width:1.8;flex:none}
+  .m-tag{font-size:9px;padding:0 5px;border-radius:3px;background:#f0f4f8;color:#7a8896;flex:none;white-space:nowrap}
+  .m-dot{position:absolute;left:5px;top:50%;transform:translateY(-50%);width:4px;height:4px;border-radius:50%;background:var(--blue);display:none}
+  .mail-item.unread .m-dot{display:block}
+
+  .reading{display:flex;flex-direction:column;min-width:0;overflow:hidden;background:#fff}
+  .read-empty{flex:1;display:grid;place-items:center;color:#a9b4c0;font-size:12px;text-align:center;padding:30px}
+  .read-empty svg{width:54px;height:54px;stroke:#dde5ec;fill:none;stroke-width:1;margin:0 auto 10px}
+  .read-head{padding:16px 20px 13px;border-bottom:1px solid var(--line-soft)}
+  .read-head h2{margin:0 0 8px;font-size:15.5px;font-weight:600;line-height:1.45}
+  .read-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .read-meta .m-ava{width:28px;height:28px;border-radius:6px;font-size:10.5px}
+  .read-meta .who b{font-size:11.5px;font-weight:500;display:block;line-height:1.3}
+  .read-meta .who span{font-size:10px;color:var(--muted);font-family:var(--mono)}
+  .read-meta .time{font-size:10px;color:var(--muted);margin-left:auto;font-family:var(--mono)}
+  .read-body{padding:18px 20px;overflow-y:auto;font-size:12.5px;line-height:1.9;color:var(--ink-2);flex:1}
+  .read-body p{margin:0 0 12px}
+  .read-body .q{
+    border-left:2px solid var(--blue);background:#f7fafd;padding:10px 14px;color:#52606d;
+    font-size:12px;margin:12px 0;border-radius:0 5px 5px 0;
+  }
+  .read-body table{border-collapse:collapse;font-size:11.5px;margin:10px 0;width:100%;max-width:460px}
+  .read-body td,.read-body th{border:1px solid var(--line);padding:6px 9px;text-align:left}
+  .read-body th{background:#f7f9fb;font-weight:500;color:var(--ink-2)}
+  .attach{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--line-soft)}
+  .att{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:6px;padding:5px 9px;font-size:10.5px;color:var(--ink-2);background:#fbfcfd}
+  .att svg{width:12px;height:12px;stroke:#7a8896;fill:none;stroke-width:1.7}
+  .att span{color:var(--muted);font-size:9.5px}
+
+  /* compose modal */
+  .mask{
+    position:fixed;inset:0;background:rgba(15,25,35,.42);z-index:60;display:grid;place-items:center;
+    opacity:0;pointer-events:none;transition:.2s;padding:20px;
+  }
+  .mask.on{opacity:1;pointer-events:auto}
+  .compose-box{
+    width:640px;max-width:100%;background:#fff;border-radius:10px;overflow:hidden;
+    box-shadow:0 30px 70px rgba(15,25,35,.3);transform:translateY(8px);transition:.2s;
+    display:flex;flex-direction:column;max-height:86vh;
+  }
+  .mask.on .compose-box{transform:none}
+  .cb-head{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+  .cb-head b{font-size:13px;font-weight:600}
+  .cb-head button{color:var(--muted);width:24px;height:24px;border-radius:5px;display:grid;place-items:center}
+  .cb-head button:hover{background:#f2f5f8;color:var(--ink)}
+  .cb-field{display:flex;align-items:center;gap:8px;padding:9px 16px;border-bottom:1px solid var(--line-soft);font-size:12px}
+  .cb-field label{width:44px;color:var(--muted);flex:none}
+  .cb-field input{flex:1;border:0;outline:0;padding:2px 0;font-size:12.5px}
+  .cb-field input::placeholder{color:#b5c0cb}
+  .cb-body{flex:1;min-height:220px;padding:12px 16px;border:0;outline:0;resize:none;font-size:12.5px;line-height:1.9;width:100%}
+  .cb-foot{padding:10px 16px;border-top:1px solid var(--line);display:flex;align-items:center;gap:8px}
+  .cb-foot .tip{font-size:10.5px;color:var(--muted);margin-left:auto}
+  .err{color:#c0392b;font-size:10.5px;padding:0 16px 8px;display:none}
+  .err.on{display:block}
+
+  .toast{
+    position:fixed;left:50%;bottom:30px;transform:translate(-50%,8px);z-index:90;
+    background:#16202a;color:#fff;font-size:12px;padding:9px 16px;border-radius:7px;
+    opacity:0;pointer-events:none;transition:.25s;box-shadow:0 10px 26px rgba(0,0,0,.22);
+  }
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+  .page-foot{font-size:10.5px;color:#9aa7b4;margin-top:14px;line-height:1.7}
+
+  @media (max-width:1100px){
+    .mail-app{grid-template-columns:150px 300px 1fr}
+  }
+  @media (max-width:900px){
+    .head-in{padding:0 16px;gap:14px}
+    .brand span{display:none}
+    .tabs button{padding:6px 10px;font-size:12px}
+    .demo-chip{display:none}
+    .page{padding:16px}
+    .config{grid-template-columns:1fr}
+    .steps{position:static;display:flex;gap:6px;overflow-x:auto;padding:12px}
+    .steps h3,.steps-foot{display:none}
+    .step-item{flex:none;padding:0 12px 0 0;gap:7px;align-items:center}
+    .step-item::before{display:none}
+    .step-item span{display:none}
+    .step-item b{font-size:11.5px;white-space:nowrap;margin:0}
+    .since{display:none}
+    .mail-app{grid-template-columns:1fr;height:auto;min-height:0}
+    .folders{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line);padding:8px;gap:2px;align-items:center}
+    .compose{margin:0 8px 0 0;width:auto;padding:6px 12px;font-size:11.5px;flex:none}
+    .folder{width:auto;white-space:nowrap;margin:0;padding:6px 9px;flex:none}
+    .folder .unread{margin-left:4px}
+    .storage{display:none}
+    .maillist{border-right:0;max-height:420px}
+    .reading{border-top:1px solid var(--line);min-height:320px}
+    .mail-app.reading .maillist{display:none}
+    .mail-app:not(.reading) .reading{display:none}
+    .frame-title{font-size:10px!important;letter-spacing:.02em!important}
+  }
+  @media (max-width:520px){
+    .head-in{height:52px}
+    .brand b{font-size:13px}
+    .brand .logo{width:26px;height:26px}
+    .tabs button{padding:5px 8px;font-size:11.5px}
+    .avatar{display:none}
+    .page-title h1{font-size:18px}
+    .value{max-width:240px}
+    .rec-table th:nth-child(4),.rec-table td:nth-child(4){display:none}
+    .cfg-foot .note{width:100%}
+    .cfg-foot .spacer{margin-left:0;width:100%}
+    .cfg-foot .btn{flex:1}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="head-in">
+    <div class="brand">
+      <span class="logo"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg></span>
+      <div><b>邮企 MailSuite</b><span>ENTERPRISE MAIL</span></div>
+    </div>
+    <div class="tabs">
+      <button class="on" data-sec="config" onclick="switchSection('config', this)">域名邮箱配置</button>
+      <button data-sec="mailbox" onclick="switchSection('mailbox', this)">网页邮箱</button>
+    </div>
+    <div class="head-right">
+      <span class="demo-chip">演示项目 · 数据为模拟</span>
+      <span class="avatar">王</span>
+    </div>
+  </div>
+</header>
+
+<!-- ================= 配置向导 ================= -->
+<section class="section on" id="sec-config">
+  <div class="page">
+    <div class="page-title">
+      <div>
+        <h1>域名邮箱配置</h1>
+        <p>添加域名 → 验证所有权 → 配置解析 → 检测生效，约 10 分钟完成</p>
+      </div>
+      <div class="hint-line"><span class="dot"></span>DNS 服务商：阿里云云解析 · 区域：华东1</div>
+    </div>
+
+    <div class="config">
+      <aside class="steps" id="stepRail">
+        <h3>配置进度</h3>
+        <div class="step-item done"><span class="n">✓</span><div><b>添加域名</b><span>luye-demo.com 已添加</span></div></div>
+        <div class="step-item done"><span class="n">✓</span><div><b>验证所有权</b><span>TXT 记录已验证通过</span></div></div>
+        <div class="step-item now"><span class="n">3</span><div><b>配置解析记录</b><span>共 6 条记录待配置</span></div></div>
+        <div class="step-item"><span class="n">4</span><div><b>检测生效</b><span>等待解析生效</span></div></div>
+        <div class="steps-foot">解析记录修改后，全球 DNS 生效通常需要 10 分钟至 24 小时。演示环境的检测为模拟过程。</div>
+      </aside>
+
+      <div class="cfg-main">
+        <div class="card">
+          <div class="card-head">
+            <h2>域名</h2>
+            <span class="meta">添加于 2026-11-08 14:20</span>
+          </div>
+          <div class="card-body">
+            <div class="domain-row">
+              <div class="domain-box">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg>
+                luye-demo.com
+              </div>
+              <span class="verified"><i></i>所有权已验证</span>
+              <button class="btn sm push-right" onclick="toast('演示环境：暂不支持添加新域名')">+ 添加域名</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h2>解析记录</h2>
+            <span class="meta">6 条记录 · 需在 DNS 服务商后台逐条添加</span>
+          </div>
+
+          <div class="progress-box" id="progressBox">
+            <div class="pbar"><i id="pFill"></i></div>
+            <div class="pmeta"><span id="pText">准备检测…</span><span id="pPct">0%</span></div>
+          </div>
+
+          <div class="table-scroll">
+            <table class="rec-table">
+              <thead>
+                <tr>
+                  <th style="width:74px">类型</th>
+                  <th style="width:170px">主机记录</th>
+                  <th>记录值</th>
+                  <th style="width:76px">TTL</th>
+                  <th style="width:96px">状态</th>
+                  <th style="width:44px"></th>
+                </tr>
+              </thead>
+              <tbody id="recBody"></tbody>
+            </table>
+          </div>
+
+          <div class="cfg-foot">
+            <div class="note">提示：MX 记录决定收信，SPF / DKIM / DMARC 影响发信到达率，建议全部配置。</div>
+            <div class="spacer"></div>
+            <button class="btn" onclick="copyAll()">
+              <svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+              复制全部记录
+            </button>
+            <button class="btn primary" id="checkBtn" onclick="startCheck()">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></svg>
+              检测解析状态
+            </button>
+          </div>
+        </div>
+
+        <div class="tips">
+          <h4><svg viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3z"/><path d="M12 9v5M12 17h.01"/></svg>常见问题</h4>
+          <ul>
+            <li>SPF 记录一个域名只能有一条，如已有 <code>v=spf1</code> 记录，请合并而不是新增。</li>
+            <li>DKIM 记录主机名含选择器，示例为 <code>s1._domainkey</code>，请与邮件服务商提供的一致。</li>
+            <li>DMARC 建议先使用 <code>p=none</code> 观察 1-2 周，确认无异常后再改为 <code>quarantine</code>。</li>
+            <li>解析添加后可用 <code>dig MX luye-demo.com</code> 或在线工具复核，避免多打空格。</li>
+          </ul>
+        </div>
+        <div class="page-foot">演示项目，数据为模拟 · 域名、记录值均为虚构示例，不会真实修改任何 DNS。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 网页邮箱 ================= -->
+<section class="section" id="sec-mailbox">
+  <div class="page">
+    <div class="page-title">
+      <div>
+        <h1>网页邮箱</h1>
+        <p>wang@luye-demo.com · 收件箱 8 封 · 容量 12.6 GB / 50 GB</p>
+      </div>
+      <div class="hint-line"><span class="dot"></span>IMAP / SMTP 已连接</div>
+    </div>
+
+    <div class="mail-app" id="mailApp">
+      <aside class="folders">
+        <button class="compose" onclick="openCompose()">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          写邮件
+        </button>
+        <button class="folder on" onclick="toast('演示环境：仅展示收件箱')">
+          <svg viewBox="0 0 24 24"><path d="M3 7l9 6 9-6"/><rect x="3" y="5" width="18" height="14" rx="2"/></svg>
+          收件箱 <span class="unread" id="unreadCount">5</span>
+        </button>
+        <button class="folder" onclick="toast('演示环境：已发送文件夹为模拟')">
+          <svg viewBox="0 0 24 24"><path d="m4 12 16-7-7 16-2-7-7-2z"/></svg>
+          已发送 <span class="cnt">12</span>
+        </button>
+        <button class="folder" onclick="toast('演示环境：草稿箱为模拟')">
+          <svg viewBox="0 0 24 24"><path d="M4 20h16M6 16l10-10 3 3-10 10H6v-3z"/></svg>
+          草稿箱 <span class="cnt">2</span>
+        </button>
+        <button class="folder" onclick="toast('演示环境：垃圾邮件为模拟')">
+          <svg viewBox="0 0 24 24"><path d="M5 7h14l-1 13H6L5 7z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>
+          垃圾邮件 <span class="cnt">1</span>
+        </button>
+        <button class="folder" onclick="toast('演示环境：回收站为模拟')">
+          <svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/></svg>
+          回收站
+        </button>
+        <div class="storage">
+          邮箱容量
+          <div class="bar"><i></i></div>
+          12.6 GB / 50 GB
+        </div>
+      </aside>
+
+      <div class="maillist">
+        <div class="list-top">
+          <h3>收件箱 <span id="listCount">8 封</span></h3>
+          <div class="search">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+            <input id="searchInput" placeholder="搜索发件人或主题" oninput="renderList()">
+          </div>
+        </div>
+        <div class="mails" id="mailList"></div>
+      </div>
+
+      <div class="reading" id="readingPane">
+        <div class="read-empty">
+          <div>
+            <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>
+            选择一封邮件查看内容
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="page-foot">演示项目，数据为模拟 · 邮件内容、发件人均为虚构，不连接真实邮件服务器。</div>
+  </div>
+</section>
+
+<!-- 写邮件 -->
+<div class="mask" id="composeMask" onclick="if(event.target===this)closeCompose()">
+  <div class="compose-box">
+    <div class="cb-head">
+      <b>写邮件</b>
+      <button onclick="closeCompose()" aria-label="关闭">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="cb-field"><label>发件人</label><input value="wang@luye-demo.com" readonly style="color:#7a8896"></div>
+    <div class="cb-field"><label>收件人</label><input id="cpTo" placeholder="name@example.com" value="chen.manager@kehu-demo.com"></div>
+    <div class="cb-field"><label>主题</label><input id="cpSubject" placeholder="邮件主题" value="官网改版第三版设计稿已更新"></div>
+    <div class="err" id="cpErr">请填写收件人和主题</div>
+    <textarea class="cb-body" id="cpBody" placeholder="正文…">陈经理，您好：
+
+第三版设计稿已更新，主要调整了首页 Banner、产品列表筛选和移动端导航，附件为对比说明。
+
+如有问题随时联系，谢谢。
+
+王工
+昆山 · 软件开发
+wang@luye-demo.com</textarea>
+    <div class="cb-foot">
+      <button class="btn primary" onclick="sendMail()">发送</button>
+      <button class="btn" onclick="closeCompose()">保存草稿</button>
+      <span class="tip">演示环境，发送不会真实投递</span>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= 解析记录数据 ================= */
+const RECORDS = [
+  { type:'MX',    host:'@',                     value:'mx1.qiye-mail.com（优先级 5）', ttl:'600',   note:'主收信服务器' },
+  { type:'MX',    host:'@',                     value:'mx2.qiye-mail.com（优先级 10）', ttl:'600',  note:'备用收信服务器' },
+  { type:'TXT',   host:'@',                     value:'v=spf1 include:spf.qiye-mail.com ~all', ttl:'600', note:'SPF 发信授权' },
+  { type:'TXT',   host:'s1._domainkey',         value:'v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4x7Yk9uQm2LpZ8vR3sT6wN1cH5jF0aB7eK2dG4iM9oPqS3rV8xW1yZ5nC6bA2fH4jL7mN0pR3sT9uV2wX5yZ8aB1cD4eF7gH0jK3mN6pQ9rS2tU5vW8xY1zA4bC7dE0fG3hJ6kL9mN2oP5qR8sT1uV4wX7yZ0aB3cD6eF9gH2iJ5kL8mN1oP4qR7sT0uV3wX6yZ9aB2cD5eF8gH1iJ4kL7mN0oP3qR6sT9uV2wX5yZ8aB1cD4eF7gH0iJ3kL6mN9oP2qR5sT8uV1wX4yZ7aB0cD3eF6gH9iJ2kL5mN8oP1qR4sT7uV0wX3yZ6aB9cD2eF5gH8iJ1kL4mN7oP0qR3sT6uV9wX2yZ5aB8cD1eF4gH7iJ0kL3mN6oP9qR2sT5uV8wX1yZ4aB7cD0eF3gH6iJ9kL2mN5oP8qR1sT4uV7wX0yZ3aB6cD9eF2gH5iJ8kL1mN4oP7qR0sT3uV6wX9yZ2aB5cD8eF1gH4iJ7kL0mN3oP6qR9sT2uV5wX8yZ1aB4cD7eF0gH3iJ6kL9mN2oP5qR8sT1uV4wX7yZ0aB3cD6eF9gH2iJ', ttl:'600', note:'DKIM 签名公钥' },
+  { type:'TXT',   host:'_dmarc',                 value:'v=DMARC1; p=quarantine; rua=mailto:dmarc@luye-demo.com; pct=100', ttl:'600', note:'DMARC 策略' },
+  { type:'CNAME', host:'mail',                   value:'mail.qiye-mail.com', ttl:'600', note:'网页邮箱登录入口' },
+  { type:'TXT',   host:'_qiye-verify',           value:'qiye-verify=8f2c41d7a9b3e6405c1f', ttl:'600', note:'所有权验证（已通过）' }
+];
+
+/* ================= 渲染记录 ================= */
+function renderRecords(){
+  document.getElementById('recBody').innerHTML = RECORDS.map((r, i) => `
+    <tr>
+      <td><span class="type-badge ${r.type.toLowerCase()}">${r.type}</span></td>
+      <td><span class="host">${r.host}<em>${r.note}</em></span></td>
+      <td><div class="value clip" id="val-${i}">${r.value}</div></td>
+      <td><span class="ttl">${r.ttl}</span></td>
+      <td><span class="rec-status ${r.status ? 'ok' : ''}" id="st-${i}"><i></i>${r.status ? '已生效' : '待检测'}</span></td>
+      <td>
+        <button class="copy-btn" id="cp-${i}" onclick="copyRecord(${i})" title="复制记录值">
+          <svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+        </button>
+      </td>
+    </tr>`).join('');
+}
+renderRecords();
+
+/* ================= 复制 ================= */
+function copyText(text){
+  if (navigator.clipboard && window.isSecureContext){
+    return navigator.clipboard.writeText(text);
+  }
+  return new Promise(resolve => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(e){}
+    document.body.removeChild(ta);
+    resolve();
+  });
+}
+function copyRecord(i){
+  const btn = document.getElementById('cp-' + i);
+  copyText(RECORDS[i].value).then(() => {
+    btn.classList.add('copied');
+    toast('已复制 ' + RECORDS[i].type + ' 记录值');
+    setTimeout(() => btn.classList.remove('copied'), 1600);
+  });
+}
+function copyAll(){
+  const lines = RECORDS.map(r => `${r.type}\t${r.host}\t${r.value}\tTTL ${r.ttl}`).join('\n');
+  copyText(lines).then(() => toast('6 条记录已复制，可直接粘贴到 DNS 后台'));
+}
+
+/* ================= 模拟检测 ================= */
+let checking = false;
+function startCheck(){
+  if (checking) return;
+  checking = true;
+  const btn = document.getElementById('checkBtn');
+  btn.disabled = true;
+  btn.textContent = '检测中…';
+  const box = document.getElementById('progressBox');
+  box.classList.add('on');
+  const fill = document.getElementById('pFill');
+  const pct = document.getElementById('pPct');
+  const txt = document.getElementById('pText');
+
+  // 重置状态
+  RECORDS.forEach((r, i) => {
+    r.status = false;
+    const st = document.getElementById('st-' + i);
+    st.className = 'rec-status';
+    st.innerHTML = '<i></i>待检测';
+  });
+
+  let idx = 0;
+  const tick = () => {
+    if (idx > 0){
+      const prev = document.getElementById('st-' + (idx - 1));
+      prev.className = 'rec-status ok';
+      prev.innerHTML = '<i></i>已生效';
+    }
+    if (idx >= RECORDS.length){
+      fill.style.width = '100%';
+      pct.textContent = '100%';
+      txt.textContent = '全部 6 条记录已生效 · 可开始收发邮件';
+      btn.textContent = '重新检测';
+      btn.disabled = false;
+      checking = false;
+      RECORDS.forEach(r => r.status = true);
+      // 更新步骤条
+      const rail = document.querySelectorAll('#stepRail .step-item');
+      rail[2].className = 'step-item done';
+      rail[2].querySelector('.n').textContent = '✓';
+      rail[3].className = 'step-item done';
+      rail[3].querySelector('.n').textContent = '✓';
+      toast('解析检测完成：6 条记录全部生效');
+      return;
+    }
+    const st = document.getElementById('st-' + idx);
+    st.className = 'rec-status checking';
+    st.innerHTML = '<i></i>检测中';
+    const p = Math.round((idx + 1) / RECORDS.length * 100);
+    fill.style.width = p + '%';
+    pct.textContent = p + '%';
+    txt.textContent = `正在检测第 ${idx + 1} / ${RECORDS.length} 条：${RECORDS[idx].type} ${RECORDS[idx].host}`;
+    idx++;
+    setTimeout(tick, 620);
+  };
+  txt.textContent = '正在连接 DNS 服务器…';
+  setTimeout(tick, 500);
+}
+
+/* ================= 邮件数据 ================= */
+const MAILS = [
+  {
+    id:1, color:'#c0392b', letter:'云', from:'云服务通知', addr:'notice@cloud-demo.com',
+    subject:'您的 SSL 证书将于 15 天后到期', time:'14:12', unread:true, tag:'重要', attach:'cert-list.txt',
+    body:`<p>尊敬的用户，您好：</p>
+      <p>您名下域名 <b>shop.luye-demo.com</b> 的 SSL 证书将于 <b>2026-11-23</b> 到期，剩余 15 天。为避免网站出现“不安全”提示，请尽快完成续期或更换证书。</p>
+      <div class="q">证书类型：Let's Encrypt 泛域名（DV）<br>绑定域名：shop.luye-demo.com、www.luye-demo.com<br>到期时间：2026-11-23 08:00</div>
+      <p>如已开启自动续期，请忽略本邮件；如未开启，可在控制台「证书管理 - 续期」中一键申请。</p>
+      <p>云服务运维组</p>`
+  },
+  {
+    id:2, color:'#2f6f4f', letter:'陈', from:'陈经理', addr:'chen.manager@kehu-demo.com',
+    subject:'关于官网改版第三版设计稿的反馈', time:'11:38', unread:true, tag:'客户', attach:'改版意见-v3.pdf',
+    body:`<p>王工，您好：</p>
+      <p>第三版设计稿我们内部看过了，整体方向没问题，几点意见：</p>
+      <p>1. 首页 Banner 文案层级可以再清楚一些，主标题和副标题拉开差距；<br>
+         2. 产品列表页的筛选项在手机上太挤，建议收进「筛选」抽屉；<br>
+         3. 客户案例模块希望增加行业标签，方便按行业查看。</p>
+      <p>另外，上线时间是否还能按 11 月底排？我们这边市场活动定在 12 月 5 日。</p>
+      <p>附件是汇总的修改意见，麻烦评估一下工作量。</p>
+      <p>陈经理<br>苏州××精密机械有限公司</p>`
+  },
+  {
+    id:3, color:'#8a5a2b', letter:'域', from:'域名服务商', addr:'service@domain-demo.cn',
+    subject:'域名实名认证审核通过通知', time:'10:05', unread:true, tag:'通知', attach:'',
+    body:`<p>您好：</p>
+      <p>您提交的域名 <b>luye-demo.com</b> 实名认证资料已审核通过，域名状态已恢复正常，可正常解析与使用。</p>
+      <p>域名注册信息：</p>
+      <table>
+        <tr><th>域名</th><td>luye-demo.com</td></tr>
+        <tr><th>注册时间</th><td>2026-10-28</td></tr>
+        <tr><th>到期时间</th><td>2027-10-28</td></tr>
+        <tr><th>实名状态</th><td>已通过</td></tr>
+      </table>
+      <p>建议开启域名到期提醒，避免因忘记续费导致解析中断。</p>`
+  },
+  {
+    id:4, color:'#2b5f8a', letter:'G', from:'GitHub', addr:'noreply@github.com',
+    subject:'[luye-shop] 部署失败：build 任务在第 2 步退出', time:'09:21', unread:true, tag:'系统', attach:'',
+    body:`<p>Hi wangdingkui123,</p>
+      <p>Workflow <b>deploy.yml</b> 在分支 <b>main</b> 上运行失败。</p>
+      <div class="q">Job: build · Step 2/5: npm run build<br>Exit code: 1<br>Duration: 42s<br>Commit: 8f2c41d (fix: 商品详情页库存显示)</div>
+      <p>常见原因：依赖未锁定版本、Node 版本不一致、构建时缺少环境变量。日志显示 <code>Cannot find module 'sharp'</code>，建议在 CI 中增加安装步骤或锁定 lockfile。</p>
+      <p>— GitHub Actions</p>`
+  },
+  {
+    id:5, color:'#5b4b8a', letter:'团', from:'研发小组', addr:'dev@luye-demo.com',
+    subject:'本周迭代计划（11.04 - 11.10）', time:'昨天', unread:true, tag:'内部', attach:'sprint-23.xlsx',
+    body:`<p>各位好，本周迭代重点：</p>
+      <p>1. 商城购物车性能优化，减少重复渲染；<br>
+         2. 小程序预约表单增加「人数」校验，修复重复提交；<br>
+         3. 运维面板接入真实监控数据（测试环境）；<br>
+         4. 企业邮箱 DMARC 策略从 p=none 调整为 quarantine。</p>
+      <p>周三 15:00 同步进度，有问题提前在群里说。</p>
+      <p>王工</p>`
+  },
+  {
+    id:6, color:'#1c7c72', letter:'阿', from:'阿里云监控', addr:'alert@aliyun-demo.com',
+    subject:'ECS 实例 CPU 使用率告警恢复通知', time:'昨天', unread:false, tag:'告警', attach:'',
+    body:`<p>您的云监控告警已恢复。</p>
+      <table>
+        <tr><th>实例</th><td>prod-api-01（i-8vb2k9f3a1c8）</td></tr>
+        <tr><th>监控项</th><td>CPU 使用率</td></tr>
+        <tr><th>触发阈值</th><td>&gt; 85%，持续 5 分钟</td></tr>
+        <tr><th>当前值</th><td>46%</td></tr>
+        <tr><th>恢复时间</th><td>2026-11-07 21:42:10</td></tr>
+      </table>
+      <p>本次告警持续 11 分钟，建议检查该时段是否有定时任务或流量突增。</p>`
+  },
+  {
+    id:7, color:'#a8762c', letter:'商', from:'昆山企业服务联盟', addr:'event@ks-demo.org',
+    subject:'11 月企业沙龙邀请函：中小企业数字化落地', time:'11-06', unread:false, tag:'活动', attach:'邀请函.pdf',
+    body:`<p>尊敬的企业负责人：</p>
+      <p>联盟将于 <b>11 月 20 日（周四）14:00</b> 在昆山高新区科创中心举办「中小企业数字化落地」主题沙龙，围绕官网、小程序、企业邮箱与云资源成本控制做实操分享。</p>
+      <p>议程：<br>
+         14:00 - 14:40 数字化投入的优先级怎么排<br>
+         14:40 - 15:20 小程序与官网的获客配合<br>
+         15:20 - 16:00 自由交流</p>
+      <p>名额 40 人，回复本邮件即可报名。</p>`
+  },
+  {
+    id:8, color:'#5f6b7a', letter:'票', from:'电子发票平台', addr:'invoice@tax-demo.cn',
+    subject:'电子发票已开具（发票号 25320000000012345678）', time:'11-05', unread:false, tag:'财务', attach:'发票.pdf',
+    body:`<p>您好，您申请的电子发票已开具成功。</p>
+      <table>
+        <tr><th>发票号码</th><td>25320000000012345678</td></tr>
+        <tr><th>开票日期</th><td>2026-11-05</td></tr>
+        <tr><th>购买方</th><td>昆山××网络科技有限公司</td></tr>
+        <tr><th>项目</th><td>信息技术服务 · 网站开发</td></tr>
+        <tr><th>金额</th><td>¥ 12,000.00（含税）</td></tr>
+      </table>
+      <p>发票文件已随邮件附上，可在 30 天内下载，逾期请到开票平台重新获取。</p>`
+  }
+];
+
+let currentMail = null;
+
+/* ================= 邮件列表 ================= */
+function renderList(){
+  const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+  const list = MAILS.filter(m => !q || m.from.toLowerCase().includes(q) || m.subject.toLowerCase().includes(q));
+  document.getElementById('listCount').textContent = list.length + ' 封';
+  const unread = MAILS.filter(m => m.unread).length;
+  const uc = document.getElementById('unreadCount');
+  uc.textContent = unread;
+  uc.style.display = unread ? '' : 'none';
+
+  document.getElementById('mailList').innerHTML = list.length ? list.map(m => `
+    <div class="mail-item ${m.unread ? 'unread' : ''} ${currentMail === m.id ? 'on' : ''}" onclick="openMail(${m.id})">
+      <span class="m-dot"></span>
+      <div class="m-ava" style="background:${m.color}">${m.letter}</div>
+      <div class="m-body">
+        <div class="m-top"><span class="m-from">${m.from}</span><span class="m-time">${m.time}</span></div>
+        <div class="m-sub">${m.subject}</div>
+        <div class="m-prev">
+          <span class="m-tag">${m.tag}</span>
+          ${m.attach ? '<svg viewBox="0 0 24 24"><path d="M21 11.5 12.5 20a5 5 0 0 1-7-7l8.5-8.5a3.5 3.5 0 0 1 5 5L10.5 18a2 2 0 0 1-3-3l8-8"/></svg>' : ''}
+          ${stripHtml(m.body).slice(0, 30)}…
+        </div>
+      </div>
+    </div>`).join('')
+    : '<div style="padding:40px 20px;text-align:center;color:#a9b4c0;font-size:12px">没有找到匹配的邮件</div>';
+}
+function stripHtml(html){
+  const d = document.createElement('div');
+  d.innerHTML = html;
+  return d.textContent.replace(/\s+/g, ' ').trim();
+}
+function openMail(id){
+  const m = MAILS.find(x => x.id === id);
+  currentMail = id;
+  m.unread = false;
+  document.getElementById('mailApp').classList.add('reading');
+  document.getElementById('readingPane').innerHTML = `
+    <div class="read-head">
+      <h2>${m.subject}</h2>
+      <div class="read-meta">
+        <div class="m-ava" style="background:${m.color}">${m.letter}</div>
+        <div class="who"><b>${m.from} &lt;${m.addr}&gt;</b><span>发送给 wang@luye-demo.com</span></div>
+        <span class="time">${m.time}</span>
+      </div>
+    </div>
+    <div class="read-body">
+      ${m.body}
+      ${m.attach ? `<div class="attach">
+        <span class="att"><svg viewBox="0 0 24 24"><path d="M21 11.5 12.5 20a5 5 0 0 1-7-7l8.5-8.5a3.5 3.5 0 0 1 5 5L10.5 18a2 2 0 0 1-3-3l8-8"/></svg>${m.attach}<span>· 附件</span></span>
+      </div>` : ''}
+      <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn sm" onclick="toast('演示环境：回复功能未接入')">回复</button>
+        <button class="btn sm" onclick="toast('演示环境：转发功能未接入')">转发</button>
+        <button class="btn sm" onclick="backToList()">返回列表</button>
+      </div>
+    </div>`;
+  renderList();
+}
+function backToList(){
+  document.getElementById('mailApp').classList.remove('reading');
+}
+renderList();
+
+/* ================= 写邮件 ================= */
+function openCompose(){
+  const mask = document.getElementById('composeMask');
+  mask.classList.add('on');
+  document.getElementById('cpErr').classList.remove('on');
+  setTimeout(() => document.getElementById('cpTo').focus(), 200);
+}
+function closeCompose(){
+  document.getElementById('composeMask').classList.remove('on');
+}
+function sendMail(){
+  const to = document.getElementById('cpTo').value.trim();
+  const subject = document.getElementById('cpSubject').value.trim();
+  const err = document.getElementById('cpErr');
+  const validTo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to);
+  if (!validTo || !subject){
+    err.textContent = validTo ? '请填写邮件主题' : '请填写有效的收件人邮箱';
+    err.classList.add('on');
+    return;
+  }
+  err.classList.remove('on');
+  closeCompose();
+  toast('邮件已发送（模拟）：' + to);
+}
+
+/* ================= 分区切换 ================= */
+function switchSection(sec, btn){
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('on'));
+  document.getElementById('sec-' + sec).classList.add('on');
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b === btn));
+  window.scrollTo({top:0, behavior:'instant'});
+  if (sec === 'mailbox'){
+    renderList();
+    if (!currentMail && window.innerWidth > 900) openMail(1);
+  }
+}
+
+/* ================= toast ================= */
+let toastTimer = null;
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('on'), 2000);
+}
+
+// 邮箱数据在切换分区时渲染
+</script>
+</body>
+</html>
