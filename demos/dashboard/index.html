@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>经营数据看板 · 演示样例</title>
+<meta name="description" content="后台管理系统演示：多图表看板、筛选联动、明细表与 CSV 导出。演示样例 · Demo，非真实客户项目。">
+<style>
+  :root{
+    --bg:#eef2f6;--panel:#fff;--ink:#16222e;--ink2:#465767;--mut:#8294a3;
+    --line:#e0e7ee;--line2:#ccd8e3;
+    --navy:#132a3d;--navy2:#1b3a52;
+    --c1:#2f6fa0;--c2:#3fa08c;--c3:#c08a2e;--c4:#8a6bb0;--c5:#c25d4e;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  button,select{font-family:inherit}
+
+  .demo-note{background:#0e1a24;color:#b3c5d3;font-size:11px;text-align:center;padding:6px 12px}
+  .demo-note b{color:#8fc7e8}
+  .demo-note a{color:#8fc7e8;margin-left:8px}
+
+  .top{background:var(--navy);color:#c3d4e0;display:flex;align-items:center;gap:18px;padding:0 20px;height:54px;position:sticky;top:0;z-index:30}
+  .top .brand{display:flex;align-items:center;gap:9px;color:#fff;font-weight:600;font-size:13.5px}
+  .top .brand i{width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,#3f8fc4,#2f6fa0);display:grid;place-items:center;font-style:normal;font-size:11px}
+  .top nav{display:flex;gap:18px;font-size:12.5px;margin-left:10px}
+  .top nav a{padding:4px 0;border-bottom:2px solid transparent;color:#9fb4c3}
+  .top nav a.on{color:#fff;border-color:#5aa8d8}
+  .top nav a:hover{color:#fff}
+  .top .r{margin-left:auto;display:flex;align-items:center;gap:14px;font-size:11.5px;color:#8ea6b7}
+  .live{display:inline-flex;align-items:center;gap:5px}
+  .live s{width:6px;height:6px;border-radius:50%;background:#3ddc97;text-decoration:none;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  @media(max-width:820px){.top nav{display:none}.top .r span.hide{display:none}}
+
+  .wrap{padding:18px 20px 34px;max-width:1440px;margin:0 auto}
+  @media(max-width:520px){.wrap{padding:14px}}
+
+  .pageh{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+  .pageh h1{margin:0;font-size:19px;font-weight:600}
+  .pageh p{margin:3px 0 0;font-size:11.5px;color:var(--mut)}
+
+  /* filters */
+  .filters{background:#fff;border:1px solid var(--line);border-radius:8px;padding:11px 14px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+  .fgroup{display:flex;align-items:center;gap:7px}
+  .fgroup .lab{font-size:11px;color:var(--mut);white-space:nowrap}
+  .seg{display:flex;border:1px solid var(--line2);border-radius:5px;overflow:hidden}
+  .seg button{background:#fff;border:none;border-right:1px solid var(--line);padding:5px 11px;font-size:11.5px;color:var(--ink2);cursor:pointer}
+  .seg button:last-child{border-right:none}
+  .seg button:hover{background:#f4f8fb}
+  .seg button.on{background:#e8f1f8;color:var(--c1);font-weight:600}
+  select.ft{border:1px solid var(--line2);border-radius:5px;padding:5px 8px;font-size:11.5px;color:var(--ink2);background:#fff;outline:none}
+  .filters .sp{margin-left:auto;display:flex;gap:8px}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:5px;border:1px solid var(--line2);background:#fff;font-size:11.5px;color:var(--ink2);cursor:pointer}
+  .btn:hover{border-color:#a3b6c5}
+  .btn-p{background:var(--c1);border-color:var(--c1);color:#fff}
+  .btn-p:hover{background:#255d87;color:#fff}
+  @media(max-width:700px){.filters{gap:10px}.filters .sp{width:100%;margin-left:0}}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+  @media(max-width:980px){.kpis{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.kpis{grid-template-columns:1fr}}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:8px;padding:14px 16px;position:relative;overflow:hidden}
+  .kpi:after{content:"";position:absolute;right:-20px;top:-20px;width:70px;height:70px;border-radius:50%;background:rgba(47,111,160,.05)}
+  .kpi .k{font-size:11.5px;color:var(--mut);display:flex;align-items:center;gap:6px}
+  .kpi strong{display:block;font-size:24px;font-weight:600;letter-spacing:-.02em;margin:5px 0 2px;font-variant-numeric:tabular-nums}
+  .kpi strong small{font-size:12px;font-weight:400;color:var(--mut);margin-left:2px}
+  .kpi .d{font-size:11px;display:flex;align-items:center;gap:6px}
+  .up{color:#1f8a5f}.down{color:#c0392b}
+  .kpi .d span{color:var(--mut)}
+
+  .grid2{display:grid;grid-template-columns:1.75fr 1fr;gap:12px;margin-bottom:12px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+  @media(max-width:1080px){.grid2{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}}
+  @media(max-width:700px){.grid3{grid-template-columns:1fr}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:14px 16px 16px;min-width:0}
+  .card-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px}
+  .card-h h3{margin:0;font-size:13.5px;font-weight:600}
+  .card-h span{font-size:10.5px;color:var(--mut)}
+  .card-h .val{font-size:11px;color:var(--ink2);font-family:ui-monospace,Menlo,monospace}
+
+  svg.chart{display:block;width:100%;height:auto;overflow:visible}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:11px;color:var(--ink2)}
+  .legend i{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:5px}
+
+  .donut-wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .donut-wrap svg{flex:0 0 132px;width:132px;height:132px}
+  .dl{flex:1;min-width:120px;font-size:11.5px}
+  .dl div{display:flex;align-items:center;gap:6px;padding:3px 0}
+  .dl i{width:8px;height:8px;border-radius:2px;flex:0 0 auto}
+  .dl b{margin-left:auto;font-weight:600;font-variant-numeric:tabular-nums}
+  .dl span{color:var(--mut);font-size:10.5px;width:34px;text-align:right}
+
+  .hbar{margin-bottom:10px}
+  .hbar .r{display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:4px}
+  .hbar .r b{font-weight:600;font-variant-numeric:tabular-nums}
+  .hbar .t{height:7px;background:#eef2f6;border-radius:4px;overflow:hidden}
+  .hbar .t i{display:block;height:100%;border-radius:4px;background:var(--c1);transition:width .45s}
+
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  thead th{text-align:left;background:#f6f9fb;padding:8px 10px;font-size:11px;color:var(--ink2);font-weight:600;border-bottom:1px solid var(--line);white-space:nowrap}
+  tbody td{padding:8px 10px;border-bottom:1px solid #eef2f6;white-space:nowrap}
+  tbody tr:hover{background:#f9fbfd}
+  .tbl-wrap{overflow-x:auto;margin:0 -16px -16px;padding:0 0 0}
+  .tbl-wrap table{min-width:640px}
+  .num{text-align:right;font-family:ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+  .pill{font-size:10px;padding:1px 6px;border-radius:3px;background:#eef2f6;color:#5d6f7e}
+  .pill.g{background:#e7f4ee;color:#1f7d55}
+  .pill.a{background:#fdf4e5;color:#a9741c}
+</style>
+</head>
+<body>
+
+<div class="demo-note">演示样例 · DEMO &nbsp;·&nbsp; 本页为能力演示，<b>非真实客户项目</b>，所有数字均为模拟<a href="../../cases/">← 返回案例库</a></div>
+
+<div class="top">
+  <div class="brand"><i>BI</i>经营看板</div>
+  <nav>
+    <a class="on" href="#">总览</a><a href="#">销售</a><a href="#">库存</a><a href="#">财务</a>
+  </nav>
+  <div class="r">
+    <span class="live"><s></s>实时同步</span>
+    <span class="hide">数据更新 09:30</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="pageh">
+    <div>
+      <h1>经营总览</h1>
+      <p id="scopeText">统计范围：近 30 天 · 全部区域 · 全部渠道</p>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="fgroup">
+      <span class="lab">时间</span>
+      <div class="seg" id="fRange">
+        <button data-v="7">近 7 天</button>
+        <button class="on" data-v="30">近 30 天</button>
+        <button data-v="90">近 90 天</button>
+      </div>
+    </div>
+    <div class="fgroup">
+      <span class="lab">区域</span>
+      <select class="ft" id="fRegion">
+        <option value="all">全部区域</option>
+        <option value="华东">华东</option>
+        <option value="华南">华南</option>
+        <option value="华北">华北</option>
+      </select>
+    </div>
+    <div class="fgroup">
+      <span class="lab">渠道</span>
+      <select class="ft" id="fChannel">
+        <option value="all">全部渠道</option>
+        <option value="直销">直销</option>
+        <option value="经销">经销</option>
+        <option value="线上">线上</option>
+      </select>
+    </div>
+    <div class="sp">
+      <button class="btn" id="resetBtn">重置</button>
+      <button class="btn btn-p" id="exportBtn">导出 CSV</button>
+    </div>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-h"><h3>订单与回款趋势</h3><span class="val" id="lineSum"></span></div>
+      <div id="lineChart"></div>
+      <div class="legend"><span><i style="background:#2f6fa0"></i>订单金额（万元）</span><span><i style="background:#3fa08c"></i>回款金额（万元）</span></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>渠道结构</h3><span>按订单金额</span></div>
+      <div class="donut-wrap">
+        <div id="donut"></div>
+        <div class="dl" id="dl"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid3">
+    <div class="card">
+      <div class="card-h"><h3>区域销售</h3><span>万元</span></div>
+      <div id="barChart"></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>热销品类 Top 5</h3><span>件</span></div>
+      <div id="topList"></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>订单结构</h3><span>按状态</span></div>
+      <div id="statusList"></div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:11.5px;color:var(--ink2);display:flex;justify-content:space-between">
+        <span>复购客户占比</span><b id="repeat">—</b>
+      </div>
+      <div style="margin-top:8px;font-size:11.5px;color:var(--ink2);display:flex;justify-content:space-between">
+        <span>平均客单价</span><b id="aov">—</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>订单明细（最近 8 条）</h3><span id="tblNote"></span></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>订单号</th><th>客户</th><th>区域</th><th>渠道</th><th>品类</th><th class="num">金额</th><th>状态</th><th>日期</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- state ---------- */
+var state = { range:'30', region:'all', channel:'all' };
+
+var REGIONS = ['华东','华南','华北'];
+var CHANNELS = ['直销','经销','线上'];
+var CATS = ['精密件','标准件','外协加工','耗材','设备'];
+var CUSTOMERS = ['恒信精密','锐驰自动化','钧合智能','禾木包装','新瑞机电','华擎电子','博远模具','朗晟医疗'];
+
+/* deterministic pseudo random */
+function rnd(seed){
+  var x = Math.sin(seed * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+/* ---------- data generation ---------- */
+function genData(){
+  var days = +state.range;
+  var points = days === 7 ? 7 : (days === 30 ? 15 : 18);
+  var step = days / points;
+
+  var regionFactor = state.region === 'all' ? 1 : 0.42;
+  var channelFactor = state.channel === 'all' ? 1 : 0.46;
+  var seedBase = days * 7 + (state.region === 'all' ? 3 : REGIONS.indexOf(state.region) * 11) + (state.channel === 'all' ? 5 : CHANNELS.indexOf(state.channel) * 13);
+
+  var series = [];
+  var ordersTotal = 0, payTotal = 0;
+  for(var i=0;i<points;i++){
+    var wave = 1 + 0.32 * Math.sin(i * 0.7 + seedBase * 0.1);
+    var order = (16 + rnd(seedBase + i) * 14) * wave * regionFactor * channelFactor;
+    var pay = order * (0.62 + rnd(seedBase + i + 40) * 0.26);
+    series.push({ label: 'D' + Math.round((i+1)*step), order: order, pay: pay });
+    ordersTotal += order;
+    payTotal += pay;
+  }
+
+  var regionVals = REGIONS.map(function(r, i){
+    var f = state.region === 'all' ? 1 : (REGIONS.indexOf(state.region) === i ? 3.1 : 0);
+    return { name: r, v: Math.round((52 + rnd(seedBase + i * 9) * 46) * f) };
+  });
+  if(state.region !== 'all'){
+    regionVals = regionVals.filter(function(x){ return x.v > 0; });
+  }
+
+  var chVals = CHANNELS.map(function(c, i){
+    var base = [0.52, 0.29, 0.19][i];
+    var f = state.channel === 'all' ? 1 : (CHANNELS.indexOf(state.channel) === i ? 1 / base : 0);
+    return { name: c, v: Math.round(ordersTotal * base * f) };
+  });
+  if(state.channel !== 'all') chVals = chVals.filter(function(x){ return x.v > 0; });
+
+  var top = CATS.slice(0, 5).map(function(c, i){
+    return { name: c, v: Math.round((320 + rnd(seedBase + i * 5) * 480) * regionFactor) };
+  }).sort(function(a,b){ return b.v - a.v; });
+
+  var status = [
+    { name:'已完成', v: Math.round(ordersTotal * 0.58), cls:'g' },
+    { name:'生产中', v: Math.round(ordersTotal * 0.27), cls:'a' },
+    { name:'待付款', v: Math.round(ordersTotal * 0.15), cls:'' }
+  ];
+
+  var rows = [];
+  for(var k=0;k<8;k++){
+    var reg = state.region === 'all' ? REGIONS[k % 3] : state.region;
+    var cha = state.channel === 'all' ? CHANNELS[k % 3] : state.channel;
+    var st = k % 3 === 0 ? '已完成' : (k % 3 === 1 ? '生产中' : '待付款');
+    rows.push({
+      no: 'SO-2026' + String(9000 + k + days * 3),
+      cust: CUSTOMERS[(k + days) % CUSTOMERS.length],
+      region: reg,
+      channel: cha,
+      cat: CATS[k % CATS.length],
+      amount: Math.round((3.2 + rnd(seedBase + k * 3) * 18) * regionFactor * channelFactor * 10) / 10,
+      status: st,
+      date: '09-' + String(8 - k).padStart(2,'0')
+    });
+  }
+
+  return {
+    series: series,
+    ordersTotal: ordersTotal,
+    payTotal: payTotal,
+    regionVals: regionVals,
+    chVals: chVals,
+    top: top,
+    status: status,
+    rows: rows,
+    orders: Math.round(ordersTotal * 2.6),
+    customers: Math.round(ordersTotal * 1.15),
+    conv: (2.1 + rnd(seedBase) * 1.4).toFixed(1),
+    aov: (ordersTotal / Math.max(1, Math.round(ordersTotal * 2.6)) * 10).toFixed(1)
+  };
+}
+
+/* ---------- renderers ---------- */
+function fmt(n, d){ return n.toFixed(d === undefined ? 1 : d); }
+
+function renderKPI(d){
+  var items = [
+    { k:'销售额', v:'¥' + fmt(d.ordersTotal) + '<small>万</small>', d:'+12.4%', up:true, s:'较上周期' },
+    { k:'回款金额', v:'¥' + fmt(d.payTotal) + '<small>万</small>', d:'+8.1%', up:true, s:'回款率 ' + Math.round(d.payTotal/d.ordersTotal*100) + '%' },
+    { k:'订单数', v:d.orders + '<small>单</small>', d:'+5.2%', up:true, s:'客单价 ¥' + d.aov + ' 万' },
+    { k:'新增客户', v:d.customers + '<small>家</small>', d:'-2.7%', up:false, s:'转化率 ' + d.conv + '%' }
+  ];
+  document.getElementById('kpis').innerHTML = items.map(function(i){
+    return '<div class="kpi"><div class="k">'+i.k+'</div>'
+      + '<strong>'+i.v+'</strong>'
+      + '<div class="d"><b class="'+(i.up?'up':'down')+'">'+(i.up?'▲':'▼')+' '+i.d+'</b><span>'+i.s+'</span></div></div>';
+  }).join('');
+}
+
+function renderLine(d){
+  var W = 640, H = 220, PL = 34, PR = 12, PT = 14, PB = 26;
+  var iw = W - PL - PR, ih = H - PT - PB;
+  var max = 0;
+  d.series.forEach(function(p){ max = Math.max(max, p.order, p.pay); });
+  max = Math.ceil(max / 10) * 10 || 10;
+
+  function px(i){ return PL + (d.series.length === 1 ? iw/2 : iw * i / (d.series.length - 1)); }
+  function py(v){ return PT + ih - (v / max) * ih; }
+
+  var grid = '', ylab = '';
+  for(var g=0;g<=4;g++){
+    var y = PT + ih * g / 4;
+    var val = max * (1 - g/4);
+    grid += '<line x1="'+PL+'" y1="'+y+'" x2="'+(W-PR)+'" y2="'+y+'" stroke="#eef2f6" stroke-width="1"/>';
+    ylab += '<text x="'+(PL-7)+'" y="'+(y+3.5)+'" text-anchor="end" font-size="9.5" fill="#8294a3">'+Math.round(val)+'</text>';
+  }
+
+  var ptsO = d.series.map(function(p,i){ return px(i).toFixed(1)+','+py(p.order).toFixed(1); }).join(' ');
+  var ptsP = d.series.map(function(p,i){ return px(i).toFixed(1)+','+py(p.pay).toFixed(1); }).join(' ');
+  var area = 'M ' + PL + ' ' + (PT+ih) + ' L ' + d.series.map(function(p,i){ return px(i).toFixed(1)+' '+py(p.order).toFixed(1); }).join(' L ') + ' L ' + (W-PR) + ' ' + (PT+ih) + ' Z';
+
+  var xlab = '';
+  d.series.forEach(function(p,i){
+    if(d.series.length > 10 && i % 2 !== 0) return;
+    xlab += '<text x="'+px(i)+'" y="'+(H-8)+'" text-anchor="middle" font-size="9" fill="#8294a3">'+p.label+'</text>';
+  });
+
+  var dotsO = d.series.map(function(p,i){ return '<circle cx="'+px(i)+'" cy="'+py(p.order)+'" r="2.4" fill="#2f6fa0"/>'; }).join('');
+  var dotsP = d.series.map(function(p,i){ return '<circle cx="'+px(i)+'" cy="'+py(p.pay)+'" r="2.4" fill="#3fa08c"/>'; }).join('');
+
+  document.getElementById('lineChart').innerHTML =
+    '<svg class="chart" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" style="height:220px">'
+    + '<defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f6fa0" stop-opacity=".18"/><stop offset="1" stop-color="#2f6fa0" stop-opacity="0"/></linearGradient></defs>'
+    + grid + ylab + xlab
+    + '<path d="'+area+'" fill="url(#ga)"/>'
+    + '<polyline points="'+ptsO+'" fill="none" stroke="#2f6fa0" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'
+    + '<polyline points="'+ptsP+'" fill="none" stroke="#3fa08c" stroke-width="1.8" stroke-dasharray="4 3" stroke-linejoin="round"/>'
+    + dotsO + dotsP
+    + '</svg>';
+
+  document.getElementById('lineSum').textContent = '合计 ¥' + fmt(d.ordersTotal) + ' 万 / 回款 ¥' + fmt(d.payTotal) + ' 万';
+}
+
+function renderDonut(d){
+  var total = d.chVals.reduce(function(a,b){ return a+b.v; }, 0) || 1;
+  var colors = ['#2f6fa0','#3fa08c','#c08a2e'];
+  var R = 54, C = 2 * Math.PI * R, off = 0;
+  var segs = '';
+  d.chVals.forEach(function(c,i){
+    var len = c.v / total * C;
+    segs += '<circle cx="66" cy="66" r="'+R+'" fill="none" stroke="'+colors[i]+'" stroke-width="18" '
+      + 'stroke-dasharray="'+len+' '+(C-len)+'" stroke-dashoffset="'+(-off)+'" transform="rotate(-90 66 66)"/>';
+    off += len;
+  });
+  document.getElementById('donut').innerHTML =
+    '<svg width="132" height="132" viewBox="0 0 132 132">'
+    + '<circle cx="66" cy="66" r="'+R+'" fill="none" stroke="#f0f4f8" stroke-width="18"/>'
+    + segs
+    + '<text x="66" y="62" text-anchor="middle" font-size="11" fill="#8294a3">总计</text>'
+    + '<text x="66" y="80" text-anchor="middle" font-size="15" font-weight="600" fill="#16222e">'+fmt(total,0)+'万</text>'
+    + '</svg>';
+
+  document.getElementById('dl').innerHTML = d.chVals.map(function(c,i){
+    return '<div><i style="background:'+colors[i]+'"></i>'+c.name
+      + '<b>'+fmt(c.v,0)+'</b><span>'+Math.round(c.v/total*100)+'%</span></div>';
+  }).join('');
+}
+
+function renderBars(d){
+  var max = Math.max.apply(null, d.regionVals.map(function(x){ return x.v; })) || 1;
+  document.getElementById('barChart').innerHTML = d.regionVals.map(function(r){
+    return '<div class="hbar"><div class="r"><span>'+r.name+'</span><b>'+r.v+'</b></div>'
+      + '<div class="t"><i style="width:'+Math.round(r.v/max*100)+'%"></i></div></div>';
+  }).join('');
+}
+
+function renderTop(d){
+  var max = d.top[0] ? d.top[0].v : 1;
+  document.getElementById('topList').innerHTML = d.top.map(function(t, i){
+    return '<div class="hbar"><div class="r"><span><span style="color:#8294a3;margin-right:5px">'+(i+1)+'</span>'+t.name+'</span><b>'+t.v+'</b></div>'
+      + '<div class="t"><i style="width:'+Math.round(t.v/max*100)+'%;background:#3fa08c"></i></div></div>';
+  }).join('');
+}
+
+function renderStatus(d){
+  var total = d.status.reduce(function(a,b){ return a+b.v; }, 0) || 1;
+  document.getElementById('statusList').innerHTML = d.status.map(function(s){
+    return '<div class="hbar"><div class="r"><span>'+s.name+'</span><b>'+Math.round(s.v/total*100)+'%</b></div>'
+      + '<div class="t"><i style="width:'+Math.round(s.v/total*100)+'%;background:'+(s.cls==='g'?'#3fa08c':(s.cls==='a'?'#c08a2e':'#8294a3'))+'"></i></div></div>';
+  }).join('');
+  document.getElementById('repeat').textContent = Math.round(38 + rnd(+state.range) * 18) + '%';
+  document.getElementById('aov').textContent = '¥' + d.aov + ' 万';
+}
+
+function renderTable(d){
+  document.getElementById('tbody').innerHTML = d.rows.map(function(r){
+    var pill = r.status === '已完成' ? 'pill g' : (r.status === '待付款' ? 'pill a' : 'pill');
+    return '<tr><td style="font-family:ui-monospace,Menlo,monospace;font-size:11px">'+r.no+'</td>'
+      + '<td>'+r.cust+'</td><td>'+r.region+'</td><td>'+r.channel+'</td><td>'+r.cat+'</td>'
+      + '<td class="num">¥'+r.amount.toFixed(1)+' 万</td>'
+      + '<td><span class="'+pill+'">'+r.status+'</span></td><td style="color:#8294a3">'+r.date+'</td></tr>';
+  }).join('');
+  document.getElementById('tblNote').textContent = '已按当前筛选条件过滤';
+}
+
+var lastData = null;
+function renderAll(){
+  var d = genData();
+  lastData = d;
+  renderKPI(d);
+  renderLine(d);
+  renderDonut(d);
+  renderBars(d);
+  renderTop(d);
+  renderStatus(d);
+  renderTable(d);
+  var r = state.region === 'all' ? '全部区域' : state.region;
+  var c = state.channel === 'all' ? '全部渠道' : state.channel;
+  document.getElementById('scopeText').textContent = '统计范围：近 ' + state.range + ' 天 · ' + r + ' · ' + c;
+}
+
+/* ---------- events ---------- */
+document.getElementById('fRange').addEventListener('click', function(e){
+  var b = e.target.closest('button');
+  if(!b) return;
+  var all = this.querySelectorAll('button');
+  for(var i=0;i<all.length;i++) all[i].classList.toggle('on', all[i]===b);
+  state.range = b.getAttribute('data-v');
+  renderAll();
+});
+document.getElementById('fRegion').addEventListener('change', function(){ state.region = this.value; renderAll(); });
+document.getElementById('fChannel').addEventListener('change', function(){ state.channel = this.value; renderAll(); });
+
+document.getElementById('resetBtn').addEventListener('click', function(){
+  state = { range:'30', region:'all', channel:'all' };
+  document.getElementById('fRegion').value = 'all';
+  document.getElementById('fChannel').value = 'all';
+  var bs = document.querySelectorAll('#fRange button');
+  for(var i=0;i<bs.length;i++) bs[i].classList.toggle('on', bs[i].getAttribute('data-v') === '30');
+  renderAll();
+});
+
+document.getElementById('exportBtn').addEventListener('click', function(){
+  if(!lastData) return;
+  var head = '订单号,客户,区域,渠道,品类,金额(万元),状态,日期\n';
+  var body = lastData.rows.map(function(r){
+    return [r.no,r.cust,r.region,r.channel,r.cat,r.amount.toFixed(1),r.status,r.date].join(',');
+  }).join('\n');
+  var blob = new Blob(['\ufeff'+head+body], {type:'text/csv;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '经营看板-演示数据.csv';
+  a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
+});
+
+renderAll();
+</script>
+</body>
+</html>
