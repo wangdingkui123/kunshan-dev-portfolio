@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>H5 活动抽奖 · 演示样例</title>
+<meta name="description" content="H5 互动演示：大转盘抽奖、概率配置、奖品库存、中奖记录与并发处理说明。演示样例 · Demo，非真实客户项目。">
+<style>
+  :root{
+    --bg1:#2a1035;--bg2:#3d1230;--bg3:#1b0b24;
+    --gold:#f2c86b;--gold2:#d8a63c;--red:#c0392b;
+    --ink:#f7efe2;--mut:#c3aebf;
+    --card:rgba(255,255,255,.07);--line:rgba(255,255,255,.14);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;min-height:100vh;color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif;font-size:14px;line-height:1.65;
+    background:
+      radial-gradient(80% 50% at 50% 0%, #5b1c3f 0, transparent 62%),
+      radial-gradient(70% 50% at 10% 90%, #3a1b46 0, transparent 60%),
+      linear-gradient(160deg,var(--bg1),var(--bg2) 55%,var(--bg3));
+    background-attachment:fixed;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit}
+  .demo-note{background:rgba(0,0,0,.42);color:#c9b6c3;font-size:11px;text-align:center;padding:6px 12px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .demo-note b{color:var(--gold)}
+  .demo-note a{color:var(--gold);margin-left:8px}
+
+  .wrap{max-width:1080px;margin:0 auto;padding:20px 18px 44px}
+  .tabs{display:flex;gap:6px;margin-bottom:18px}
+  .tabs button{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--mut);padding:7px 16px;border-radius:999px;font-size:12.5px;cursor:pointer}
+  .tabs button.on{background:var(--gold);border-color:var(--gold);color:#3a2010;font-weight:600}
+
+  /* hero / campaign */
+  .camp{display:grid;grid-template-columns:420px 1fr;gap:30px;align-items:start}
+  @media(max-width:900px){.camp{grid-template-columns:1fr;gap:20px}}
+
+  .phone{
+    background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.04));
+    border:1px solid var(--line);border-radius:22px;padding:18px 16px 22px;position:relative;overflow:hidden;
+    box-shadow:0 24px 60px rgba(0,0,0,.36);
+  }
+  .phone:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% -10%,rgba(242,200,107,.18),transparent 52%)}
+  .camp-eyebrow{font-size:10.5px;letter-spacing:.22em;color:var(--gold);text-align:center;margin-bottom:6px}
+  .camp h1{font-size:23px;line-height:1.35;margin:0 0 4px;text-align:center;letter-spacing:.02em}
+  .camp-sub{text-align:center;font-size:11.5px;color:var(--mut);margin-bottom:14px}
+  .meta{display:flex;justify-content:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+  .meta span{font-size:10.5px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--mut)}
+  .meta b{color:var(--gold)}
+
+  .wheel-wrap{position:relative;width:300px;height:300px;margin:0 auto 8px}
+  @media(max-width:420px){.wheel-wrap{width:260px;height:260px}}
+  .wheel-ring{position:absolute;inset:0;border-radius:50%;border:6px solid rgba(242,200,107,.5);box-shadow:0 0 0 6px rgba(0,0,0,.25),0 0 34px rgba(242,200,107,.22)}
+  #wheel{position:absolute;inset:6px;width:calc(100% - 12px);height:calc(100% - 12px);transition:transform 4.4s cubic-bezier(.12,.72,.14,1);will-change:transform}
+  .pointer{
+    position:absolute;left:50%;top:-6px;transform:translateX(-50%);z-index:5;
+    width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;
+    border-top:26px solid var(--gold);filter:drop-shadow(0 3px 5px rgba(0,0,0,.5));
+  }
+  .hub{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:66px;height:66px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fff3d4,#e0ab45 62%,#b97f22);
+    display:grid;place-items:center;color:#5a3410;font-weight:700;font-size:13px;letter-spacing:.06em;
+    box-shadow:0 6px 16px rgba(0,0,0,.4),inset 0 -2px 6px rgba(120,70,0,.3);z-index:4;cursor:pointer;
+    border:2px solid rgba(255,255,255,.5);
+  }
+  .hub:active{transform:translate(-50%,-50%) scale(.96)}
+  .hub small{display:block;font-size:8.5px;font-weight:500;letter-spacing:.04em;margin-top:-2px}
+
+  .spin-note{text-align:center;font-size:11px;color:var(--mut);margin:10px 0 0}
+  .spin-note b{color:var(--gold)}
+
+  .result{
+    margin-top:12px;border:1px solid rgba(242,200,107,.4);background:rgba(242,200,107,.1);
+    border-radius:10px;padding:11px 14px;font-size:12.5px;text-align:center;display:none;
+  }
+  .result.show{display:block;animation:pop .3s ease}
+  @keyframes pop{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
+  .result b{color:var(--gold)}
+  .result span{display:block;font-size:10.5px;color:var(--mut);margin-top:3px}
+
+  /* side */
+  .side h2{font-size:15px;margin:0 0 10px;font-weight:600}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+  .rules{margin:0;padding-left:16px;font-size:12.5px;color:var(--mut);line-height:2}
+  .prize-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  @media(max-width:520px){.prize-list{grid-template-columns:1fr}}
+  .prize-item{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:12px;background:rgba(0,0,0,.14)}
+  .prize-item i{width:8px;height:8px;border-radius:2px;flex:0 0 auto}
+  .prize-item .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .prize-item .s{font-size:10.5px;color:var(--mut);white-space:nowrap}
+  .prize-item.out{opacity:.42}
+
+  .mine{max-height:190px;overflow-y:auto}
+  .mine-row{display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:7px 0;border-bottom:1px dashed rgba(255,255,255,.1)}
+  .mine-row:last-child{border-bottom:none}
+  .mine-row span{color:var(--mut);font-size:10.5px}
+
+  /* ops */
+  .ops{display:none}
+  .ops.on{display:block}
+  .camp-view.off{display:none}
+  .ops-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+  .ops-head h2{margin:0;font-size:17px;font-weight:600}
+  .ops-head p{margin:2px 0 0;font-size:11.5px;color:var(--mut)}
+  .btn{background:rgba(255,255,255,.08);border:1px solid var(--line);color:var(--ink);padding:7px 14px;border-radius:6px;font-size:12px;cursor:pointer}
+  .btn:hover{border-color:rgba(255,255,255,.32)}
+  .btn-gold{background:var(--gold);border-color:var(--gold);color:#3a2010;font-weight:600}
+  .btn-gold:hover{background:#e8bb55}
+
+  .ops-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:14px;align-items:start}
+  @media(max-width:900px){.ops-grid{grid-template-columns:1fr}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .panel-h{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .panel-h h3{margin:0;font-size:13px;font-weight:600}
+  .panel-h span{font-size:10.5px;color:var(--mut)}
+  table{width:100%;border-collapse:collapse;font-size:11.5px}
+  thead th{text-align:left;padding:8px 12px;font-size:10px;letter-spacing:.08em;color:var(--mut);border-bottom:1px solid var(--line);white-space:nowrap;font-weight:500}
+  tbody td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.06);white-space:nowrap}
+  tbody tr:hover{background:rgba(255,255,255,.03)}
+  input.num{width:62px;background:rgba(0,0,0,.24);border:1px solid var(--line);border-radius:4px;color:var(--ink);padding:4px 6px;font-size:11.5px;font-family:ui-monospace,Menlo,monospace;outline:none}
+  input.num:focus{border-color:var(--gold)}
+  .pct{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--gold)}
+  .danger{color:#f08f80}
+  .log-tbl{max-height:420px;overflow-y:auto}
+  .conc{font-size:11.5px;color:var(--mut);line-height:1.9;padding:14px 16px}
+  .conc b{color:var(--ink)}
+  .conc code{font-family:ui-monospace,Menlo,monospace;background:rgba(0,0,0,.3);padding:1px 5px;border-radius:3px;font-size:10.5px;color:#e8c88a}
+  .footnote{margin-top:18px;font-size:10.5px;color:var(--mut);text-align:center;line-height:1.9}
+
+  .toast{position:fixed;left:50%;bottom:30px;transform:translate(-50%,20px);background:#1b0b24;border:1px solid var(--gold);color:var(--ink);padding:9px 18px;border-radius:999px;font-size:12.5px;opacity:0;pointer-events:none;transition:.25s;z-index:90}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<div class="demo-note">演示样例 · DEMO &nbsp;·&nbsp; 本页为能力演示，<b>非真实客户项目</b>，奖品与中奖记录均为模拟<a href="../../cases/">← 返回案例库</a></div>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="on" data-v="camp">用户端活动页</button>
+    <button data-v="ops">运营配置</button>
+  </div>
+
+  <!-- ============ 用户端 ============ -->
+  <div class="camp-view" id="campView">
+    <div class="camp">
+      <div class="phone">
+        <div class="camp-eyebrow">MID-AUTUMN MEMBER EVENT</div>
+        <h1>中秋会员回馈 · 转盘抽好礼</h1>
+        <div class="camp-sub">每人 3 次机会 · 奖品有限，抽完即止</div>
+        <div class="meta">
+          <span>剩余次数 <b id="leftTimes">3</b> 次</span>
+          <span>距结束 <b id="countdown">--:--:--</b></span>
+        </div>
+
+        <div class="wheel-wrap">
+          <div class="wheel-ring"></div>
+          <div class="pointer"></div>
+          <svg id="wheel" viewBox="0 0 300 300" aria-label="抽奖转盘"></svg>
+          <div class="hub" id="hub">抽奖<small>SPIN</small></div>
+        </div>
+
+        <div class="result" id="result"></div>
+        <div class="spin-note">点击中间按钮或转盘中心开始 · <b>演示环境不消耗真实权益</b></div>
+      </div>
+
+      <div class="side">
+        <div class="card">
+          <h2>奖池与库存</h2>
+          <div class="prize-list" id="prizeList"></div>
+        </div>
+        <div class="card">
+          <h2>活动规则</h2>
+          <ul class="rules">
+            <li>每位会员每日 3 次抽奖机会，分享可额外获得 1 次（演示中未开启）。</li>
+            <li>奖品数量有限，抽中后库存实时扣减，库存为 0 的奖品自动从奖池移除。</li>
+            <li>实物奖品在活动结束后 7 个工作日内寄出，优惠券实时到账。</li>
+            <li>本页为交互演示，不涉及真实发放。</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>我的中奖记录</h2>
+          <div class="mine" id="mine"><div style="font-size:12px;color:var(--mut)">还没有中奖记录，试试手气。</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 运营配置 ============ -->
+  <div class="ops" id="opsView">
+    <div class="ops-head">
+      <div>
+        <h2>奖品与概率配置</h2>
+        <p>修改权重与库存后点击保存，前台立即按新概率抽奖（演示环境为内存生效）。</p>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn" id="resetCfg">恢复默认</button>
+        <button class="btn btn-gold" id="saveCfg">保存配置</button>
+      </div>
+    </div>
+
+    <div class="ops-grid">
+      <div>
+        <div class="panel">
+          <div class="panel-h"><h3>奖品池</h3><span id="cfgSum">—</span></div>
+          <div style="overflow-x:auto">
+            <table>
+              <thead><tr><th>#</th><th>奖品</th><th>类型</th><th>权重</th><th>实际概率</th><th>库存</th><th>已抽</th></tr></thead>
+              <tbody id="cfgBody"></tbody>
+            </table>
+          </div>
+          <div class="conc" style="border-top:1px solid var(--line)">
+            权重为相对值，不需要凑成 100；实际概率 = 本奖品权重 ÷ 所有<b>有库存</b>奖品的权重之和。库存为 0 时该奖品权重自动置为 0，不会出现「抽中但发不出」。
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel" style="margin-bottom:14px">
+          <div class="panel-h"><h3>并发与防刷（演示说明）</h3><span>DESIGN NOTE</span></div>
+          <div class="conc">
+            <b>库存扣减</b><br>用 <code>UPDATE prize SET stock = stock - 1 WHERE id = ? AND stock &gt; 0</code> 判断受影响行数，或 Redis <code>DECR</code> 后回补，避免超发。<br><br>
+            <b>幂等</b><br>每次抽奖带 <code>requestId</code>，同一 ID 重复请求直接返回上次结果，防止网络重试造成重复发奖。<br><br>
+            <b>限次</b><br>按 <code>memberId + 活动ID + 日期</code> 计数，先 <code>INCR</code> 再判断是否超过 3 次，超限立即回退。<br><br>
+            <b>概率</b><br>先按权重选出奖品，再尝试扣库存；扣减失败则重选一次，仍失败则返回「谢谢参与」。
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h3>中奖记录</h3><span id="logSum">—</span></div>
+          <div class="log-tbl">
+            <table>
+              <thead><tr><th>时间</th><th>会员</th><th>奖品</th><th>状态</th></tr></thead>
+              <tbody id="logBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footnote">本页为单文件 H5 演示，所有概率与记录只保存在浏览器内存中，刷新即重置。</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------------- data ---------------- */
+var COLORS = ['#5e2a52','#7a3150','#8f3a4a','#7a3150','#5e2a52','#7a3150','#8f3a4a','#7a3150'];
+var PRIZES = [
+  { name:'谢谢参与', weight:30, stock:9999, type:'空奖', drawn:0, color:'#4a2340' },
+  { name:'5 元无门槛券', weight:24, stock:2000, type:'优惠券', drawn:0, color:'#6b2d55' },
+  { name:'20 元满减券', weight:16, stock:800, type:'优惠券', drawn:0, color:'#833552' },
+  { name:'定制月饼礼盒', weight:10, stock:120, type:'实物', drawn:0, color:'#6b2d55' },
+  { name:'50 元券', weight:8, stock:300, type:'优惠券', drawn:0, color:'#833552' },
+  { name:'品牌保温杯', weight:6, stock:60, type:'实物', drawn:0, color:'#6b2d55' },
+  { name:'100 元券', weight:4, stock:80, type:'优惠券', drawn:0, color:'#833552' },
+  { name:'蓝牙耳机', weight:2, stock:10, type:'实物', drawn:0, color:'#6b2d55' }
+];
+var DEFAULT_CFG = JSON.parse(JSON.stringify(PRIZES));
+
+var LOGS = [
+  { t:'09:41:22', user:'138****6721', prize:'20 元满减券', st:'已发放' },
+  { t:'09:40:58', user:'159****3104', prize:'5 元无门槛券', st:'已发放' },
+  { t:'09:40:31', user:'137****8842', prize:'谢谢参与', st:'—' },
+  { t:'09:39:47', user:'186****2250', prize:'定制月饼礼盒', st:'待发货' },
+  { t:'09:38:12', user:'133****9077', prize:'5 元无门槛券', st:'已发放' },
+  { t:'09:37:40', user:'150****4419', prize:'蓝牙耳机', st:'待发货' }
+];
+
+var leftTimes = 3;
+var spinning = false;
+var rotation = 0;
+var myWins = [];
+
+/* ---------------- wheel ---------------- */
+var wheel = document.getElementById('wheel');
+var R = 144, CX = 150, CY = 150;
+
+function polar(cx, cy, r, deg){
+  var rad = (deg - 90) * Math.PI / 180;
+  return [cx + r * Math.cos(rad), cy + r * Math.sin(rad)];
+}
+
+function buildWheel(){
+  var n = PRIZES.length;
+  var seg = 360 / n;
+  var html = '<circle cx="150" cy="150" r="147" fill="#3a1a33"/>';
+  for(var i=0;i<n;i++){
+    var a0 = i * seg, a1 = (i+1) * seg;
+    var p0 = polar(CX, CY, R, a0);
+    var p1 = polar(CX, CY, R, a1);
+    var large = seg > 180 ? 1 : 0;
+    html += '<path d="M '+CX+' '+CY+' L '+p0[0].toFixed(2)+' '+p0[1].toFixed(2)
+      + ' A '+R+' '+R+' 0 '+large+' 1 '+p1[0].toFixed(2)+' '+p1[1].toFixed(2)+' Z" fill="'+PRIZES[i].color+'" stroke="rgba(242,200,107,.24)" stroke-width="1"/>';
+    var mid = a0 + seg/2;
+    var tp = polar(CX, CY, R * 0.66, mid);
+    var txt = PRIZES[i].name;
+    var fs = txt.length > 7 ? 9 : 10.5;
+    html += '<text x="'+tp[0].toFixed(1)+'" y="'+tp[1].toFixed(1)+'" fill="#f4e6d2" font-size="'+fs+'" text-anchor="middle" dominant-baseline="middle" transform="rotate('+mid+' '+tp[0].toFixed(1)+' '+tp[1].toFixed(1)+')">'+txt+'</text>';
+  }
+  wheel.innerHTML = html;
+}
+
+function available(){
+  return PRIZES.map(function(p,i){ return { p:p, i:i }; }).filter(function(x){ return x.p.stock > 0; });
+}
+
+function pickPrize(){
+  var list = available();
+  var total = list.reduce(function(a,b){ return a + b.p.weight; }, 0);
+  if(!total) return -1;
+  var r = Math.random() * total;
+  for(var k=0;k<list.length;k++){
+    r -= list[k].p.weight;
+    if(r <= 0) return list[k].i;
+  }
+  return list[list.length-1].i;
+}
+
+function spin(){
+  if(spinning) return;
+  if(leftTimes <= 0){ toast('今日 3 次机会已用完'); return; }
+  var idx = pickPrize();
+  if(idx < 0){ toast('奖品已抽完，下次再来'); return; }
+
+  spinning = true;
+  leftTimes--;
+  document.getElementById('leftTimes').textContent = leftTimes;
+
+  var seg = 360 / PRIZES.length;
+  var center = idx * seg + seg / 2;
+  var currentMod = rotation % 360;
+  var delta = (360 - ((currentMod + center) % 360)) % 360;
+  rotation += 360 * 6 + delta;
+  wheel.style.transform = 'rotate(' + rotation + 'deg)';
+
+  setTimeout(function(){
+    spinning = false;
+    PRIZES[idx].stock--;
+    PRIZES[idx].drawn++;
+    var win = PRIZES[idx].name !== '谢谢参与';
+    if(win){
+      myWins.unshift({ name:PRIZES[idx].name, t:nowHM() });
+      LOGS.unshift({ t:nowHM(), user:'138****0001', prize:PRIZES[idx].name, st: PRIZES[idx].type === '实物' ? '待发货' : '已发放' });
+    } else {
+      LOGS.unshift({ t:nowHM(), user:'138****0001', prize:'谢谢参与', st:'—' });
+    }
+    var res = document.getElementById('result');
+    res.className = 'result show';
+    res.innerHTML = win
+      ? '恭喜抽中 <b>' + PRIZES[idx].name + '</b><span>优惠券已放入账户 · 演示记录不真实发放</span>'
+      : '谢谢参与，下次再来<span>本次未中奖，剩余 ' + leftTimes + ' 次机会</span>';
+    renderPrizeList();
+    renderMine();
+    renderCfg();
+    renderLogs();
+  }, 4500);
+}
+
+document.getElementById('hub').addEventListener('click', spin);
+
+/* ---------------- prize list ---------------- */
+function renderPrizeList(){
+  document.getElementById('prizeList').innerHTML = PRIZES.map(function(p){
+    var out = p.stock <= 0;
+    return '<div class="prize-item'+(out?' out':'')+'"><i style="background:'+p.color+';box-shadow:0 0 0 1px rgba(242,200,107,.4)"></i>'
+      + '<span class="n">'+p.name+'</span>'
+      + '<span class="s">'+(out ? '已抽完' : '剩 '+p.stock)+'</span></div>';
+  }).join('');
+}
+
+function renderMine(){
+  var el = document.getElementById('mine');
+  el.innerHTML = myWins.length
+    ? myWins.map(function(w){ return '<div class="mine-row"><span style="color:#f0d6a8">'+w.name+'</span><span>'+w.t+'</span></div>'; }).join('')
+    : '<div style="font-size:12px;color:var(--mut)">还没有中奖记录，试试手气。</div>';
+}
+
+/* ---------------- ops ---------------- */
+function renderCfg(){
+  var total = PRIZES.reduce(function(a,p){ return a + (p.stock > 0 ? p.weight : 0); }, 0);
+  document.getElementById('cfgBody').innerHTML = PRIZES.map(function(p, i){
+    var pct = (p.stock > 0 && total) ? (p.weight / total * 100).toFixed(1) + '%' : '0.0%';
+    return '<tr>'
+      + '<td style="color:#c3aebf">'+(i+1)+'</td>'
+      + '<td><i style="display:inline-block;width:7px;height:7px;border-radius:2px;background:'+p.color+';margin-right:6px;box-shadow:0 0 0 1px rgba(242,200,107,.4)"></i>'+p.name+'</td>'
+      + '<td style="color:#c3aebf">'+p.type+'</td>'
+      + '<td><input class="num" type="number" min="0" max="999" value="'+p.weight+'" data-w="'+i+'"></td>'
+      + '<td class="pct">'+pct+'</td>'
+      + '<td><input class="num" type="number" min="0" max="99999" value="'+p.stock+'" data-s="'+i+'"></td>'
+      + '<td style="color:#c3aebf">'+p.drawn+'</td>'
+      + '</tr>';
+  }).join('');
+  document.getElementById('cfgSum').textContent = '权重合计 ' + total + ' · 8 个奖项';
+}
+
+document.getElementById('cfgBody').addEventListener('change', function(e){
+  var w = e.target.getAttribute('data-w');
+  var s = e.target.getAttribute('data-s');
+  if(w !== null) PRIZES[+w].weight = Math.max(0, +e.target.value || 0);
+  if(s !== null) PRIZES[+s].stock = Math.max(0, Math.floor(+e.target.value || 0));
+  renderCfg();
+});
+
+document.getElementById('saveCfg').addEventListener('click', function(){
+  renderPrizeList();
+  buildWheel();
+  renderCfg();
+  toast('配置已保存（演示，仅内存生效）');
+});
+
+document.getElementById('resetCfg').addEventListener('click', function(){
+  PRIZES = JSON.parse(JSON.stringify(DEFAULT_CFG));
+  buildWheel();
+  renderPrizeList();
+  renderCfg();
+  toast('已恢复默认配置');
+});
+
+function renderLogs(){
+  document.getElementById('logBody').innerHTML = LOGS.slice(0, 20).map(function(l){
+    return '<tr><td class="pct" style="color:#c3aebf">'+l.t+'</td><td style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px">'+l.user+'</td>'
+      + '<td>'+l.prize+'</td><td style="color:'+(l.st==='—'?'#c3aebf':'#8fd6b4')+'">'+l.st+'</td></tr>';
+  }).join('');
+  document.getElementById('logSum').textContent = LOGS.length + ' 条 · 仅演示';
+}
+
+/* ---------------- tabs ---------------- */
+document.querySelector('.tabs').addEventListener('click', function(e){
+  var b = e.target.closest('button');
+  if(!b) return;
+  var all = this.querySelectorAll('button');
+  for(var i=0;i<all.length;i++) all[i].classList.toggle('on', all[i]===b);
+  var v = b.getAttribute('data-v');
+  document.getElementById('campView').classList.toggle('off', v !== 'camp');
+  document.getElementById('opsView').classList.toggle('on', v === 'ops');
+  if(v === 'ops'){ renderCfg(); renderLogs(); }
+});
+
+/* ---------------- countdown ---------------- */
+var endAt = Date.now() + 1000 * 60 * 60 * 26 + 1000 * 60 * 42;
+function tick(){
+  var d = endAt - Date.now();
+  if(d < 0) d = 0;
+  var h = Math.floor(d / 3600000);
+  var m = Math.floor(d % 3600000 / 60000);
+  var s = Math.floor(d % 60000 / 1000);
+  document.getElementById('countdown').textContent =
+    String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+setInterval(tick, 1000);
+
+/* ---------------- helpers ---------------- */
+function nowHM(){
+  var d = new Date();
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0') + ':' + String(d.getSeconds()).padStart(2,'0');
+}
+var toastTimer;
+function toast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('on'); }, 2200);
+}
+
+buildWheel();
+renderPrizeList();
+renderMine();
+renderCfg();
+renderLogs();
+tick();
+</script>
+</body>
+</html>
