@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>云枢 CloudOps · 云服务器部署面板 Demo</title>
+<meta name="description" content="云服务器运维控制台演示：ECS 实例监控、一键部署、SSL 证书提醒与备份记录。">
+<style>
+  :root{
+    --bg:#0a0e12;
+    --panel:#111920;
+    --panel-2:#0e151b;
+    --line:#1d2a33;
+    --line-soft:#172129;
+    --ink:#dbe4ea;
+    --ink-2:#a7b6c2;
+    --muted:#6f8190;
+    --green:#3ddc97;
+    --blue:#4a9eff;
+    --amber:#f0a33a;
+    --red:#ff6b6b;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink)}
+  body{
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    font-size:13px;line-height:1.55;-webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  button,input,select{font-family:inherit;font-size:inherit;color:inherit}
+  button{cursor:pointer;border:0;background:none}
+  .layout{display:flex;min-height:100vh}
+
+  /* ---------- sidebar ---------- */
+  .side{
+    width:208px;flex:none;background:var(--panel-2);border-right:1px solid var(--line);
+    display:flex;flex-direction:column;position:sticky;top:0;height:100vh;
+  }
+  .logo{display:flex;align-items:center;gap:9px;padding:18px 18px 16px;border-bottom:1px solid var(--line-soft)}
+  .logo .mark{
+    width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#1b4f3c,#3ddc97);
+    display:grid;place-items:center;flex:none;box-shadow:0 0 18px rgba(61,220,151,.25);
+  }
+  .logo .mark svg{width:15px;height:15px;stroke:#06251a;stroke-width:2;fill:none}
+  .logo b{font-size:13.5px;letter-spacing:.02em;font-weight:600}
+  .logo span{display:block;font-size:9.5px;color:var(--muted);letter-spacing:.1em;font-family:var(--mono)}
+  .nav{padding:12px 10px;flex:1;overflow-y:auto}
+  .nav .group{font-size:9.5px;letter-spacing:.14em;color:#4d5d69;padding:10px 9px 6px;font-family:var(--mono)}
+  .nav button{
+    width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;
+    color:var(--ink-2);font-size:12.5px;margin-bottom:2px;text-align:left;transition:.15s;
+  }
+  .nav button svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.6;flex:none;opacity:.85}
+  .nav button:hover{background:#16222b;color:var(--ink)}
+  .nav button.on{background:rgba(61,220,151,.09);color:var(--green)}
+  .nav button .n{margin-left:auto;font-size:10px;font-family:var(--mono);color:var(--muted)}
+  .side-foot{padding:12px 14px;border-top:1px solid var(--line-soft);font-size:10px;color:#55656f;line-height:1.7}
+  .side-foot .badge-demo{display:inline-block;font-family:var(--mono);font-size:9px;color:#8b6b3a;border:1px solid #4a3a22;background:#211a10;border-radius:4px;padding:1px 5px;margin-bottom:6px}
+
+  /* ---------- main ---------- */
+  .main{flex:1;min-width:0;display:flex;flex-direction:column}
+  .top{
+    height:56px;flex:none;border-bottom:1px solid var(--line);display:flex;align-items:center;
+    padding:0 22px;gap:14px;background:rgba(10,14,18,.9);backdrop-filter:blur(8px);
+    position:sticky;top:0;z-index:20;
+  }
+  .crumb{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:7px}
+  .crumb b{color:var(--ink);font-weight:500}
+  .crumb .sep{color:#3a4852}
+  .spacer{margin-left:auto}
+  .region{
+    display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-2);
+    border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:5px 9px;
+  }
+  .region .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+  .avatar-sm{width:27px;height:27px;border-radius:50%;background:linear-gradient(140deg,#2c4a5c,#3d6a7a);display:grid;place-items:center;font-size:11px;color:#cfe6ef;border:1px solid #2f4757}
+  .wrap{padding:20px 22px 44px;max-width:1360px;width:100%}
+
+  .page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+  .page-head h1{margin:0 0 4px;font-size:20px;font-weight:600;letter-spacing:-.01em}
+  .page-head p{margin:0;font-size:11.5px;color:var(--muted);font-family:var(--mono)}
+  .actions{display:flex;gap:8px;align-items:center}
+  .btn{
+    display:inline-flex;align-items:center;gap:6px;border-radius:7px;border:1px solid var(--line);
+    background:var(--panel);padding:7px 12px;font-size:12px;color:var(--ink-2);transition:.15s;
+  }
+  .btn:hover{border-color:#2c404d;background:#16222b;color:var(--ink)}
+  .btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.7}
+  .btn.primary{background:var(--green);border-color:var(--green);color:#04231a;font-weight:600;box-shadow:0 0 20px rgba(61,220,151,.18)}
+  .btn.primary:hover{background:#4be8a6;color:#04231a}
+  .btn.primary svg{stroke:#04231a}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+  .stat{
+    background:linear-gradient(170deg,#121b22,#0f161c);border:1px solid var(--line);
+    border-radius:9px;padding:13px 14px;position:relative;overflow:hidden;
+  }
+  .stat::after{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(61,220,151,.4),transparent)}
+  .stat .k{font-size:10.5px;color:var(--muted);display:flex;align-items:center;gap:5px}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:600;letter-spacing:-.02em;margin-top:5px;line-height:1.2}
+  .stat .v small{font-size:11px;font-weight:400;color:var(--muted);margin-left:2px}
+  .stat .sub{font-size:10px;color:var(--muted);margin-top:4px;display:flex;gap:6px;align-items:center}
+  .stat .up{color:var(--green)}
+  .stat .warn{color:var(--amber)}
+  .spark{position:absolute;right:10px;bottom:10px;width:62px;height:22px;opacity:.7}
+
+  .grid-2{display:grid;grid-template-columns:1.55fr 1fr;gap:12px;margin-bottom:14px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  .panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line-soft)}
+  .panel-head h2{margin:0;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:7px}
+  .panel-head h2 .dot{width:5px;height:5px;border-radius:50%;background:var(--green)}
+  .panel-head .meta{font-size:10px;color:var(--muted);font-family:var(--mono)}
+  .panel-head .link{font-size:11px;color:var(--blue);cursor:pointer}
+  .panel-body{padding:14px}
+
+  /* charts */
+  .chart-tabs{display:flex;gap:4px;background:#0b1318;border:1px solid var(--line);border-radius:6px;padding:2px}
+  .chart-tabs button{font-size:10.5px;padding:3px 8px;border-radius:4px;color:var(--muted)}
+  .chart-tabs button.on{background:#1c2b34;color:var(--ink)}
+  .chart-box{position:relative;padding-top:4px}
+  .chart-legend{display:flex;gap:16px;font-size:10px;color:var(--muted);margin-bottom:6px;font-family:var(--mono)}
+  .chart-legend i{display:inline-block;width:14px;height:2px;border-radius:2px;margin-right:5px;vertical-align:2px}
+  svg.chart{width:100%;height:176px;display:block;overflow:visible}
+  .chart .grid-l{stroke:#1a252d;stroke-width:1}
+  .chart .axis{fill:#556672;font-size:7.4px;font-family:var(--mono)}
+  .chart .area{fill:url(#areaGrad)}
+  .chart .ln{fill:none;stroke:var(--green);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;
+    stroke-dasharray:1000;stroke-dashoffset:1000;animation:draw 1.4s ease forwards}
+  .chart .ln2{fill:none;stroke:#4a9eff;stroke-width:1.2;stroke-dasharray:3 3;opacity:.6}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  .chart-foot{display:flex;justify-content:space-between;font-size:9.5px;color:#4f606c;font-family:var(--mono);margin-top:4px}
+
+  /* mini metric list */
+  .kv-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line-soft)}
+  .kv-row:last-child{border:0;padding-bottom:0}
+  .kv-row .name{width:74px;font-size:11px;color:var(--ink-2);flex:none}
+  .kv-row .meter{flex:1;height:4px;background:#1b262e;border-radius:99px;overflow:hidden}
+  .kv-row .meter i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#2f9e74,var(--green))}
+  .kv-row .meter i.warn{background:linear-gradient(90deg,#a8742a,var(--amber))}
+  .kv-row .val{width:46px;text-align:right;font-family:var(--mono);font-size:10.5px;color:var(--ink-2);flex:none}
+  .disk{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+  .disk .d-row{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-2);font-family:var(--mono)}
+  .disk .d-bar{height:5px;border-radius:99px;background:#1b262e;overflow:hidden}
+  .disk .d-bar i{display:block;height:100%;background:linear-gradient(90deg,#2c5f8a,var(--blue))}
+  .alert{
+    margin-top:12px;background:rgba(240,163,58,.07);border:1px solid rgba(240,163,58,.25);
+    border-radius:7px;padding:9px 11px;display:flex;gap:8px;font-size:11px;color:#d9b077;line-height:1.6;
+  }
+  .alert svg{width:14px;height:14px;stroke:var(--amber);fill:none;stroke-width:1.8;flex:none;margin-top:1px}
+  .alert b{color:var(--amber);font-weight:600}
+
+  /* table */
+  .table-wrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:11.5px;white-space:nowrap}
+  th{
+    text-align:left;font-weight:500;color:var(--muted);font-size:10px;letter-spacing:.06em;
+    padding:9px 12px;border-bottom:1px solid var(--line);background:#0e161c;font-family:var(--mono);
+  }
+  td{padding:11px 12px;border-bottom:1px solid var(--line-soft);color:var(--ink-2);vertical-align:middle}
+  tr:last-child td{border-bottom:0}
+  tbody tr{transition:background .15s}
+  tbody tr:hover{background:#141f27}
+  .inst{display:flex;align-items:center;gap:8px}
+  .inst .ico{width:24px;height:24px;border-radius:6px;background:#17242d;display:grid;place-items:center;flex:none}
+  .inst .ico svg{width:13px;height:13px;stroke:var(--green);fill:none;stroke-width:1.6}
+  .inst .nm b{display:block;font-size:11.5px;color:var(--ink);font-weight:500}
+  .inst .nm span{font-size:9.5px;color:var(--muted);font-family:var(--mono)}
+  .mono{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+  .status{display:inline-flex;align-items:center;gap:5px;font-size:10.5px}
+  .status i{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+  .status.stopped i{background:#5d6b75;box-shadow:none}
+  .status.stopped{color:var(--muted)}
+  .status.restarting i{background:var(--amber);box-shadow:0 0 6px var(--amber);animation:blink 1s infinite}
+  @keyframes blink{50%{opacity:.3}}
+  .mini-bar{width:58px;height:4px;background:#1b262e;border-radius:99px;overflow:hidden;display:inline-block;vertical-align:middle}
+  .mini-bar i{display:block;height:100%;background:var(--green)}
+  .mini-bar i.warn{background:var(--amber)}
+  .row-act{display:flex;gap:6px}
+  .row-act button{font-size:10.5px;color:var(--blue);padding:2px 4px;border-radius:4px}
+  .row-act button:hover{background:rgba(74,158,255,.1)}
+  .row-act button.gray{color:var(--muted)}
+  .row-act button:disabled{color:#3e4c56;cursor:not-allowed}
+
+  /* ssl + backup */
+  .lower{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  .cert{display:flex;gap:11px;padding:11px 0;border-bottom:1px solid var(--line-soft);align-items:center}
+  .cert:last-child{border:0;padding-bottom:0}
+  .cert .lock{width:30px;height:30px;border-radius:7px;display:grid;place-items:center;flex:none;border:1px solid #24343e;background:#121c23}
+  .cert .lock svg{width:14px;height:14px;stroke:var(--green);fill:none;stroke-width:1.6}
+  .cert .lock.warn svg{stroke:var(--amber)}
+  .cert .c-info{flex:1;min-width:0}
+  .cert .c-info b{display:block;font-size:11.5px;color:var(--ink);font-weight:500;font-family:var(--mono)}
+  .cert .c-info span{font-size:9.5px;color:var(--muted)}
+  .cert .c-right{text-align:right;flex:none}
+  .cert .c-right b{display:block;font-size:11.5px;font-family:var(--mono)}
+  .cert .c-right b.warn{color:var(--amber)}
+  .cert .c-right span{font-size:9px;color:var(--muted)}
+  .backup-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line-soft);font-size:11px}
+  .backup-row:last-child{border:0;padding-bottom:0}
+  .backup-row .bi{width:22px;height:22px;border-radius:5px;background:#152029;display:grid;place-items:center;flex:none}
+  .backup-row .bi svg{width:12px;height:12px;stroke:var(--blue);fill:none;stroke-width:1.7}
+  .backup-row .bt{flex:1;min-width:0}
+  .backup-row .bt b{display:block;font-family:var(--mono);font-size:10.5px;color:var(--ink-2);font-weight:400}
+  .backup-row .bt span{font-size:9px;color:var(--muted)}
+  .tag{font-size:9px;padding:1px 6px;border-radius:3px;border:1px solid #24343e;color:var(--muted);flex:none}
+  .tag.auto{color:#6fb1e0;border-color:#24455c;background:#0e1c25}
+  .tag.manual{color:#c8a06a;border-color:#4a3a22;background:#1d1710}
+
+  /* deploy drawer */
+  .overlay{
+    position:fixed;inset:0;background:rgba(3,7,10,.66);z-index:50;opacity:0;pointer-events:none;
+    transition:opacity .25s;backdrop-filter:blur(2px);
+  }
+  .overlay.on{opacity:1;pointer-events:auto}
+  .drawer{
+    position:fixed;top:0;right:0;bottom:0;width:520px;max-width:100%;background:var(--panel-2);
+    border-left:1px solid var(--line);z-index:51;transform:translateX(100%);
+    transition:transform .32s cubic-bezier(.3,.8,.3,1);display:flex;flex-direction:column;
+    box-shadow:-20px 0 60px rgba(0,0,0,.5);
+  }
+  .drawer.on{transform:translateX(0)}
+  .drawer-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:10px}
+  .drawer-head h3{margin:0 0 3px;font-size:15px;font-weight:600}
+  .drawer-head p{margin:0;font-size:11px;color:var(--muted)}
+  .drawer-head .x{margin-left:auto;width:26px;height:26px;border-radius:6px;display:grid;place-items:center;color:var(--muted);border:1px solid var(--line);flex:none}
+  .drawer-head .x:hover{background:#1a262e;color:var(--ink)}
+  .drawer-body{flex:1;overflow-y:auto;padding:16px 18px}
+  .form-row{margin-bottom:16px}
+  .form-row > label{display:block;font-size:11px;color:var(--muted);margin-bottom:7px;letter-spacing:.02em}
+  .env-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .env{
+    display:flex;align-items:flex-start;gap:8px;border:1px solid var(--line);border-radius:7px;
+    padding:9px 10px;background:#101920;transition:.15s;text-align:left;
+  }
+  .env:hover{border-color:#2a3d49}
+  .env.on{border-color:rgba(61,220,151,.5);background:rgba(61,220,151,.06)}
+  .env .box{
+    width:14px;height:14px;border-radius:4px;border:1px solid #33454f;flex:none;margin-top:1px;
+    display:grid;place-items:center;background:#0c141a;
+  }
+  .env.on .box{background:var(--green);border-color:var(--green)}
+  .env.on .box::after{content:"";width:7px;height:4px;border-left:1.6px solid #04231a;border-bottom:1.6px solid #04231a;transform:rotate(-45deg);margin-top:-2px}
+  .env b{display:block;font-size:11.5px;font-weight:500;color:var(--ink)}
+  .env span{display:block;font-size:9.5px;color:var(--muted);font-family:var(--mono);margin-top:1px}
+  select,input.txt{
+    width:100%;background:#0d151b;border:1px solid var(--line);border-radius:6px;
+    padding:8px 10px;font-size:11.5px;color:var(--ink);outline:0;
+  }
+  select:focus,input.txt:focus{border-color:#2c5a48}
+  .hint{font-size:9.5px;color:#55656f;margin-top:5px;line-height:1.6}
+  .progress-wrap{margin-top:6px}
+  .progress-bar{height:6px;background:#18242c;border-radius:99px;overflow:hidden}
+  .progress-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2f9e74,var(--green));border-radius:99px;transition:width .4s ease;box-shadow:0 0 12px rgba(61,220,151,.4)}
+  .progress-meta{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:5px}
+  .steps{display:flex;flex-direction:column;gap:0;margin-top:14px}
+  .step{display:flex;gap:9px;font-size:11px;color:#5a6b77;padding:4px 0;transition:.2s}
+  .step .sd{width:14px;height:14px;border-radius:50%;border:1px solid #2a3b45;flex:none;margin-top:1px;display:grid;place-items:center;font-size:8px;font-family:var(--mono)}
+  .step.done{color:var(--ink-2)}
+  .step.done .sd{border-color:var(--green);color:var(--green);background:rgba(61,220,151,.08)}
+  .step.run{color:var(--green)}
+  .step.run .sd{border-color:var(--green);border-right-color:transparent;animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .log{
+    margin-top:14px;background:#070c10;border:1px solid #18242c;border-radius:7px;padding:11px 12px;
+    height:218px;overflow-y:auto;font-family:var(--mono);font-size:10px;line-height:1.85;
+    color:#8ea0ad;scrollbar-width:thin;
+  }
+  .log .t{color:#42535f}
+  .log .ok{color:var(--green)}
+  .log .info{color:#5e9fd1}
+  .log .warn{color:var(--amber)}
+  .log .cmd{color:#c9d7e0}
+  .log::-webkit-scrollbar{width:6px}
+  .log::-webkit-scrollbar-thumb{background:#22323c;border-radius:3px}
+  .drawer-foot{padding:13px 18px calc(13px + env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;gap:9px;align-items:center}
+  .drawer-foot .sum{font-size:10.5px;color:var(--muted);line-height:1.6}
+  .drawer-foot .sum b{color:var(--ink-2);font-weight:500}
+  .drawer-foot .btn.primary{margin-left:auto}
+  .drawer-foot .btn[disabled]{opacity:.45;cursor:not-allowed}
+
+  /* toast */
+  .toast{
+    position:fixed;left:50%;bottom:28px;transform:translate(-50%,10px);z-index:90;
+    background:#e6f5ee;color:#0b3a2a;font-size:12px;padding:9px 16px;border-radius:7px;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:.25s;
+  }
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+
+  @media (max-width:1080px){
+    .grid-2{grid-template-columns:1fr}
+    .lower{grid-template-columns:1fr}
+    .stats{grid-template-columns:1fr 1fr}
+  }
+  @media (max-width:780px){
+    .layout{flex-direction:column}
+    .side{width:100%;height:auto;position:static;flex-direction:row;align-items:center;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}
+    .logo{border:0;padding:12px 14px;flex:none}
+    .nav{display:flex;gap:4px;padding:6px 10px;overflow-x:auto;flex:1}
+    .nav .group{display:none}
+    .nav button{width:auto;white-space:nowrap;margin:0;padding:6px 10px}
+    .nav button .n{display:none}
+    .side-foot{display:none}
+    .top{padding:0 14px;height:48px}
+    .wrap{padding:14px 14px 34px}
+    .page-head h1{font-size:17px}
+    .page-head .actions{width:100%}
+    .page-head .actions .btn{flex:1;justify-content:center}
+    .stat .v{font-size:19px}
+    .drawer{width:100%}
+    .table-wrap table{min-width:660px}
+  }
+  @media (max-width:420px){
+    .stats{grid-template-columns:1fr 1fr;gap:8px}
+    .stat{padding:11px}
+    .env-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="side">
+    <div class="logo">
+      <span class="mark"><svg viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 .6-8A6 6 0 0 0 6 11a3.5 3.5 0 0 0 1 7z"/></svg></span>
+      <div>
+        <b>云枢 CloudOps</b>
+        <span>CONSOLE v2.4</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="group">OVERVIEW</div>
+      <button class="on" onclick="jump('overview', this)">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="5" rx="2"/><rect x="13" y="10" width="8" height="11" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/></svg>
+        总览
+      </button>
+      <button onclick="jump('instances', this)">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></svg>
+        实例管理 <span class="n" id="navInstCount">5</span>
+      </button>
+      <button onclick="jump('monitor', this)">
+        <svg viewBox="0 0 24 24"><path d="M3 17l5-6 4 4 4-7 5 5"/><path d="M3 21h18"/></svg>
+        监控
+      </button>
+      <div class="group">OPERATIONS</div>
+      <button onclick="openDeploy()">
+        <svg viewBox="0 0 24 24"><path d="M12 3v10"/><path d="m8 9 4 4 4-4"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+        部署中心 <span class="n">NEW</span>
+      </button>
+      <button onclick="jump('certs', this)">
+        <svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        SSL 证书 <span class="n" id="navCertCount">1</span>
+      </button>
+      <button onclick="jump('backups', this)">
+        <svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
+        备份与恢复
+      </button>
+    </nav>
+    <div class="side-foot">
+      <span class="badge-demo">DEMO MODE</span><br>
+      数据为本地模拟<br>不连接真实云账号
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="top">
+      <div class="crumb"><span>华东1（杭州）</span><span class="sep">/</span><b id="crumb">资源总览</b></div>
+      <div class="spacer"></div>
+      <div class="region"><span class="dot"></span>生产环境</div>
+      <div class="avatar-sm">王</div>
+    </div>
+
+    <div class="wrap">
+      <section id="overview">
+        <div class="page-head">
+          <div>
+            <h1>资源总览</h1>
+            <p>UPDATED 2026-11-08 14:32:06 CST · AUTO REFRESH 60s</p>
+          </div>
+          <div class="actions">
+            <button class="btn" onclick="toast('监控数据已刷新（模拟）')">
+              <svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 6.3"/><path d="M20 4v7h-7"/></svg>
+              刷新
+            </button>
+            <button class="btn primary" onclick="openDeploy()">
+              <svg viewBox="0 0 24 24"><path d="M12 3v10"/><path d="m8 9 4 4 4-4"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+              一键部署
+            </button>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="k">运行中实例</div>
+            <div class="v">4<small>/ 5 台</small></div>
+            <div class="sub"><span class="up">● 全部健康</span> · 华东1</div>
+            <svg class="spark" viewBox="0 0 60 22"><polyline points="0,16 8,14 16,15 24,10 32,12 40,8 48,9 56,6" fill="none" stroke="#3ddc97" stroke-width="1.4"/></svg>
+          </div>
+          <div class="stat">
+            <div class="k">今日请求数</div>
+            <div class="v">1.28<small>M</small></div>
+            <div class="sub"><span class="up">↑ 8.4%</span> 较昨日</div>
+            <svg class="spark" viewBox="0 0 60 22"><polyline points="0,18 8,16 16,17 24,12 32,13 40,9 48,10 56,5" fill="none" stroke="#4a9eff" stroke-width="1.4"/></svg>
+          </div>
+          <div class="stat">
+            <div class="k">平均响应时间</div>
+            <div class="v">86<small>ms</small></div>
+            <div class="sub"><span class="up">↓ 12ms</span> P95 214ms</div>
+            <svg class="spark" viewBox="0 0 60 22"><polyline points="0,6 8,8 16,7 24,11 32,10 40,13 48,12 56,15" fill="none" stroke="#3ddc97" stroke-width="1.4"/></svg>
+          </div>
+          <div class="stat">
+            <div class="k">带宽峰值</div>
+            <div class="v">42.6<small>Mbps</small></div>
+            <div class="sub"><span class="warn">● 达配额 71%</span> 5Mbps 计费</div>
+            <svg class="spark" viewBox="0 0 60 22"><polyline points="0,15 8,11 16,13 24,7 32,9 40,5 48,8 56,4" fill="none" stroke="#f0a33a" stroke-width="1.4"/></svg>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="panel" id="monitor">
+            <div class="panel-head">
+              <h2><span class="dot"></span>性能监控 <span class="meta">prod-web-01</span></h2>
+              <div class="chart-tabs">
+                <button class="on" data-m="cpu">CPU</button>
+                <button data-m="mem">内存</button>
+                <button data-m="net">带宽</button>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="chart-legend"><span><i style="background:#3ddc97"></i><span id="lg1">CPU 使用率</span></span><span><i style="background:#4a9eff"></i>过去 24 小时均值</span></div>
+              <div class="chart-box">
+                <svg class="chart" viewBox="0 0 640 176" preserveAspectRatio="none" id="mainChart">
+                  <defs>
+                    <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#3ddc97" stop-opacity=".22"/>
+                      <stop offset="100%" stop-color="#3ddc97" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <g id="gridG"></g>
+                  <path class="area" id="areaPath" d=""></path>
+                  <path class="ln2" id="avgLine" d=""></path>
+                  <path class="ln" id="linePath" d=""></path>
+                  <g id="axisX"></g>
+                </svg>
+              </div>
+              <div class="chart-foot"><span>00:00</span><span>04:00</span><span>08:00</span><span>12:00</span><span>16:00</span><span>20:00</span><span>NOW</span></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h2><span class="dot"></span>资源使用</h2>
+              <span class="meta">avg / 24h</span>
+            </div>
+            <div class="panel-body">
+              <div class="kv-row"><span class="name">CPU</span><span class="meter"><i style="width:46%"></i></span><span class="val">46%</span></div>
+              <div class="kv-row"><span class="name">内存</span><span class="meter"><i style="width:63%"></i></span><span class="val">63%</span></div>
+              <div class="kv-row"><span class="name">带宽</span><span class="meter"><i class="warn" style="width:71%"></i></span><span class="val">71%</span></div>
+              <div class="kv-row"><span class="name">Load 1m</span><span class="meter"><i style="width:22%"></i></span><span class="val">0.42</span></div>
+              <div style="margin-top:14px">
+                <div class="disk">
+                  <div class="d-row"><span>/ 系统盘 40G</span><span>18.2G / 40G</span></div>
+                  <div class="d-bar"><i style="width:45%"></i></div>
+                  <div class="d-row" style="margin-top:6px"><span>/data 数据盘 200G</span><span>126G / 200G</span></div>
+                  <div class="d-bar"><i style="width:63%"></i></div>
+                </div>
+              </div>
+              <div class="alert">
+                <svg viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3z"/><path d="M12 9v5M12 17h.01"/></svg>
+                <div><b>带宽接近配额：71%</b><br>建议升级到 100Mbps 或开启 CDN 回源，避免晚高峰拥塞。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" id="instances">
+          <div class="panel-head">
+            <h2><span class="dot"></span>ECS 实例</h2>
+            <span class="meta">5 INSTANCES · 华东1（杭州）</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>实例 / ID</th><th>规格</th><th>内网 IP</th><th>状态</th><th>CPU</th><th>操作</th></tr>
+              </thead>
+              <tbody id="instBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="lower">
+          <div class="panel" id="certs">
+            <div class="panel-head">
+              <h2><span class="dot"></span>SSL 证书</h2>
+              <span class="link" onclick="toast('已触发续期检查（模拟），请联系域名服务商')">立即续期</span>
+            </div>
+            <div class="panel-body" style="padding-top:6px">
+              <div class="cert">
+                <span class="lock warn"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 15v2"/></svg></span>
+                <div class="c-info"><b>shop.luye-demo.com</b><span>Let's Encrypt · 泛域名 · 自动续期已关闭</span></div>
+                <div class="c-right"><b class="warn">剩余 15 天</b><span>到期 2026-11-23</span></div>
+              </div>
+              <div class="cert">
+                <span class="lock"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 15v2"/></svg></span>
+                <div class="c-info"><b>admin.luye-demo.com</b><span>DigiCert OV · 单域名</span></div>
+                <div class="c-right"><b>剩余 214 天</b><span>到期 2027-06-10</span></div>
+              </div>
+              <div class="cert">
+                <span class="lock"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 15v2"/></svg></span>
+                <div class="c-info"><b>mail.luye-demo.com</b><span>Let's Encrypt · 邮件服务专用</span></div>
+                <div class="c-right"><b>剩余 62 天</b><span>到期 2027-01-09</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel" id="backups">
+            <div class="panel-head">
+              <h2><span class="dot"></span>备份记录</h2>
+              <span class="link" onclick="toast('已创建手动备份任务（模拟）')">手动备份</span>
+            </div>
+            <div class="panel-body" style="padding-top:6px;padding-bottom:8px">
+              <div class="backup-row">
+                <span class="bi"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/></svg></span>
+                <div class="bt"><b>db-prod-20261108-0300.sql.gz</b><span>MySQL 8.0 · 2026-11-08 03:00 · 4.2 GB</span></div>
+                <span class="tag auto">自动</span>
+              </div>
+              <div class="backup-row">
+                <span class="bi"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/></svg></span>
+                <div class="bt"><b>db-prod-20261107-0300.sql.gz</b><span>MySQL 8.0 · 2026-11-07 03:00 · 4.1 GB</span></div>
+                <span class="tag auto">自动</span>
+              </div>
+              <div class="backup-row">
+                <span class="bi"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg></span>
+                <div class="bt"><b>web-root-20261105-1420.tar.gz</b><span>/www/wwwroot · 2026-11-05 14:20 · 812 MB</span></div>
+                <span class="tag manual">手动</span>
+              </div>
+              <div class="backup-row">
+                <span class="bi"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/></svg></span>
+                <div class="bt"><b>db-prod-20261106-0300.sql.gz</b><span>MySQL 8.0 · 2026-11-06 03:00 · 4.1 GB</span></div>
+                <span class="tag auto">自动</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size:10px;color:#46545e;margin-top:16px;line-height:1.8">
+          演示项目，数据为模拟 · 所有实例、证书、备份均为虚构，不连接任何云服务账号。
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- 部署抽屉 -->
+<div class="overlay" id="overlay" onclick="closeDeploy()"></div>
+<aside class="drawer" id="drawer" aria-label="一键部署">
+  <div class="drawer-head">
+    <div>
+      <h3>一键部署</h3>
+      <p>选择运行环境，自动完成安装、配置与健康检查</p>
+    </div>
+    <button class="x" onclick="closeDeploy()" aria-label="关闭">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body">
+    <div class="form-row">
+      <label>运行环境（可多选）</label>
+      <div class="env-grid" id="envGrid"></div>
+      <div class="hint">Nginx 用于反向代理，MySQL / Redis 安装后需设置密码，Docker 会一并安装 compose 插件。</div>
+    </div>
+    <div class="form-row">
+      <label>目标实例</label>
+      <select id="target">
+        <option>prod-web-01 · 172.16.3.21 · 2C4G</option>
+        <option>prod-api-01 · 172.16.3.22 · 4C8G</option>
+        <option>prod-db-01 · 172.16.3.31 · 8C16G</option>
+        <option>test-web-01 · 172.16.4.11 · 2C2G</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>部署目录</label>
+      <input class="txt" id="deployDir" value="/www/wwwroot/shop" spellcheck="false">
+      <div class="hint">脚本会写入该目录的 docker-compose.yml，并注册 systemd 服务。</div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-bar"><i id="progFill"></i></div>
+      <div class="progress-meta"><span id="progText">等待开始</span><span id="progPct">0%</span></div>
+    </div>
+
+    <div class="steps" id="stepList"></div>
+    <div class="log" id="logBox"><span class="t">[14:32:06]</span> <span class="info">cloudops</span> 部署面板已就绪，点击「开始部署」执行。<br></div>
+  </div>
+  <div class="drawer-foot">
+    <div class="sum">目标：<b id="footTarget">prod-web-01</b><br>预计耗时 <b>约 90 秒</b></div>
+    <button class="btn" onclick="resetDeploy()">重置</button>
+    <button class="btn primary" id="startBtn" onclick="startDeploy()">开始部署</button>
+  </div>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= 数据 ================= */
+const INSTANCES = [
+  { name:'prod-web-01', id:'i-8vb2k9f3a1c7', spec:'2 vCPU / 4 GiB', ip:'172.16.3.21', status:'running', cpu:46, role:'Web 前端' },
+  { name:'prod-api-01', id:'i-8vb2k9f3a1c8', spec:'4 vCPU / 8 GiB', ip:'172.16.3.22', status:'running', cpu:62, role:'API 服务' },
+  { name:'prod-db-01',  id:'i-8vb2k9f3a1d2', spec:'8 vCPU / 16 GiB', ip:'172.16.3.31', status:'running', cpu:38, role:'MySQL 主库' },
+  { name:'test-web-01', id:'i-8vb4m1p7b3e5', spec:'2 vCPU / 2 GiB', ip:'172.16.4.11', status:'running', cpu:12, role:'测试环境' },
+  { name:'prod-cache-01', id:'i-8vb4m1p7b3f9', spec:'2 vCPU / 4 GiB', ip:'172.16.3.41', status:'stopped', cpu:0, role:'Redis 缓存' }
+];
+const ENVS = [
+  { key:'nginx', label:'Nginx', ver:'1.24.0 稳定版', on:true },
+  { key:'mysql', label:'MySQL', ver:'8.0.36 / 需设置 root 密码', on:true },
+  { key:'redis', label:'Redis', ver:'7.2.4 / 仅内网访问', on:true },
+  { key:'docker', label:'Docker', ver:'26.1.4 + compose v2', on:false }
+];
+const STEPS = ['连接目标实例', '更新系统与依赖', '安装运行环境', '写入服务配置', '启动服务', '健康检查'];
+
+/* ================= 渲染实例 ================= */
+function renderInstances(){
+  const body = document.getElementById('instBody');
+  body.innerHTML = INSTANCES.map((it, i) => {
+    const stMap = { running:['运行中',''], stopped:['已停止','stopped'], restarting:['重启中','restarting'] };
+    const st = stMap[it.status];
+    return `<tr>
+      <td>
+        <div class="inst">
+          <span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></svg></span>
+          <span class="nm"><b>${it.name}</b><span>${it.id}</span></span>
+        </div>
+      </td>
+      <td><span style="color:#a7b6c2">${it.spec}</span><br><span class="mono">${it.role}</span></td>
+      <td class="mono">${it.ip}</td>
+      <td><span class="status ${st[1]}"><i></i>${st[0]}</span></td>
+      <td><span class="mini-bar"><i class="${it.cpu > 55 ? 'warn' : ''}" style="width:${it.cpu}%"></i></span> <span class="mono">${it.cpu}%</span></td>
+      <td>
+        <div class="row-act">
+          <button onclick="reboot(${i})" ${it.status !== 'running' ? 'disabled' : ''}>重启</button>
+          <button onclick="openDeploy('${it.name}')" ${it.status !== 'running' ? 'disabled' : ''}>部署</button>
+          <button class="gray" onclick="toast('演示环境：实例详情页未接入')">详情</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+  document.getElementById('navInstCount').textContent = INSTANCES.filter(i => i.status === 'running').length + '/' + INSTANCES.length;
+}
+function reboot(i){
+  const it = INSTANCES[i];
+  it.status = 'restarting';
+  renderInstances();
+  toast(`正在重启 ${it.name}，预计 20 秒`);
+  setTimeout(() => {
+    it.status = 'running';
+    it.cpu = Math.max(8, Math.round(it.cpu + (Math.random() * 8 - 4)));
+    renderInstances();
+    toast(`${it.name} 已重启完成，服务健康`);
+  }, 2200);
+}
+
+/* ================= 折线图 ================= */
+const CHART_DATA = {
+  cpu: { vals:[18,16,15,14,13,14,22,34,41,38,44,52,48,45,47,43,39,46,52,58,49,42,38,46], color:'#3ddc97', max:100, unit:'%', label:'CPU 使用率' },
+  mem: { vals:[52,52,53,53,54,55,58,60,62,61,63,66,64,62,61,63,65,64,63,62,61,62,63,63], color:'#4a9eff', max:100, unit:'%', label:'内存使用率' },
+  net: { vals:[6,5,4,4,3,5,12,18,26,31,28,34,30,27,25,29,33,38,42,39,35,31,28,42], color:'#f0a33a', max:60, unit:'Mbps', label:'带宽（Mbps）' }
+};
+let chartMetric = 'cpu';
+const W = 640, H = 176, PADL = 30, PADR = 8, PADT = 10, PADB = 18;
+function drawChart(metric){
+  chartMetric = metric;
+  const d = CHART_DATA[metric];
+  const vals = d.vals;
+  const plotW = W - PADL - PADR, plotH = H - PADT - PADB;
+  const xs = vals.map((_, i) => PADL + plotW * i / (vals.length - 1));
+  const ys = vals.map(v => PADT + plotH - (v / d.max) * plotH);
+
+  // 网格与 Y 轴
+  let g = '';
+  for (let i = 0; i <= 4; i++){
+    const y = PADT + plotH * i / 4;
+    const val = Math.round(d.max - d.max * i / 4);
+    g += `<line class="grid-l" x1="${PADL}" y1="${y}" x2="${W - PADR}" y2="${y}"/>`;
+    g += `<text class="axis" x="${PADL - 6}" y="${y + 2.5}" text-anchor="end">${val}</text>`;
+  }
+  document.getElementById('gridG').innerHTML = g;
+
+  // X 轴
+  let ax = '';
+  ['00','04','08','12','16','20'].forEach((h, i) => {
+    const x = PADL + plotW * (i * 4) / 23;
+    ax += `<text class="axis" x="${x}" y="${H - 4}" text-anchor="middle">${h}:00</text>`;
+  });
+  document.getElementById('axisX').innerHTML = ax;
+
+  // 折线 & 面积
+  let line = '';
+  vals.forEach((v, i) => { line += (i ? 'L' : 'M') + xs[i].toFixed(1) + ' ' + ys[i].toFixed(1) + ' '; });
+  const lineEl = document.getElementById('linePath');
+  lineEl.setAttribute('d', line.trim());
+  lineEl.style.stroke = d.color;
+  lineEl.style.animation = 'none';
+  void lineEl.getBoundingClientRect();
+  lineEl.style.animation = 'draw 1.2s ease forwards';
+
+  document.getElementById('areaPath').setAttribute('d', line.trim() + ` L${xs[xs.length-1].toFixed(1)} ${PADT+plotH} L${PADL} ${PADT+plotH} Z`);
+  // 面积渐变跟随颜色
+  const grad = document.querySelector('#areaGrad stop');
+  grad.setAttribute('stop-color', d.color);
+
+  // 均值虚线
+  const avg = vals.reduce((a,b) => a+b, 0) / vals.length;
+  const avgY = PADT + plotH - (avg / d.max) * plotH;
+  document.getElementById('avgLine').setAttribute('d', `M${PADL} ${avgY.toFixed(1)} L${W - PADR} ${avgY.toFixed(1)}`);
+
+  document.getElementById('lg1').textContent = d.label;
+  document.querySelectorAll('.chart-tabs button').forEach(b => b.classList.toggle('on', b.dataset.m === metric));
+}
+document.querySelectorAll('.chart-tabs button').forEach(b => {
+  b.addEventListener('click', () => drawChart(b.dataset.m));
+});
+
+/* ================= 导航 ================= */
+function jump(id, btn){
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  const names = { overview:'资源总览', instances:'实例管理', monitor:'性能监控', certs:'SSL 证书', backups:'备份与恢复' };
+  document.getElementById('crumb').textContent = names[id] || '资源总览';
+}
+
+/* ================= 部署 ================= */
+let deploying = false, timers = [];
+function openDeploy(inst){
+  renderEnvs();
+  if (inst){
+    const sel = document.getElementById('target');
+    [...sel.options].forEach(o => { if (o.text.includes(inst)) sel.selectedIndex = o.index; });
+    document.getElementById('footTarget').textContent = inst;
+  }
+  document.getElementById('overlay').classList.add('on');
+  document.getElementById('drawer').classList.add('on');
+  setTimeout(() => document.getElementById('logBox').scrollTop = 9999, 350);
+}
+function closeDeploy(){
+  if (deploying){ toast('部署进行中，请等待完成'); return; }
+  document.getElementById('overlay').classList.remove('on');
+  document.getElementById('drawer').classList.remove('on');
+}
+function renderEnvs(){
+  document.getElementById('envGrid').innerHTML = ENVS.map((e, i) =>
+    `<button class="env ${e.on ? 'on' : ''}" onclick="toggleEnv(${i})">
+      <span class="box"></span>
+      <span><b>${e.label}</b><span>${e.ver}</span></span>
+    </button>`).join('');
+}
+function toggleEnv(i){
+  if (deploying) return;
+  ENVS[i].on = !ENVS[i].on;
+  renderEnvs();
+}
+function logLine(html){
+  const box = document.getElementById('logBox');
+  const t = new Date().toLocaleTimeString('zh-CN', {hour12:false});
+  box.insertAdjacentHTML('beforeend', `<span class="t">[${t}]</span> ${html}<br>`);
+  box.scrollTop = box.scrollHeight;
+}
+function renderSteps(idx, state){
+  const box = document.getElementById('stepList');
+  box.innerHTML = STEPS.map((s, i) => {
+    let cls = '';
+    if (i < idx) cls = 'done';
+    else if (i === idx) cls = state === 'running' ? 'run' : (state === 'done' ? 'done' : '');
+    const mark = i < idx ? '✓' : (i === idx && state === 'done' ? '✓' : '');
+    return `<div class="step ${cls}"><span class="sd">${cls === 'run' ? '' : mark}</span>${s}</div>`;
+  }).join('');
+}
+function resetDeploy(){
+  if (deploying){ toast('部署进行中，无法重置'); return; }
+  timers.forEach(clearTimeout);
+  document.getElementById('progFill').style.width = '0%';
+  document.getElementById('progPct').textContent = '0%';
+  document.getElementById('progText').textContent = '等待开始';
+  document.getElementById('logBox').innerHTML = '<span class="t">[--:--:--]</span> <span class="info">cloudops</span> 已重置，等待开始部署。<br>';
+  document.getElementById('stepList').innerHTML = '';
+  document.getElementById('startBtn').textContent = '开始部署';
+  document.getElementById('startBtn').disabled = false;
+}
+function startDeploy(){
+  if (deploying) return;
+  const chosen = ENVS.filter(e => e.on).map(e => e.label);
+  if (!chosen.length){ toast('请至少选择一个运行环境'); return; }
+  deploying = true;
+  const btn = document.getElementById('startBtn');
+  btn.disabled = true;
+  btn.textContent = '部署中…';
+
+  const target = document.getElementById('target').value.split(' · ')[0];
+  document.getElementById('footTarget').textContent = target;
+  const dir = document.getElementById('deployDir').value.trim() || '/www/wwwroot/shop';
+
+  logLine(`<span class="info">cloudops</span> 开始部署到 <span class="cmd">${target}</span>`);
+  logLine(`<span class="info">cloudops</span> 目标环境：<span class="cmd">${chosen.join(' / ')}</span>`);
+  logLine(`<span class="cmd">$ ssh deploy@${target} "mkdir -p ${dir}"</span>`);
+  renderSteps(0, 'running');
+  document.getElementById('progText').textContent = '连接目标实例…';
+
+  const timeline = [
+    { delay: 700,  pct: 14, step: 0, log: `<span class="ok">✓</span> SSH 连接成功，系统 <span class="cmd">Ubuntu 22.04.4 LTS</span>` },
+    { delay: 1500, pct: 24, step: 1, log: `<span class="cmd">$ apt-get update -qq && apt-get install -y curl gnupg2 ca-certificates</span>` },
+    { delay: 2400, pct: 32, step: 1, log: `<span class="ok">✓</span> 依赖更新完成，已安装 42 个软件包` },
+    { delay: 3000, pct: 46, step: 2, log: `<span class="cmd">$ bash install-env.sh ${chosen.join(' ')}</span>` },
+    { delay: 3900, pct: 55, step: 2, log: `<span class="ok">✓</span> ${chosen.join(' / ')} 安装完成` },
+    { delay: 4600, pct: 66, step: 3, log: `<span class="cmd">$ cat > ${dir}/docker-compose.yml</span> <span class="t"><< EOF</span>` },
+    { delay: 5300, pct: 74, step: 3, log: `<span class="ok">✓</span> 写入配置：nginx.conf / my.cnf / redis.conf` },
+    { delay: 5900, pct: 84, step: 4, log: `<span class="cmd">$ systemctl daemon-reload && systemctl enable --now cloudops.service</span>` },
+    { delay: 6600, pct: 92, step: 4, log: `<span class="ok">✓</span> 服务已启动：nginx:80 mysql:3306 redis:6379` },
+    { delay: 7300, pct: 97, step: 5, log: `<span class="cmd">$ curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1/healthz</span>` },
+    { delay: 8100, pct: 100, step: 6, log: `<span class="ok">✓ 健康检查通过 HTTP 200 · 部署成功，用时 8.1s</span>` }
+  ];
+  timeline.forEach(t => {
+    const id = setTimeout(() => {
+      document.getElementById('progFill').style.width = t.pct + '%';
+      document.getElementById('progPct').textContent = t.pct + '%';
+      if (t.pct < 100){
+        document.getElementById('progText').textContent = `执行中 · ${STEPS[Math.min(t.step, 5)]}`;
+        renderSteps(Math.min(t.step, 5), 'running');
+      }
+      logLine(t.log);
+      if (t.pct === 100){
+        renderSteps(STEPS.length, 'done');
+        document.getElementById('progText').textContent = '部署成功 · 全部服务健康';
+        document.getElementById('stepList').querySelectorAll('.step').forEach(s => s.classList.add('done'));
+        deploying = false;
+        btn.disabled = false;
+        btn.textContent = '再次部署';
+        toast('部署成功：' + target + ' 已就绪');
+      }
+    }, t.delay);
+    timers.push(id);
+  });
+}
+
+/* ================= toast ================= */
+let toastTimer = null;
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('on'), 2000);
+}
+
+/* ================= 初始化 ================= */
+renderInstances();
+drawChart('cpu');
+renderEnvs();
+document.getElementById('target').addEventListener('change', e => {
+  document.getElementById('footTarget').textContent = e.target.value.split(' · ')[0];
+});
+</script>
+</body>
+</html>
