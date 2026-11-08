@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>询盘自动分流助手 · 演示样例</title>
+<style>
+  :root{
+    --bg:#f6f4ee;--card:#fffdfa;--ink:#1d1a16;--ink2:#4a443c;--mut:#857d71;
+    --line:#e6e1d6;--line2:#d6cfc0;--acc:#a9521f;--acc2:#c96a2f;--soft:#f7ece2;
+    --ok:#2b7a55;--warn:#a8761a;--bad:#b23b32;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 "PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit}
+  .ribbon{background:#231c15;color:#d8cfc1;font-size:12px;padding:7px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .ribbon b{background:#3a2e22;color:#f5ead9;border-radius:4px;padding:1px 7px;font-weight:600}
+  .ribbon a{margin-left:auto;color:#b4a897}
+  .ribbon a:hover{color:#fff}
+
+  .shell{max-width:1400px;margin:0 auto;padding:18px 16px 28px}
+  .head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:14px}
+  h1{font-size:21px;margin:0;letter-spacing:-.01em}
+  .head p{margin:3px 0 0;font-size:12.5px;color:var(--mut)}
+  .kpis{display:flex;gap:8px;flex-wrap:wrap}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 11px;font-size:11.5px;color:var(--mut)}
+  .kpi b{display:block;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  .kpi b em{font-style:normal;font-size:11px;color:var(--mut);font-weight:400}
+
+  .cols{display:grid;grid-template-columns:300px minmax(0,1fr) 390px;gap:12px;align-items:start}
+  @media (max-width:1180px){.cols{grid-template-columns:280px minmax(0,1fr)} .col3{grid-column:1 / -1}}
+  @media (max-width:820px){.cols{grid-template-columns:1fr}}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .phead{padding:11px 13px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;font-size:13px;font-weight:650}
+  .phead small{margin-left:auto;font-size:11px;color:var(--mut);font-weight:400}
+
+  .filters{display:flex;gap:5px;padding:9px 10px;border-bottom:1px solid var(--line);overflow-x:auto}
+  .filters button{flex:0 0 auto;border:1px solid var(--line2);background:#fff;border-radius:999px;font-size:11.5px;padding:4px 10px;color:var(--ink2);cursor:pointer}
+  .filters button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+
+  .inbox{list-style:none;margin:0;padding:0;max-height:620px;overflow:auto}
+  .mail{padding:11px 12px;border-bottom:1px solid var(--line);cursor:pointer;position:relative}
+  .mail:hover{background:#fbf8f2}
+  .mail.on{background:var(--soft);box-shadow:inset 3px 0 0 var(--acc)}
+  .mail .r1{display:flex;align-items:center;gap:6px;font-size:12.6px;font-weight:600}
+  .mail .r1 u{text-decoration:none;margin-left:auto;font-size:10px;font-weight:400;color:var(--mut);white-space:nowrap}
+  .mail .sub{font-size:12px;color:var(--ink2);margin:2px 0 3px;line-height:1.45;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mail .r2{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--mut)}
+  .tag{font-size:10px;padding:1px 6px;border-radius:4px;background:#eef1ec;color:#4a6b57}
+  .tag.inq{background:#fdf0e4;color:#a9521f}
+  .tag.sample{background:#eaf0fb;color:#2c5a9e}
+  .tag.comp{background:#fbeaea;color:#a8322a}
+  .tag.coop{background:#eef1e6;color:#5d6b34}
+  .dot{width:5px;height:5px;border-radius:50%;background:var(--acc);display:inline-block}
+
+  .col2{padding:14px}
+  .src{background:#faf8f3;border:1px solid var(--line);border-radius:9px;padding:11px 12px;font-size:12.5px;color:var(--ink2);line-height:1.75;max-height:180px;overflow:auto}
+  .src .from{font-size:11px;color:var(--mut);margin-bottom:5px}
+  mark{background:#ffe6b8;color:#5f3d00;border-radius:2px;padding:0 2px}
+  .sec-title{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:650;margin:14px 0 7px;color:var(--ink)}
+  .sec-title span{font-size:10.5px;font-weight:400;color:var(--mut);border:1px solid var(--line);border-radius:4px;padding:0 5px}
+  .fields{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  @media (max-width:620px){.fields{grid-template-columns:repeat(2,1fr)}}
+  .fld{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff}
+  .fld label{display:block;font-size:10.5px;color:var(--mut);margin-bottom:1px}
+  .fld b{font-size:13px;font-weight:600;color:var(--ink);word-break:break-word}
+  .fld.miss{border-style:dashed;background:#fdfbf7}
+  .fld.miss b{color:var(--mut);font-weight:400;font-size:12px}
+  .fld .conf{font-size:9.5px;color:var(--ok);margin-left:3px}
+
+  .col3{display:flex;flex-direction:column;gap:12px}
+  .draft{padding:13px}
+  .draft .meta{font-size:11px;color:var(--mut);margin-bottom:7px;display:flex;gap:8px;flex-wrap:wrap}
+  .draft .meta b{color:var(--ink2);font-weight:600}
+  textarea{width:100%;min-height:228px;resize:vertical;border:1px solid var(--line2);border-radius:9px;padding:10px 11px;font:12.6px/1.75 inherit;background:#fffdfa;outline:none;color:var(--ink2)}
+  textarea:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(169,82,31,.09)}
+  .acts{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+  .btn{border:1px solid var(--line2);background:#fff;border-radius:8px;padding:8px 12px;font-size:12.3px;cursor:pointer;color:var(--ink2)}
+  .btn:hover{border-color:var(--ink2)}
+  .btn.primary{background:var(--acc);border-color:var(--acc);color:#fff}
+  .btn.primary:hover{background:var(--acc2)}
+  .btn:disabled{opacity:.5;cursor:default}
+  .status{margin-top:9px;font-size:11.5px;padding:8px 10px;border-radius:7px;display:none}
+  .status.ok{display:block;background:#eef6f0;border:1px solid #cfe6d8;color:#22684a}
+  .status.warn{display:block;background:#fdf6e7;border:1px solid #ecd9ac;color:#7a5a12}
+  .note{font-size:11px;color:var(--mut);line-height:1.65;padding:11px 13px;border-top:1px solid var(--line)}
+  .note b{color:var(--ink2)}
+
+  .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,10px);background:#241d16;color:#f4ece1;font-size:12.5px;padding:9px 15px;border-radius:8px;opacity:0;pointer-events:none;transition:.2s;z-index:50}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+  .empty{color:var(--mut);font-size:12.5px;padding:16px;text-align:center}
+</style>
+</head>
+<body>
+<div class="ribbon">
+  <b>演示样例 · DEMO</b>
+  <span>分类、字段提取与回复草稿均为本地预设，未接入真实模型，也不会真的收发邮件。</span>
+  <a href="../../cases/">← 返回案例库</a>
+</div>
+
+<div class="shell">
+  <div class="head">
+    <div>
+      <h1>询盘自动分流助手</h1>
+      <p>邮件和表单进来先自动分类、抽字段、起一版回复草稿，再交给人确认。目标不是替代业务员，是把第一封回得快一点。</p>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><b id="kOpen">6 <em>条</em></b>待处理</div>
+      <div class="kpi"><b>4 <em>类</em></b>自动分类</div>
+      <div class="kpi"><b>30 <em>分钟</em></b>首响目标</div>
+    </div>
+  </div>
+
+  <div class="cols">
+    <section class="panel">
+      <div class="phead">收件箱 <small>示例邮箱</small></div>
+      <div class="filters" id="filters">
+        <button class="on" data-cat="all">全部</button>
+        <button data-cat="inq">询价</button>
+        <button data-cat="sample">样品</button>
+        <button data-cat="comp">投诉</button>
+        <button data-cat="coop">合作</button>
+      </div>
+      <ul class="inbox" id="inbox"></ul>
+    </section>
+
+    <section class="panel col2">
+      <div class="phead" id="srcHead">解析结果 <small>字段命中原文高亮</small></div>
+      <div class="src" id="srcBody"></div>
+      <div class="sec-title">抽取字段 <span>来自原文，未补全</span></div>
+      <div class="fields" id="fields"></div>
+      <div class="sec-title">分流建议 <span>规则 + 预设分类</span></div>
+      <div class="src" style="max-height:none" id="route"></div>
+    </section>
+
+    <section class="panel col3">
+      <div class="phead">回复草稿 <small>需人工确认</small></div>
+      <div class="draft">
+        <div class="meta">收件人 <b id="toAddr">—</b><span>·</span>主题 <b id="toSubj">—</b></div>
+        <textarea id="draftText" spellcheck="false"></textarea>
+        <div class="acts">
+          <button class="btn primary" id="sendBtn">确认发送</button>
+          <button class="btn" id="regen">重新生成</button>
+          <button class="btn" id="manual">转人工处理</button>
+        </div>
+        <div class="status" id="status"></div>
+      </div>
+      <div class="note"><b>说明：</b>草稿只根据本页字段拼装，没有访问邮件服务器。「确认发送」仅在演示里标记状态，不会发出任何邮件。</div>
+    </section>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var MAILS = [
+  {
+    id:'m1', cat:'inq', who:'Maria Lopez', company:'Lopez Industrial (ES)',
+    time:'2 分钟前', subject:'Inquiry: 200 pcs aluminum brackets',
+    email:'m.lopez@lopezindustrial.es',
+    body:'Hello, we are looking for <mark>200 pieces</mark> of <mark>aluminum mounting brackets</mark> for our solar mounting line. Destination: <mark>Spain</mark>. Could you quote <mark>FOB Shanghai</mark> and confirm a <mark>4-week</mark> lead time? Best regards, Maria',
+    fields:[['产品','aluminum mounting brackets'],['数量','200 pcs'],['目的国','Spain'],['贸易术语','FOB Shanghai'],['期望交期','4 weeks'],['邮箱','m.lopez@lopezindustrial.es']],
+    route:'自动归类为「询价」 · 优先级 高 · 建议 30 分钟内回复并附阶梯报价表',
+    draft:'Dear Maria,\n\nThank you for your inquiry about aluminum mounting brackets.\n\nFor 200 pcs, our reference price is USD 8.40/pc FOB Shanghai, with a lead time of 4 weeks after deposit. Attached is our specification sheet and packing details.\n\nCould you confirm the surface treatment (anodized or mill finish) so we can issue a formal quotation?\n\nBest regards,\nSales Team'
+  },
+  {
+    id:'m2', cat:'sample', who:'Ahmed Khan', company:'Gulf Lighting LLC (AE)',
+    time:'18 分钟前', subject:'Sample request – LED driver 40W',
+    email:'a.khan@gulflighting.ae',
+    body:'Hi, can you send <mark>2 samples</mark> of the <mark>40W LED driver</mark> to <mark>Dubai</mark>? We will cover the courier cost. Need them before <mark>15 December</mark> for a client demo.',
+    fields:[['产品','40W LED driver'],['数量','2 samples'],['目的国','UAE / Dubai'],['期望交期','before 15 Dec'],['费用','客户承担快递'],['邮箱','a.khan@gulflighting.ae']],
+    route:'自动归类为「样品」 · 优先级 中 · 建议先确认电压制式与插头标准',
+    draft:'Dear Ahmed,\n\nWe can provide 2 samples of the 40W LED driver. Please confirm the input voltage and plug standard for the UAE market.\n\nCourier cost is at your side as noted. If confirmed today, samples can be dispatched within 3 working days and should arrive before 15 December.\n\nBest regards,\nSales Team'
+  },
+  {
+    id:'m3', cat:'comp', who:'Thomas Weber', company:'Weber Technik (DE)',
+    time:'1 小时前', subject:'Complaint: damaged cartons in shipment',
+    email:'t.weber@weber-technik.de',
+    body:'Hello, <mark>3 of 12 cartons</mark> arrived damaged on order <mark>#PO-8842</mark>. Photos attached. We need replacements or a credit note before we can release the next order.',
+    fields:[['问题','3 / 12 cartons damaged'],['订单号','PO-8842'],['诉求','replacement or credit note'],['影响','下一单暂缓'],['附件','photos'],['邮箱','t.weber@weber-technik.de']],
+    route:'自动归类为「投诉」 · 优先级 最高 · 建议 2 小时内人工接手，不要自动承诺赔付',
+    draft:'Dear Thomas,\n\nWe are sorry to hear that 3 of 12 cartons arrived damaged on order PO-8842.\n\nWe have received your photos and are checking with the forwarder and our packing team today. We will come back with a replacement plan or credit note within 24 hours.\n\nCould you confirm the number of affected units so we can prepare the claim?\n\nBest regards,\nSales Team'
+  },
+  {
+    id:'m4', cat:'coop', who:'Yuki Tanaka', company:'Tanaka Trading (JP)',
+    time:'3 小时前', subject:'Distributor cooperation in Japan',
+    email:'y.tanaka@tanaka-trading.jp',
+    body:'We are a <mark>trading company in Osaka</mark> covering industrial components. We would like to discuss <mark>exclusive distribution</mark> for the Kansai region and request your <mark>distributor price list</mark>.',
+    fields:[['类型','distributor cooperation'],['地区','Japan / Kansai'],['诉求','exclusive distribution'],['需要','distributor price list'],['公司','Tanaka Trading'],['邮箱','y.tanaka@tanaka-trading.jp']],
+    route:'自动归类为「合作」 · 优先级 中 · 建议转负责人评估，不套用标准报价',
+    draft:'Dear Yuki,\n\nThank you for your interest in distributing our products in the Kansai region.\n\nWe would like to understand your current channel and annual volume before discussing exclusivity. Could you share a short company profile and your main customer segments?\n\nOur team will then prepare a distributor price list for review.\n\nBest regards,\nSales Team'
+  },
+  {
+    id:'m5', cat:'inq', who:'Lucas Silva', company:'Silva Comercio (BR)',
+    time:'昨天', subject:'Price for 2x40HQ containers',
+    email:'lucas@silvacomercio.com.br',
+    body:'Please quote your best price for <mark>2x40HQ containers</mark> of <mark>ceramic tiles 600x600</mark>, <mark>CIF Santos</mark>. We need <mark>45 days</mark> delivery.',
+    fields:[['产品','ceramic tiles 600x600'],['数量','2x40HQ'],['目的国','Brazil / Santos'],['贸易术语','CIF Santos'],['期望交期','45 days'],['邮箱','lucas@silvacomercio.com.br']],
+    route:'自动归类为「询价」 · 优先级 中 · 建议先确认花色与每柜平方数',
+    draft:'Dear Lucas,\n\nThank you for your inquiry. For 2x40HQ of 600x600 ceramic tiles, CIF Santos, please confirm the preferred color series so we can quote accurately.\n\nIndicative lead time is 45 days after deposit. We will send the full quotation with packing details within one working day.\n\nBest regards,\nSales Team'
+  },
+  {
+    id:'m6', cat:'inq', who:'Elena Petrova', company:'Petrova Group (BG)',
+    time:'昨天', subject:'Delivery time for 500 units',
+    email:'e.petrova@petrovagroup.bg',
+    body:'Could you confirm delivery time for <mark>500 units</mark> of your <mark>standard controller</mark> to <mark>Bulgaria</mark>? We already have your price list, only need the schedule.',
+    fields:[['产品','standard controller'],['数量','500 units'],['目的国','Bulgaria'],['贸易术语','未提及'],['期望交期','未提及'],['邮箱','e.petrova@petrovagroup.bg']],
+    route:'自动归类为「询价」 · 优先级 中 · 缺贸易术语，草稿里追问，不猜测',
+    draft:'Dear Elena,\n\nFor 500 units of the standard controller, our current production lead time is 25–30 days after deposit.\n\nCould you confirm the destination port and trade term (FOB or CIF) so we can include freight in the schedule?\n\nBest regards,\nSales Team'
+  }
+];
+
+var TAG = {inq:'询价', sample:'样品', comp:'投诉', coop:'合作'};
+var current = MAILS[0];
+var filter = 'all';
+
+var inbox = document.getElementById('inbox');
+var srcBody = document.getElementById('srcBody');
+var fields = document.getElementById('fields');
+var route = document.getElementById('route');
+var draftText = document.getElementById('draftText');
+var toAddr = document.getElementById('toAddr');
+var toSubj = document.getElementById('toSubj');
+var statusEl = document.getElementById('status');
+var toastEl = document.getElementById('toast');
+
+function toast(t){
+  toastEl.textContent = t;
+  toastEl.classList.add('on');
+  clearTimeout(toastEl._t);
+  toastEl._t = setTimeout(function(){ toastEl.classList.remove('on'); }, 2200);
+}
+
+function renderInbox(){
+  var list = MAILS.filter(function(m){ return filter === 'all' || m.cat === filter; });
+  inbox.innerHTML = list.map(function(m){
+    return '<li class="mail ' + (m.id === current.id ? 'on' : '') + '" data-id="' + m.id + '">'
+      + '<div class="r1">' + m.who + '<u>' + m.time + '</u></div>'
+      + '<div class="sub">' + m.subject + '</div>'
+      + '<div class="r2"><span class="tag ' + m.cat + '">' + TAG[m.cat] + '</span>'
+      + (m.id === 'm1' ? '<span class="dot"></span>未读' : '') + '</div></li>';
+  }).join('') || '<div class="empty">该分类下没有邮件</div>';
+}
+
+function renderDetail(m){
+  document.getElementById('srcHead').innerHTML = '解析结果 <small>字段命中原文高亮</small>';
+  srcBody.innerHTML = '<div class="from">' + m.who + ' · ' + m.company + ' · ' + m.email + '</div>'
+    + '<div style="font-weight:600;color:#1d1a16;margin-bottom:4px">' + m.subject + '</div>' + m.body;
+  fields.innerHTML = m.fields.map(function(f){
+    var miss = f[1] === '未提及' || f[1] === '—';
+    return '<div class="fld ' + (miss ? 'miss' : '') + '"><label>' + f[0] + '</label><b>' + f[1] + '</b></div>';
+  }).join('');
+  route.innerHTML = '<b style="color:#a9521f">' + TAG[m.cat] + '</b> · ' + m.route.replace(/^自动归类为「[^」]+」\s*·\s*/, '');
+  toAddr.textContent = m.email;
+  toSubj.textContent = 'Re: ' + m.subject;
+  draftText.value = m.draft;
+  statusEl.className = 'status';
+  statusEl.textContent = '';
+}
+
+inbox.addEventListener('click', function(e){
+  var li = e.target.closest('.mail');
+  if (!li) return;
+  var id = li.getAttribute('data-id');
+  for (var i = 0; i < MAILS.length; i++) if (MAILS[i].id === id) current = MAILS[i];
+  renderInbox();
+  renderDetail(current);
+});
+
+document.getElementById('filters').addEventListener('click', function(e){
+  var b = e.target.closest('button');
+  if (!b) return;
+  filter = b.getAttribute('data-cat');
+  var all = this.querySelectorAll('button');
+  for (var i = 0; i < all.length; i++) all[i].classList.toggle('on', all[i] === b);
+  renderInbox();
+});
+
+document.getElementById('sendBtn').addEventListener('click', function(){
+  if (!draftText.value.trim()) { toast('草稿是空的'); return; }
+  statusEl.className = 'status ok';
+  statusEl.textContent = '已标记为已发送（演示）· 未真正发出邮件 · ' + new Date().toLocaleTimeString('zh-CN');
+  toast('已标记发送（演示，不会真的发出）');
+});
+
+document.getElementById('regen').addEventListener('click', function(){
+  draftText.value = current.draft;
+  statusEl.className = 'status warn';
+  statusEl.textContent = '已按本地预设重新生成草稿（未调用模型）';
+});
+
+document.getElementById('manual').addEventListener('click', function(){
+  statusEl.className = 'status warn';
+  statusEl.textContent = '已转人工处理（演示）· 草稿保留在编辑区';
+});
+
+renderInbox();
+renderDetail(current);
+</script>
+</body>
+</html>
