@@ -4,170 +4,138 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>案例库 · 昆山软件开发</title>
-<meta name="description" content="按行业分类的软件能力演示库：企业官网、后台管理系统、小程序、电商零售、制造业、接口与集成、云与运维。以下为能力演示，非真实客户项目。">
+<meta name="description" content="按行业与交付类型查看软件能力演示：企业官网、后台管理系统、数据看板、小程序商城、系统对接、运维年框与 H5 互动。以下为能力演示，非真实客户项目。">
 <style>
   :root{
-    --bg:#f7f7f5;--card:#fff;--ink:#15181b;--ink2:#3d4349;--mut:#7b8288;
-    --line:#e6e6e1;--line2:#d3d3cc;--accent:#14523f;--soft:#ecf0ed;
+    --bg:#f7f7f4;--card:#fff;--ink:#15181b;--ink2:#3d4349;--mut:#7b8288;
+    --line:#e5e5df;--line2:#d2d2ca;--accent:#14523f;--soft:#eaf0ec;
     --max:1180px;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.7 "PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
   a{color:inherit;text-decoration:none}
   .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
-  header{position:sticky;top:0;z-index:40;background:rgba(247,247,245,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  header{position:sticky;top:0;z-index:40;background:rgba(247,247,244,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
   .hd{display:flex;align-items:center;justify-content:space-between;height:62px;gap:20px}
   .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px}
   .mark{width:28px;height:28px;border-radius:8px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:11px;font-family:ui-monospace,Menlo,Consolas,monospace}
   .back{font-size:13.5px;color:var(--ink2);border:1px solid var(--line2);padding:7px 14px;border-radius:999px;background:#fff}
   .back:hover{border-color:var(--ink2)}
 
-  .hero{padding:48px 0 30px}
+  .hero{padding:44px 0 24px}
   .kicker{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;letter-spacing:.18em;color:var(--mut)}
   h1{font-size:clamp(24px,3.2vw,34px);margin:10px 0 12px;letter-spacing:-.01em}
-  .lead{color:var(--ink2);font-size:14.5px;max-width:52em;margin:0}
-  .disclaimer{
-    display:inline-flex;gap:9px;align-items:flex-start;margin-top:18px;padding:10px 14px;border-radius:9px;
-    background:#fff;border:1px solid var(--line);font-size:12.8px;color:var(--ink2);max-width:100%;
-  }
+  .lead{color:var(--ink2);font-size:14.5px;max-width:54em;margin:0}
+  .disclaimer{display:inline-flex;gap:9px;align-items:flex-start;margin-top:18px;padding:10px 14px;border-radius:9px;background:#fff;border:1px solid var(--line);font-size:12.8px;color:var(--ink2);max-width:100%}
   .disclaimer b{color:var(--accent)}
 
-  .filters{position:sticky;top:62px;z-index:30;background:rgba(247,247,245,.94);backdrop-filter:blur(10px);padding:14px 0;border-bottom:1px solid var(--line)}
-  .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
-  .chips::-webkit-scrollbar{display:none}
-  .chip{
-    flex:0 0 auto;font-size:13px;padding:7px 14px;border-radius:999px;border:1px solid var(--line2);
-    background:#fff;color:var(--ink2);cursor:pointer;transition:.15s;white-space:nowrap;font-family:inherit;
-  }
+  /* industry entries */
+  .ind-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:8px 0 12px}
+  .ind-head h2{font-size:15px;margin:0;letter-spacing:.02em}
+  .ind-head span{font-size:12.5px;color:var(--mut)}
+  .inds{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:6px}
+  @media (max-width:900px){.inds{grid-template-columns:repeat(2,1fr)}}
+  .ind{border:1px solid var(--line);background:#fff;border-radius:9px;padding:11px 12px;cursor:pointer;text-align:left;font-family:inherit;transition:.15s;position:relative}
+  .ind:hover{border-color:var(--line2);transform:translateY(-1px)}
+  .ind b{display:block;font-size:13.5px;font-weight:650;color:var(--ink)}
+  .ind small{display:block;font-size:11.5px;color:var(--mut);margin-top:2px;line-height:1.45}
+  .ind em{position:absolute;right:10px;top:10px;font-style:normal;font-size:10.5px;color:var(--mut);background:#f4f4ef;border-radius:4px;padding:1px 5px}
+  .ind.on{border-color:var(--accent);background:var(--soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .ind.on b{color:var(--accent)}
+
+  /* filters */
+  .filters{position:sticky;top:62px;z-index:30;background:rgba(247,247,244,.95);backdrop-filter:blur(10px);padding:11px 0;border-bottom:1px solid var(--line);margin-top:18px}
+  .frow{display:flex;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:none}
+  .frow::-webkit-scrollbar{display:none}
+  .frow+.frow{margin-top:7px}
+  .flabel{flex:0 0 auto;font-size:11px;color:var(--mut);letter-spacing:.08em;padding-right:2px}
+  .chip{flex:0 0 auto;font-size:12.5px;padding:6px 12px;border-radius:999px;border:1px solid var(--line2);background:#fff;color:var(--ink2);cursor:pointer;transition:.15s;white-space:nowrap;font-family:inherit}
   .chip:hover{border-color:var(--ink2)}
   .chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
   .count{font-size:12.5px;color:var(--mut);margin-left:auto;flex:0 0 auto;white-space:nowrap}
 
-  main{padding:30px 0 70px}
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-  @media (max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}}
-  @media (max-width:640px){.grid{grid-template-columns:1fr}}
+  main{padding:26px 0 50px}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  @media (max-width:860px){.grid{grid-template-columns:1fr}}
 
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:.18s}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:13px;overflow:hidden;display:flex;flex-direction:column;transition:.18s}
   .card:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(20,30,26,.07);border-color:var(--line2)}
-  .thumb{height:168px;position:relative;overflow:hidden;border-bottom:1px solid var(--line);background:#eef0ec}
-  .badge{position:absolute;left:12px;top:12px;z-index:3;font-size:11px;padding:3px 9px;border-radius:5px;background:rgba(255,255,255,.92);color:var(--ink2);border:1px solid rgba(0,0,0,.06)}
-  .body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px;flex:1}
-  .body h2{font-size:15.5px;margin:0;font-weight:650;letter-spacing:0}
-  .prob{margin:0;font-size:13px;color:var(--ink2)}
-  .prob b{color:var(--accent);font-weight:600}
-  .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:auto;padding-top:6px}
-  .tags span{font-size:11px;color:var(--mut);border:1px solid var(--line);border-radius:5px;padding:2px 7px;background:#fafaf7}
-  .enter{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--line);margin-top:8px}
+
+  .thumb{height:118px;position:relative;display:grid;place-items:center;overflow:hidden;border-bottom:1px solid var(--line);background:var(--tb)}
+  .badge{position:absolute;left:11px;top:10px;z-index:3;font-size:10.5px;padding:3px 8px;border-radius:5px;background:rgba(255,255,255,.92);color:var(--ink2);border:1px solid rgba(0,0,0,.06)}
+  .win{width:186px;height:96px;background:#fff;border-radius:7px;overflow:hidden;box-shadow:0 10px 22px rgba(20,30,26,.15);transform:translateY(8px)}
+  .win .bar{height:14px;background:var(--tc);display:flex;align-items:center;gap:3px;padding:0 6px}
+  .win .bar s{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.6);display:block}
+  .win .bar em{margin-left:auto;display:block;width:24px;height:4px;border-radius:2px;background:rgba(255,255,255,.4)}
+  .win .bd{padding:8px;display:grid;gap:4px}
+  .win .bd s{display:block;height:5px;border-radius:3px;background:#ecebe4}
+  .win .bd .h{height:18px;border-radius:4px;background:var(--tb2,#eeede6)}
+  .win .bd .r{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+  .win .bd .r s{height:16px;border-radius:4px;background:#f2f1ea}
+
+  .t-steel{--tb:linear-gradient(160deg,#e2e8ec,#c9d5db);--tc:#16394f;--tb2:#e7edf1}
+  .t-export{--tb:linear-gradient(160deg,#f2f5f5,#e0e7e7);--tc:#0b4f7a;--tb2:#eaf1f5}
+  .t-brand{--tb:linear-gradient(160deg,#2a2620,#171410);--tc:#a8593b;--tb2:#3a342c}
+  .t-crm{--tb:linear-gradient(160deg,#e9f0f6,#d9e5ef);--tc:#1e3a52;--tb2:#e9f0f6}
+  .t-appr{--tb:linear-gradient(160deg,#e8f1ed,#dae8e2);--tc:#0e7c86;--tb2:#e6f2f3}
+  .t-dash{--tb:linear-gradient(160deg,#e6edf4,#d5e2ec);--tc:#132a3d;--tb2:#eaf1f7}
+  .t-it{--tb:linear-gradient(160deg,#16212a,#0e151a);--tc:#0f5f52;--tb2:#e6ebe7}
+  .t-shop{--tb:linear-gradient(160deg,#f1ece2,#e6e4d9);--tc:#7a4a2b;--tb2:#f0ece3}
+  .t-phone{--tb:linear-gradient(160deg,#e9f0e9,#dbe7dd);--tc:#14523f;--tb2:#e8efe9}
+  .t-inter{--tb:linear-gradient(160deg,#e8f3ee,#d6e8df);--tc:#0f7a5f;--tb2:#e6f2ec}
+  .t-kb{--tb:linear-gradient(160deg,#eceefe,#dde0fa);--tc:#4b4ee0;--tb2:#eef0ff}
+  .t-inq{--tb:linear-gradient(160deg,#f7ece2,#eee0d1);--tc:#a9521f;--tb2:#f7ece2}
+  .t-flow{--tb:linear-gradient(160deg,#0f1a20,#0a1116);--tc:#1c8c72;--tb2:#16242b}
+
+  .body{padding:15px 17px 17px;display:flex;flex-direction:column;gap:7px;flex:1}
+  .top{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--mut)}
+  .delivery{color:var(--accent);background:var(--soft);border-radius:4px;padding:2px 7px;font-size:11px}
+  .top .upd{margin-left:auto}
+  .body h2{font-size:16px;margin:0;font-weight:650;letter-spacing:0;line-height:1.45}
+  .scale{font-size:12.2px;color:var(--mut);margin:0}
+  .fields{margin:3px 0 0;padding:0;display:grid;gap:5px}
+  .fields div{display:grid;grid-template-columns:78px 1fr;gap:8px;font-size:12.5px;line-height:1.6}
+  .fields dt{color:var(--mut)}
+  .fields dd{margin:0;color:var(--ink2)}
+  .fields dd b{color:var(--accent);font-weight:600}
+  .enter{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--line);margin-top:auto}
   .enter a{font-size:13px;font-weight:600;color:var(--accent)}
-  .enter small{font-size:11.5px;color:var(--mut)}
-  .empty{padding:60px 0;text-align:center;color:var(--mut);font-size:14px}
+  .enter small{font-size:11px;color:var(--mut)}
+  .empty{padding:50px 0;text-align:center;color:var(--mut);font-size:14px}
+  .empty b{color:var(--ink2)}
 
-  /* ---------- thumbnails ---------- */
-  .t-shop{background:linear-gradient(145deg,#f0ece3,#e6e9e2)}
-  .t-shop i{position:absolute;left:50%;top:16px;transform:translateX(-50%);width:92px;height:152px;background:#fff;border-radius:12px 12px 0 0;border:1px solid #ded9cd;box-shadow:0 10px 22px rgba(20,30,26,.12)}
-  .t-shop i:before{content:"";position:absolute;left:0;right:0;top:0;height:22px;border-radius:12px 12px 0 0;background:linear-gradient(135deg,#1c6b52,#14523f)}
-  .t-shop i:after{content:"";position:absolute;left:8px;right:8px;top:32px;height:44px;border-radius:6px;background:#e9ece6}
-  .t-shop u{position:absolute;left:calc(50% - 46px);top:84px;width:38px;height:30px;border-radius:5px;background:#f0eee7}
-  .t-shop u+u{left:calc(50% + 8px)}
+  /* capability sections */
+  .cap{margin-top:44px}
+  .cap-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:14px}
+  .cap-kicker{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;letter-spacing:.16em;color:var(--mut)}
+  .cap-head h2{font-size:20px;margin:5px 0 0;letter-spacing:-.01em}
+  .cap-head p{margin:0;font-size:13px;color:var(--mut);max-width:38em}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:13px;padding:20px 20px 18px}
+  .feature{display:grid;grid-template-columns:1.25fr 1fr;gap:22px;align-items:start}
+  @media (max-width:860px){.feature{grid-template-columns:1fr}}
+  .feature h3{font-size:17px;margin:0 0 6px}
+  .feature p{margin:0 0 12px;font-size:13.5px;color:var(--ink2)}
+  .flist{display:grid;gap:7px;margin:0;padding:0;list-style:none}
+  .flist li{font-size:12.8px;color:var(--ink2);padding-left:16px;position:relative}
+  .flist li:before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:2px;background:var(--accent)}
+  .flist a{color:var(--accent);font-weight:600;border-bottom:1px solid rgba(20,82,63,.28)}
+  .price{background:#fafaf6;border:1px dashed var(--line2);border-radius:9px;padding:13px 15px;font-size:12.5px;color:var(--ink2)}
+  .price b{display:block;font-size:19px;color:var(--accent);letter-spacing:-.01em;margin-bottom:3px}
+  .price small{display:block;color:var(--mut);margin-top:7px;font-size:11.5px;line-height:1.55}
+  .demo-link{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:13px;font-weight:600;color:var(--accent)}
+  .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media (max-width:860px){.tiers{grid-template-columns:1fr}}
+  .tier{border:1px solid var(--line);border-radius:10px;padding:15px 15px 14px;background:#fff}
+  .tier.mid{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+  .tier h4{margin:0;font-size:14px}
+  .tier .p{font-size:16px;font-weight:700;color:var(--accent);margin:3px 0 8px;letter-spacing:-.01em}
+  .tier .p small{font-size:11px;font-weight:400;color:var(--mut)}
+  .tier ul{margin:0;padding-left:16px;font-size:12.3px;color:var(--ink2);line-height:1.75}
+  .excl{margin-top:11px;font-size:11.8px;color:var(--mut);line-height:1.7}
+  .excl b{color:#8a4b2b}
+  .mini{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px}
 
-  .t-phone{background:linear-gradient(150deg,#e9ece6,#dfe5dd)}
-  .t-phone i{position:absolute;left:50%;top:14px;transform:translateX(-50%);width:104px;height:176px;border-radius:18px;background:#12161a;padding:5px;box-shadow:0 12px 26px rgba(20,30,26,.22)}
-  .t-phone i:before{content:"";display:block;width:100%;height:100%;border-radius:14px;background:#fbfaf6;background-image:linear-gradient(#1c6b52 0 22px,transparent 22px),radial-gradient(circle at 30% 46%,#e6e9e2 0 12px,transparent 12px),radial-gradient(circle at 50% 46%,#e6e9e2 0 12px,transparent 12px),radial-gradient(circle at 70% 46%,#e6e9e2 0 12px,transparent 12px),linear-gradient(#eceadf 0 6px,transparent 6px) 8px 92px/78% 6px no-repeat}
-  .t-phone i:after{content:"";position:absolute;left:16px;right:16px;bottom:22px;height:5px;border-radius:3px;background:#e4e1d7;box-shadow:0 -14px 0 #e4e1d7}
-
-  .t-ops{background:#0d1216}
-  .t-ops i{position:absolute;inset:14px 12px -6px;border-radius:10px;background:#111a20;border:1px solid #1f2c35;padding:9px}
-  .t-ops i:before{content:"";display:block;height:100%;background:
-    linear-gradient(#22313b 0 7px,transparent 7px) 0 0/34px 100% no-repeat,
-    linear-gradient(#17242c 0 26px,transparent 26px) 46px 0/calc(33% - 8px) 100% no-repeat,
-    linear-gradient(#17242c 0 26px,transparent 26px) calc(50% + 2px) 0/calc(33% - 8px) 100% no-repeat,
-    linear-gradient(#17242c 0 26px,transparent 26px) 100% 0/calc(33% - 8px) 100% no-repeat;
-    background-repeat:no-repeat}
-  .t-ops i:after{content:"";position:absolute;left:52px;right:20px;top:56px;height:58px;border-radius:5px;background:#0f181e;border:1px solid #22313b;
-    background-image:linear-gradient(180deg,rgba(61,220,151,.3),rgba(61,220,151,0));clip-path:polygon(0 74%,16% 60%,32% 68%,48% 36%,64% 46%,80% 24%,100% 14%,100% 100%,0 100%)}
-
-  .t-mail{background:linear-gradient(145deg,#efece4,#e7e9e3)}
-  .t-mail i{position:absolute;inset:18px 14px -8px;background:#fff;border:1px solid #e0dcd0;border-radius:9px;display:grid;grid-template-columns:58px 1fr;overflow:hidden;box-shadow:0 10px 22px rgba(20,30,26,.1)}
-  .t-mail i:before{content:"";background:#f3f1ea;border-right:1px solid #e6e2d7;background-image:linear-gradient(#ddd9cc 0 6px,transparent 6px);background-size:calc(100% - 16px) 20px;background-position:8px 10px;background-repeat:repeat-y}
-  .t-mail i:after{content:"";padding:10px;background-image:linear-gradient(#dfe7e0 0 9px,transparent 9px),linear-gradient(#eceae2 0 6px,transparent 6px);background-size:60% 9px,100% 6px;background-position:10px 12px,10px 32px;background-repeat:no-repeat,repeat-y}
-
-  .t-brand{background:linear-gradient(150deg,#1f2a26,#0f1614)}
-  .t-brand i{position:absolute;left:26px;top:34px;right:90px;height:9px;border-radius:2px;background:rgba(255,255,255,.85)}
-  .t-brand i:before{content:"";position:absolute;top:20px;left:0;width:64%;height:9px;border-radius:2px;background:rgba(255,255,255,.55)}
-  .t-brand i:after{content:"";position:absolute;top:44px;left:0;width:40%;height:5px;border-radius:2px;background:rgba(255,255,255,.28)}
-  .t-brand u{position:absolute;right:26px;bottom:26px;width:74px;height:74px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#d9c7a3,#8a6a3b)}
-
-  .t-factory{background:linear-gradient(160deg,#dfe3e6,#c9d2d6)}
-  .t-factory i{position:absolute;left:0;right:0;bottom:0;height:78px;background:#2b3a42;clip-path:polygon(0 34%,16% 34%,16% 8%,34% 8%,34% 34%,52% 34%,52% 16%,70% 16%,70% 34%,86% 34%,86% 0,100% 0,100% 100%,0 100%)}
-  .t-factory i:before{content:"";position:absolute;left:14px;right:14px;top:14px;height:6px;border-radius:3px;background:rgba(255,255,255,.55)}
-  .t-factory u{position:absolute;left:20px;top:22px;width:78px;height:44px;border-radius:4px;background:rgba(255,255,255,.75);box-shadow:0 0 0 1px rgba(0,0,0,.04)}
-  .t-factory u+u{left:auto;right:20px;width:52px;height:52px}
-
-  .t-trade{background:linear-gradient(150deg,#f1f2f0,#e2e6e6)}
-  .t-trade i{position:absolute;left:18px;top:22px;font:700 15px/1.1 Georgia,serif;color:#1b2a33;letter-spacing:.02em}
-  .t-trade i:before{content:"GLOBAL";display:block}
-  .t-trade i:after{content:"SUPPLY";display:block;opacity:.55;font-size:12px}
-  .t-trade u{position:absolute;right:18px;top:22px;width:76px;height:8px;border-radius:2px;background:#9aa7ad}
-  .t-trade s{position:absolute;left:18px;right:18px;bottom:16px;height:64px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-decoration:none}
-  .t-trade s b{display:block;border-radius:4px;background:#fff;border:1px solid #d8dcdc;box-shadow:0 2px 6px rgba(0,0,0,.04)}
-
-  .t-crm{background:linear-gradient(160deg,#eef2f6,#dde5ec)}
-  .t-crm i{position:absolute;inset:14px 12px -6px;background:#fff;border:1px solid #d5dee6;border-radius:8px;overflow:hidden}
-  .t-crm i:before{content:"";position:absolute;left:0;top:0;bottom:0;width:40px;background:#1b2b3a}
-  .t-crm i:after{content:"";position:absolute;left:52px;right:10px;top:12px;height:8px;border-radius:3px;background:#dbe4ec;
-    box-shadow:0 18px 0 #eef3f7,0 32px 0 #eef3f7,0 46px 0 #eef3f7,0 60px 0 #eef3f7,0 74px 0 #eef3f7}
-
-  .t-appr{background:linear-gradient(160deg,#f0f3f1,#dfe7e2)}
-  .t-appr i{position:absolute;left:20px;right:20px;top:26px;bottom:12px;background:#fff;border:1px solid #d9e0db;border-radius:8px}
-  .t-appr i:before{content:"";position:absolute;left:16px;right:16px;top:18px;bottom:18px;
-    background:radial-gradient(circle 7px at 8px 8px,#2f7d5e 98%,transparent 100%),radial-gradient(circle 7px at 8px 44px,#c9b06a 98%,transparent 100%),radial-gradient(circle 7px at 8px 80px,#b9c3c9 98%,transparent 100%);
-    background-repeat:no-repeat}
-  .t-appr i:after{content:"";position:absolute;left:8px;top:28px;width:1px;height:52px;background:#dbe2dd}
-
-  .t-dash{background:linear-gradient(160deg,#eef3f8,#dee8f1)}
-  .t-dash i{position:absolute;inset:14px 12px -6px;background:#fff;border:1px solid #d6e0e9;border-radius:8px;padding:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-  .t-dash i b{display:block;height:22px;border-radius:4px;background:#eaf1f7;border:1px solid #dde7f0}
-  .t-dash i:after{content:"";grid-column:1/-1;height:56px;border-radius:4px;background:#f4f8fb;border:1px solid #dde7f0;
-    background-image:linear-gradient(180deg,rgba(47,109,160,.22),rgba(47,109,160,0));clip-path:polygon(0 70%,18% 52%,36% 62%,54% 30%,72% 42%,88% 20%,100% 28%,100% 100%,0 100%)}
-
-  .t-itdesk{background:#0e1519}
-  .t-itdesk i{position:absolute;inset:14px 12px -6px;background:#151d23;border:1px solid #22313b;border-radius:8px;display:grid;grid-template-columns:38px 1fr;overflow:hidden}
-  .t-itdesk i:before{content:"";background:#101a20;border-right:1px solid #1e2c35;background-image:linear-gradient(#2b4552 0 6px,transparent 6px);background-size:calc(100% - 14px) 20px;background-position:7px 12px;background-repeat:repeat-y}
-  .t-itdesk i:after{content:"";margin:10px;border-radius:4px;
-    background:
-      linear-gradient(#e2685f 0 6px,transparent 6px) 0 0/58% 6px no-repeat,
-      linear-gradient(#22313b 0 5px,transparent 5px) 0 14px/100% 5px no-repeat,
-      linear-gradient(#22313b 0 5px,transparent 5px) 0 26px/100% 5px no-repeat,
-      linear-gradient(#3ddc97 0 5px,transparent 5px) 0 38px/72% 5px no-repeat,
-      linear-gradient(#22313b 0 5px,transparent 5px) 0 50px/100% 5px no-repeat,
-      linear-gradient(#e6b555 0 5px,transparent 5px) 0 62px/48% 5px no-repeat}
-
-  .t-inter{background:linear-gradient(160deg,#eef4f1,#dbe6e1)}
-  .t-inter i{position:absolute;inset:18px 16px -6px;background:#fff;border:1px solid #cfded7;border-radius:8px;padding:12px;
-    background-image:
-      linear-gradient(#0f7a5f 0 6px,transparent 6px),
-      linear-gradient(#dfeae5 0 5px,transparent 5px),
-      linear-gradient(#dfeae5 0 5px,transparent 5px),
-      linear-gradient(#dfeae5 0 5px,transparent 5px),
-      linear-gradient(#cfe6dc 0 20px,transparent 20px);
-    background-size:44% 6px,100% 5px,100% 5px,86% 5px,100% 20px;
-    background-position:12px 14px,12px 32px,12px 44px,12px 56px,12px 72px;
-    background-repeat:no-repeat}
-  .t-inter i:before{content:"";position:absolute;left:12px;right:12px;bottom:14px;height:4px;border-radius:2px;background:#e8f1ed;
-    box-shadow:0 -10px 0 #e8f1ed,0 -20px 0 #e8f1ed}
-  .t-inter i:after{content:"";position:absolute;right:14px;top:14px;width:9px;height:9px;border-radius:50%;background:#12916f;box-shadow:14px 0 0 #c9d6cf}
-
-  .t-game{background:linear-gradient(150deg,#3a1838,#1d0c24)}
-  .t-game i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:112px;height:112px;border-radius:50%;
-    background:conic-gradient(#7a3150 0 45deg,#5e2a52 45deg 90deg,#833552 90deg 135deg,#5e2a52 135deg 180deg,#7a3150 180deg 225deg,#5e2a52 225deg 270deg,#833552 270deg 315deg,#5e2a52 315deg 360deg);
-    box-shadow:0 0 0 5px rgba(242,200,107,.55),0 10px 26px rgba(0,0,0,.45)}
-  .t-game i:before{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;
-    background:radial-gradient(circle at 35% 30%,#fff3d4,#d8a63c);box-shadow:0 2px 6px rgba(0,0,0,.4)}
-  .t-game i:after{content:"";position:absolute;left:50%;top:-14px;transform:translateX(-50%);width:0;height:0;
-    border-left:8px solid transparent;border-right:8px solid transparent;border-top:14px solid #f2c86b}
-
-  footer{border-top:1px solid var(--line);padding:26px 0 40px;color:var(--mut);font-size:12.5px}
+  footer{border-top:1px solid var(--line);padding:26px 0 40px;color:var(--mut);font-size:12.5px;margin-top:26px}
   .footin{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 </style>
 </head>
@@ -182,187 +150,435 @@
 
 <div class="wrap hero">
   <div class="kicker">CASE LIBRARY</div>
-  <h1>案例库：按行业看能做什么</h1>
-  <p class="lead">每一张卡都是一套可以点开操作的演示系统，覆盖企业官网、后台管理系统、小程序、电商零售、制造业、接口对接、云与运维、IT 支持、企业系统对接与 H5 互动。按行业筛选，直接进 Demo 体验交互。</p>
-  <div class="disclaimer"><span>说明</span><div><b>以下为能力演示，非真实客户项目。</b>所有页面、数据、图表均为模拟，不代表任何已上线客户；部分行业分类持续补充中。</div></div>
+  <h1>按行业看案例，按交付物看能力</h1>
+  <p class="lead">先确认你是不是这类客户，再看我们能交付什么。行业入口只放有本地客户基础的 8 个方向；企业官网、商城与小程序、后台系统、数据看板、系统对接、AI 智能体并列展示，运维与互动单独归类。</p>
+  <div class="disclaimer"><span>说明</span><div><b>以下为能力演示，非真实客户项目。</b>页面、数据、图表与指标均为模拟，不代表任何已上线客户；分类中的空缺行业会在后续批次补充。</div></div>
+</div>
+
+<div class="wrap">
+  <div class="ind-head">
+    <h2>你在哪个行业</h2>
+    <span>点行业进入筛选，客户类型与规模见卡片</span>
+  </div>
+  <div class="inds" id="inds"></div>
 </div>
 
 <div class="filters">
-  <div class="wrap chips" id="chips">
-    <button class="chip on" data-cat="all">全部</button>
-    <button class="chip" data-cat="site">企业官网</button>
-    <button class="chip" data-cat="admin">后台管理系统</button>
-    <button class="chip" data-cat="mini">小程序</button>
-    <button class="chip" data-cat="retail">电商零售</button>
-    <button class="chip" data-cat="manufacturing">制造业</button>
-    <button class="chip" data-cat="finance">金融</button>
-    <button class="chip" data-cat="local">本地服务</button>
-    <button class="chip" data-cat="api">接口与集成</button>
-    <button class="chip" data-cat="cloud">云与运维</button>
-    <button class="chip" data-cat="itsupport">运维与 IT 支持</button>
-    <button class="chip" data-cat="integration">企业系统对接</button>
-    <button class="chip" data-cat="game">游戏与互动</button>
-    <span class="count" id="count"></span>
+  <div class="wrap">
+    <div class="frow" id="indChips"></div>
+    <div class="frow" id="typeChips">
+      <span class="flabel">交付类型</span>
+      <button class="chip on" data-type="all">全部</button>
+      <button class="chip" data-type="site">企业官网</button>
+      <button class="chip" data-type="shop">商城 / 小程序</button>
+      <button class="chip" data-type="admin">后台管理系统</button>
+      <button class="chip" data-type="bi">数据看板</button>
+      <button class="chip" data-type="api">系统对接</button>
+      <button class="chip" data-type="ai">AI 智能体</button>
+      <span class="count" id="count"></span>
+    </div>
   </div>
 </div>
 
 <main class="wrap">
   <div class="grid" id="grid"></div>
-  <div class="empty" id="empty" style="display:none">该分类下的演示正在补充，先看「全部」。</div>
+  <div class="empty" id="empty" style="display:none"></div>
+
+  <!-- 主力能力 -->
+  <section class="cap" id="integration">
+    <div class="cap-head">
+      <div>
+        <div class="cap-kicker">CORE CAPABILITY / 01</div>
+        <h2>主力能力：企业系统对接</h2>
+      </div>
+      <p>ERP、CRM、OA、MES 之间，以及支付、短信、物流、电子发票、报关接口。单项目通常 2–10 万元，是客单价最高的一块。</p>
+    </div>
+    <div class="panel feature">
+      <div>
+        <h3>不只是画一张流程图</h3>
+        <p>演示里能直接看到数据源状态、字段映射、同步日志、失败重试和对账差异——这些才是联调时真正会卡住的地方。</p>
+        <ul class="flist">
+          <li>商城 / 小程序订单下行，库存上行回传</li>
+          <li>CRM / 合同 → ERP 客户、合同与回款</li>
+          <li>支付对账、电子发票开具与红冲</li>
+          <li>物流面单与轨迹、短信 / 企微通知</li>
+        </ul>
+        <a class="demo-link" href="../demos/integration/">打开接口对接看板 →</a>
+      </div>
+      <div class="price">
+        <b>2–10 万元 / 项目</b>
+        按接口数量 × 人天 + 联调轮次计价，常见 6–20 个接口。
+        <small>说明：ERP 厂商的接口授权费（如 U8 OpenAPI）通常由客户承担，需在报价中单列；联调多安排在夜间与周末。</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI -->
+  <section class="cap" id="ai">
+    <div class="cap-head">
+      <div>
+        <div class="cap-kicker">CORE CAPABILITY / 02</div>
+        <h2>AI 智能体与自动化</h2>
+      </div>
+      <p>第四个方向，和官网后台、小程序、系统对接并列。先把重复劳动接走，再谈“智能”；答不上来必须兜底，不允许编。</p>
+    </div>
+    <div class="panel feature">
+      <div>
+        <h3>三个能直接点开的场景</h3>
+        <p>回复、分类与运行结果都是本地预设，页面显著标注“未接入真实模型”。先看交互和信息结构是否合用，再谈接入。</p>
+        <ul class="flist">
+          <li><a href="../demos/ai-inquiry/">询盘自动分流助手</a>：分类、抽字段、起草稿，人工确认再发</li>
+          <li><a href="../demos/ai-kb/">企业知识库问答</a>：资料列表、引用片段、查不到转人工</li>
+          <li><a href="../demos/ai-workflow/">报表与同步自动化</a>：画布运行、失败重试、日志与告警</li>
+        </ul>
+      </div>
+      <div class="price">
+        <b>1.5–6 万元 / 项目</b>
+        按场景数量与接口数计价；模型调用费与向量库由客户承担或代付。
+        <small>说明：不承诺准确率。上线前用客户真实问答做验收样本；检索不到就走兜底转人工，不允许生成看似正确的答案。</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- 服务保障 -->
+  <section class="cap" id="ops">
+    <div class="cap-head">
+      <div>
+        <div class="cap-kicker">SERVICE / 03</div>
+        <h2>服务保障：运维年框</h2>
+      </div>
+      <p>交付完不是结束。按年收费，远程 + 云上为主，把“出事再找人”变成“每年有人管”。</p>
+    </div>
+    <div class="tiers">
+      <div class="tier">
+        <h4>轻量版</h4>
+        <div class="p">0.6–1.2 万<small> / 年</small></div>
+        <ul>
+          <li>1–2 台云服务器</li>
+          <li>监控告警 + 每日备份</li>
+          <li>每月巡检报告</li>
+          <li>工作时间 2 小时响应</li>
+        </ul>
+      </div>
+      <div class="tier mid">
+        <h4>标准版</h4>
+        <div class="p">1.8–3 万<small> / 年</small></div>
+        <ul>
+          <li>含轻量版全部内容</li>
+          <li>域名 / 证书 / 企业邮箱</li>
+          <li>每月 4 小时开发工时</li>
+          <li>每季度备份恢复演练</li>
+        </ul>
+      </div>
+      <div class="tier">
+        <h4>安心版</h4>
+        <div class="p">4–6 万<small> / 年</small></div>
+        <ul>
+          <li>含标准版全部内容</li>
+          <li>每季度 1 次现场（昆山 / 太仓）</li>
+          <li>数据库优化</li>
+          <li>故障 4 小时到场</li>
+        </ul>
+      </div>
+    </div>
+    <div class="excl"><b>不做：</b>7×24 值守、全职驻场、硬件维保与备件。响应时限与恢复时限分开写；第三方厂商故障不在 SLA 内。</div>
+    <div class="mini">
+      <a class="demo-link" href="../demos/cloudops/">打开云监控与备份面板 →</a>
+      <a class="demo-link" href="../demos/itdesk/">打开工单与 SLA 服务台 →</a>
+    </div>
+  </section>
+
+  <!-- 增值服务 -->
+  <section class="cap" id="h5">
+    <div class="cap-head">
+      <div>
+        <div class="cap-kicker">ADD-ON / 04</div>
+        <h2>增值服务：H5 互动营销</h2>
+      </div>
+      <p>开业、展会、年庆用的抽奖、签到、答题页，配一个核销后台。只做轻互动，不做游戏研发。</p>
+    </div>
+    <div class="panel feature">
+      <div>
+        <h3>活动页 + 核销后台，2–5 天交付</h3>
+        <p>转盘交互、概率权重、奖品库存、中奖记录都能在演示里直接操作；并发控制与幂等逻辑写在页面里，不靠口头说明。</p>
+        <ul class="flist">
+          <li>大转盘 / 抽奖 / 签到 / 答题，换皮肤即可复用</li>
+          <li>奖品权重、库存、每人限次可配置</li>
+          <li>中奖记录与活动数据可导出核销</li>
+        </ul>
+        <a class="demo-link" href="../demos/lottery/">打开 H5 抽奖 Demo →</a>
+      </div>
+      <div class="price">
+        <b>0.5–2 万元 / 次</b>
+        含页面定制、上线部署与一年托管。
+        <small>说明：需要版号、充值道具或长线运营的“游戏”一律不接；小游戏备案与实名要求不在服务范围内。</small>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer>
   <div class="wrap footin">
-    <div>© 2026 昆山软件开发 · 案例库（演示样例 · Demo）</div>
+    <div>© 2026 昆山软件开发 · 案例库 · 全部为演示样例（Demo），非真实客户项目</div>
     <a href="../index.html#contact" style="color:#14523f">联系我们 →</a>
   </div>
 </footer>
 
 <script>
+var IND = [
+  {key:'retail',  name:'电商与零售', note:'含跨境电商 / 外贸子类', extra:'4'},
+  {key:'manufacturing', name:'制造业与工厂', note:'汽零 / 精密加工 / 装备', extra:'3'},
+  {key:'finance', name:'金融', note:'分支机构 / 类金融', extra:'待补'},
+  {key:'local',  name:'本地生活服务', note:'餐饮 / 美业 / 门店', extra:'2'},
+  {key:'edu',    name:'教育培训', note:'职教 / 艺培 / 企业内训', extra:'待补'},
+  {key:'medical',name:'医疗健康', note:'诊所 / 口腔 / 药械', extra:'待补'},
+  {key:'logistics', name:'物流仓储', note:'货代 / 报关 / 轻 WMS', extra:'待补'},
+  {key:'office', name:'企业通用办公', note:'OA / CRM / 报表 / 工单', extra:'4'}
+];
+
 var CASES = [
   {
-    id:'site-brand', kind:'brand', href:'../demos/site-brand/', cats:['site'],
-    title:'设计工作室品牌官网',
-    problem:'服务型公司只有一页简介，讲不清能做什么、做过什么，客户看完还是不敢联系。',
-    tags:['留白排版','滚动叙事','响应式'],
-    label:'企业官网'
+    id:'d01', kind:'t-steel', title:'汽车零部件制造型官网',
+    ind:'制造业与工厂', cats:['manufacturing'], delivery:'企业官网', dkey:'site',
+    scale:'一级 / 二级汽零供应商 · 300–800 人（示例画像）',
+    problem:'采购方先看认证、设备与“能不能做我这个件”，官网却只有公司简介和领导视察。',
+    did:['产品按车型 / 材质筛参数表','IATF 16949 与体系认证墙','RFQ 上传图纸询价'],
+    stack:['原生 HTML/CSS/JS','SVG 参数表','零外部依赖'],
+    cycle:'3–4 周', result:'4 类产品、20+ 参数项；询价 4 字段 + 图纸上传；手机端可用',
+    updated:'2026-11', href:'../demos/site-manufacturing/'
   },
   {
-    id:'site-manufacturing', kind:'factory', href:'../demos/site-manufacturing/', cats:['site','manufacturing'],
-    title:'精密制造企业官网',
-    problem:'工厂有产能、有资质，官网却只有几张图，海外与本地采购方拿不到参数和证书。',
-    tags:['产品参数表','车间展示位','资质证书'],
-    label:'制造业'
+    id:'d06', kind:'t-export', title:'跨境电商 / 外贸英文站',
+    ind:'电商与零售（含外贸）', cats:['retail'], delivery:'企业官网', dkey:'site',
+    scale:'外贸工厂 / 工贸一体 · 50–300 人',
+    problem:'海外买家看不懂中文站，产品目录和询盘全靠邮件来回，WhatsApp 也找不到入口。',
+    did:['英文首屏与排版规范','8 个产品、4 类筛选','询盘表单 + WhatsApp 浮标'],
+    stack:['原生 HTML/CSS/JS','英文排版系统','表单前端校验'],
+    cycle:'2–3 周', result:'8 个产品可筛；6 字段询盘；手机端完整可用',
+    updated:'2026-11', href:'../demos/site-trade/'
   },
   {
-    id:'site-trade', kind:'trade', href:'../demos/site-trade/', cats:['site','manufacturing'],
-    title:'外贸 B2B 英文站',
-    problem:'中文站给海外客户看，产品目录看不懂，询盘全靠邮件来回问参数。',
-    tags:['英文排版','产品目录','询盘表单'],
-    label:'企业官网'
+    id:'d09', kind:'t-brand', title:'品牌型官网（设计 / 服务业）',
+    ind:'本地生活服务', cats:['local'], delivery:'企业官网', dkey:'site',
+    scale:'设计工作室 / 高端服务 · 10–50 人',
+    problem:'作品与调性撑不起报价，页面看起来像套模板，客户只拿价格来比。',
+    did:['大图留白首屏','服务与流程分段叙事','作品图位与联系表单'],
+    stack:['原生 HTML/CSS/JS','IntersectionObserver','衬线排版'],
+    cycle:'2 周', result:'7 个区块、4 个作品位；滚动入场并可降级',
+    updated:'2026-11', href:'../demos/site-brand/'
   },
   {
-    id:'crm', kind:'crm', href:'../demos/crm/', cats:['admin','local'],
-    title:'CRM 客户管理系统',
-    problem:'客户资料散在微信、Excel 和业务员手里，跟进记录丢失，商机卡在哪个阶段没人知道。',
-    tags:['客户列表','跟进记录','销售漏斗'],
-    label:'后台管理'
+    id:'d15', kind:'t-crm', title:'制造业 CRM',
+    ind:'企业通用办公', cats:['office','manufacturing'], delivery:'后台管理系统', dkey:'admin',
+    scale:'B2B 销售团队 · 5–30 人',
+    problem:'客户资料散在微信和 Excel，商机卡在哪一步、谁多久没跟进，没人说得清。',
+    did:['客户列表与详情抽屉','跟进记录时间线','销售漏斗与 CSV 导出'],
+    stack:['原生 JS','CSS Grid','Blob 导出'],
+    cycle:'4–6 周', result:'24 条示例客户；5 阶段漏斗；8 条 / 页分页',
+    updated:'2026-11', href:'../demos/crm/'
   },
   {
-    id:'approval', kind:'appr', href:'../demos/approval/', cats:['admin','manufacturing'],
-    title:'审批流系统',
-    problem:'报销、采购还在走纸质单，单据卡在谁手里、批到第几步，发起人只能挨个问。',
-    tags:['流程节点','待办已办','驳回留痕'],
-    label:'后台管理'
+    id:'d16', kind:'t-appr', title:'通用审批 OA',
+    ind:'企业通用办公', cats:['office'], delivery:'后台管理系统', dkey:'admin',
+    scale:'50–500 人企业 · 行政 / HR',
+    problem:'报销、采购还在走纸质单，单子批到第几步要挨个问人，驳回也没有留痕。',
+    did:['发起 / 待办 / 已办','流程节点图','同意驳回留痕'],
+    stack:['原生 JS','流程状态机','纯前端演示'],
+    cycle:'4–6 周', result:'3 类单据；5 节点流程；审批动作可回放',
+    updated:'2026-11', href:'../demos/approval/'
   },
   {
-    id:'dashboard', kind:'dash', href:'../demos/dashboard/', cats:['admin','cloud','finance'],
-    title:'经营数据看板',
-    problem:'订单、回款、库存分散在几个系统里，管理层想看一眼当月经营情况要等财务出表。',
-    tags:['多图表','筛选联动','导出 CSV'],
-    label:'后台管理'
+    id:'d17', kind:'t-dash', title:'老板数据看板',
+    ind:'企业通用办公', cats:['office','manufacturing','retail'], delivery:'数据看板', dkey:'bi',
+    scale:'总经理 / 厂长 · 中小制造与贸易',
+    problem:'订单、回款、库存分散在几个系统，月底等财务出表才知道发生了什么。',
+    did:['多图表与筛选联动','区域 / 渠道对比','明细表与 CSV 导出'],
+    stack:['手写 SVG 图表','确定性模拟数据','响应式布局'],
+    cycle:'2–4 周（不含数据源接入）', result:'7 / 30 / 90 天切换；4 组图表；一屏下钻',
+    updated:'2026-11', href:'../demos/dashboard/'
   },
   {
-    id:'itdesk', kind:'itdesk', href:'../demos/itdesk/', cats:['itsupport','cloud'],
-    title:'IT 运维服务台',
-    problem:'报修靠电话和微信，工单归谁、SLA 还剩多少、哪台服务器在告警，没人说得清。',
-    tags:['工单流转','SLA 计时','告警列表'],
-    label:'运维与 IT 支持'
+    id:'d23', kind:'t-it', title:'售后工单与 SLA',
+    ind:'企业通用办公', cats:['office','manufacturing'], delivery:'后台管理系统', dkey:'admin',
+    scale:'设备商 / 制造厂售后团队 · 3–20 人',
+    problem:'报修靠电话微信，工单归谁、有没有超时都说不清，月底也没法统计。',
+    did:['工单队列与派单','SLA 倒计时','告警列表与处理留痕'],
+    stack:['原生 JS','定时器状态','状态标签'],
+    cycle:'3–5 周', result:'8 条示例工单；3 档 SLA；5 条告警',
+    updated:'2026-11', href:'../demos/itdesk/'
   },
   {
-    id:'integration', kind:'inter', href:'../demos/integration/', cats:['integration','api'],
-    title:'接口对接看板',
-    problem:'ERP、CRM、MES 各存一份数据，同步失败只能等业务发现，对账差异靠人工翻表。',
-    tags:['字段映射','同步日志','失败重试','对账差异'],
-    label:'企业系统对接'
+    id:'shop', kind:'t-shop', title:'零售商城（前台 + 订单）',
+    ind:'电商与零售', cats:['retail'], delivery:'商城 / 小程序', dkey:'shop',
+    scale:'品牌零售 / 门店连锁',
+    problem:'只做了小程序商城，商品、订单、售后没有一套能管的后台。',
+    did:['首页 / 详情 / SKU','购物车与结算','订单状态与售后'],
+    stack:['原生 JS','localStorage','移动端优先'],
+    cycle:'4–8 周', result:'6 步下单路径；SKU 联动；订单状态流转',
+    updated:'2026-10', href:'../demos/ecommerce/'
   },
   {
-    id:'ecommerce', kind:'shop', href:'../demos/ecommerce/', cats:['retail'],
-    title:'移动端商城',
-    problem:'商品规格多、库存与价格联动复杂，购物车和结算经常算错，订单状态也不透明。',
-    tags:['SKU 矩阵','购物车计价','订单状态机'],
-    label:'电商零售'
+    id:'mini', kind:'t-phone', title:'门店小程序（本地生活）',
+    ind:'本地生活服务', cats:['local'], delivery:'商城 / 小程序', dkey:'shop',
+    scale:'单店 / 3–5 店连锁',
+    problem:'顾客看不到项目与价格，预约只能打电话，忙起来就漏单。',
+    did:['手机壳与 tabbar','会员与预约','门店信息'],
+    stack:['原生 JS','移动端布局','无框架'],
+    cycle:'2–4 周', result:'4 个 tab；预约时段可选；会员卡展示',
+    updated:'2026-10', href:'../demos/miniprogram/'
   },
   {
-    id:'miniprogram', kind:'phone', href:'../demos/miniprogram/', cats:['mini','local'],
-    title:'门店小程序（预约 + 会员）',
-    problem:'门店的预约、会员积分、优惠券只能靠人工登记，客户复购没有抓手。',
-    tags:['Tabbar','预约校验','积分会员'],
-    label:'小程序'
+    id:'d37', kind:'t-inter', title:'跨境电商 ERP 对接看板',
+    ind:'电商与零售（含外贸）', cats:['retail'], delivery:'系统对接', dkey:'api',
+    scale:'有 ERP 的贸易 / 工厂 · 财务与仓管',
+    problem:'订单靠手工导 Excel，库存对不上，同步失败没人发现，月底对账靠加班。',
+    did:['数据源与字段映射','同步日志与失败重试','对账差异处理'],
+    stack:['原生 JS','接口状态模拟','等宽数据视图'],
+    cycle:'6–10 周', result:'6 个数据源；10 条字段映射；4 类运维视图',
+    updated:'2026-11', href:'../demos/integration/'
   },
   {
-    id:'cloudops', kind:'ops', href:'../demos/cloudops/', cats:['cloud'],
-    title:'云服务器部署面板',
-    problem:'上环境靠手工敲命令，装了什么、证书哪天到期、上次备份是否成功，全靠记忆。',
-    tags:['资源监控','一键部署','证书提醒'],
-    label:'云与运维'
+    id:'ai-inq', kind:'t-inq', title:'询盘自动分流助手',
+    ind:'电商与零售（含外贸）', cats:['retail'], delivery:'AI 智能体', dkey:'ai',
+    scale:'外贸 SOHO / 小贸易团队 · 1–10 人',
+    problem:'客户发了询盘，业务员在展会或路上，第一封回复常常拖到第二天。',
+    did:['邮件自动分类 + 字段抽取','命中原文高亮','回复草稿 + 人工确认'],
+    stack:['原生 JS','三栏工作台','本地预设数据'],
+    cycle:'3–5 周', result:'4 类分流；6 个字段；草稿可改后标记发送',
+    updated:'2026-11', href:'../demos/ai-inquiry/'
   },
   {
-    id:'email', kind:'mail', href:'../demos/email/', cats:['api','cloud'],
-    title:'企业邮箱配置台',
-    problem:'企业域名邮箱配了发不出去，MX/SPF/DKIM/DMARC 少一条就进垃圾箱，排查全靠猜。',
-    tags:['DNS 记录','逐条检测','收件箱界面'],
-    label:'接口与集成'
+    id:'ai-kb', kind:'t-kb', title:'企业知识库问答智能体',
+    ind:'企业通用办公', cats:['office'], delivery:'AI 智能体', dkey:'ai',
+    scale:'有产品手册与售后团队的企业 · 20–200 人',
+    problem:'产品手册、报价单、FAQ 散在网盘，新人回答客户全靠问老员工。',
+    did:['资料上传 / 删除与索引状态','问答气泡 + 引用片段','查不到时兜底转人工'],
+    stack:['原生 JS','关键词命中模拟','未接入模型'],
+    cycle:'4–6 周', result:'5 份示例资料；5 组预设答案；兜底工单入口',
+    updated:'2026-11', href:'../demos/ai-kb/'
   },
   {
-    id:'lottery', kind:'game', href:'../demos/lottery/', cats:['game'],
-    title:'H5 活动抽奖',
-    problem:'做活动只有一张海报，转发没互动；抽奖又怕超发、刷单、库存对不上。',
-    tags:['转盘交互','概率配置','库存扣减','中奖记录'],
-    label:'游戏与互动'
+    id:'ai-flow', kind:'t-flow', title:'报表与数据同步自动化',
+    ind:'企业通用办公', cats:['office','manufacturing','retail'], delivery:'AI 智能体', dkey:'ai',
+    scale:'同时有 ERP 与商城的贸易 / 工厂',
+    problem:'每天手工导表对账，错了要等财务发现，同步失败也没人知道。',
+    did:['多数据源拉取与清洗','对账失败即停止并告警','重试续跑与日报推送'],
+    stack:['原生 JS','节点状态机','模拟日志流'],
+    cycle:'4–6 周', result:'6 节点流程；失败可重试；日报 + 差异 CSV',
+    updated:'2026-11', href:'../demos/ai-workflow/'
   }
 ];
+
+var activeInd = 'all';
+var activeType = 'all';
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function thumb(c){
+  return '<div class="thumb '+c.kind+'"><span class="badge">'+esc(c.ind)+'</span>'
+    + '<div class="win"><div class="bar"><s></s><s></s><s></s><em></em></div>'
+    + '<div class="bd"><div class="h"></div><div class="r"><s></s><s></s><s></s></div>'
+    + '<s style="width:86%"></s><s style="width:57%"></s></div></div></div>';
+}
+
+function cardHTML(c){
+  return '<article class="card">'
+    + thumb(c)
+    + '<div class="body">'
+    + '<div class="top"><span class="delivery">'+esc(c.delivery)+'</span><span class="upd">'+esc(c.updated)+' 更新</span></div>'
+    + '<h2>'+esc(c.title)+'</h2>'
+    + '<p class="scale">客户类型 / 规模：'+esc(c.scale)+'</p>'
+    + '<dl class="fields">'
+    + '<div><dt>解决问题</dt><dd>'+esc(c.problem)+'</dd></div>'
+    + '<div><dt>做了什么</dt><dd>'+c.did.map(esc).join(' / ')+'</dd></div>'
+    + '<div><dt>技术栈</dt><dd>'+c.stack.map(esc).join(' · ')+'</dd></div>'
+    + '<div><dt>交付周期</dt><dd>'+esc(c.cycle)+'</dd></div>'
+    + '<div><dt>成果 / 数字</dt><dd><b>演示口径：</b>'+esc(c.result)+'</dd></div>'
+    + '</dl>'
+    + '<div class="enter"><a href="'+c.href+'">进入 Demo →</a><small>演示样例 · Demo</small></div>'
+    + '</div></article>';
+}
+
+var indWrap = document.getElementById('inds');
+IND.forEach(function(it){
+  var b = document.createElement('button');
+  b.className = 'ind';
+  b.setAttribute('data-ind', it.key);
+  b.innerHTML = '<em>'+esc(it.extra)+'</em><b>'+esc(it.name)+'</b><small>'+esc(it.note)+'</small>';
+  indWrap.appendChild(b);
+});
+
+var indChips = document.getElementById('indChips');
+var defs = [{key:'all', name:'全部行业'}].concat(IND.map(function(i){ return {key:i.key, name:i.name}; }));
+defs.forEach(function(d, i){
+  var b = document.createElement('button');
+  b.className = 'chip' + (i === 0 ? ' on' : '');
+  b.setAttribute('data-ind', d.key);
+  b.textContent = d.name;
+  indChips.appendChild(b);
+});
 
 var grid = document.getElementById('grid');
 var countEl = document.getElementById('count');
 var emptyEl = document.getElementById('empty');
 
-function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function cardHTML(c){
-  var tags = c.tags.map(function(t){ return '<span>'+esc(t)+'</span>'; }).join('');
-  return '<article class="card">'
-    + '<div class="thumb t-'+c.kind+'"><span class="badge">'+esc(c.label)+'</span><i></i>'
-    + (c.kind==='shop' ? '<u></u><u></u>' : '')
-    + (c.kind==='brand' ? '<u></u>' : '')
-    + (c.kind==='factory' ? '<u></u><u></u>' : '')
-    + (c.kind==='trade' ? '<u></u><s><b></b><b></b><b></b></s>' : '')
-    + (c.kind==='dash' ? '' : '')
-    + '</div>'
-    + '<div class="body">'
-    + '<h2>'+esc(c.title)+'</h2>'
-    + '<p class="prob"><b>解决：</b>'+esc(c.problem)+'</p>'
-    + '<div class="tags">'+tags+'</div>'
-    + '<div class="enter"><a href="'+c.href+'">进入 Demo →</a><small>演示样例 · Demo</small></div>'
-    + '</div></article>';
+function emptyText(){
+  var ind = null;
+  for (var i = 0; i < IND.length; i++) if (IND[i].key === activeInd) ind = IND[i];
+  if (ind) return '「' + ind.name + '」的 Demo 还在后续批次补充。<br><b>可以先看企业通用办公与系统对接</b>，或直接联系我们按你的行业做一版。';
+  return '当前组合下没有 Demo，试试切换交付类型或看全部行业。';
 }
 
-var active = 'all';
 function render(){
   var list = CASES.filter(function(c){
-    return active === 'all' || c.cats.indexOf(active) > -1;
+    var okInd = activeInd === 'all' || c.cats.indexOf(activeInd) > -1;
+    var okType = activeType === 'all' || c.dkey === activeType;
+    return okInd && okType;
   });
   grid.innerHTML = list.map(cardHTML).join('');
   countEl.textContent = list.length + ' / ' + CASES.length + ' 个演示';
   emptyEl.style.display = list.length ? 'none' : 'block';
+  emptyEl.innerHTML = emptyText();
 }
 
-document.getElementById('chips').addEventListener('click', function(e){
-  var btn = e.target.closest('.chip');
-  if(!btn) return;
-  active = btn.getAttribute('data-cat');
-  var all = this.querySelectorAll('.chip');
-  for(var i=0;i<all.length;i++) all[i].classList.toggle('on', all[i] === btn);
+function setInd(key){
+  activeInd = key;
+  var all = document.querySelectorAll('[data-ind]');
+  for (var i = 0; i < all.length; i++){
+    var el = all[i];
+    if (el.classList.contains('chip')) el.classList.toggle('on', el.getAttribute('data-ind') === key);
+    else if (el.classList.contains('ind')) el.classList.toggle('on', el.getAttribute('data-ind') === key);
+  }
   render();
-  if(history.replaceState){
-    history.replaceState(null, '', active === 'all' ? location.pathname : '?cat=' + active);
+  var q = [];
+  if (activeInd !== 'all') q.push('cat=' + activeInd);
+  if (activeType !== 'all') q.push('type=' + activeType);
+  if (history.replaceState) history.replaceState(null, '', q.length ? '?' + q.join('&') : location.pathname);
+}
+
+document.addEventListener('click', function(e){
+  var t = e.target.closest('[data-ind]');
+  if (t) { setInd(t.getAttribute('data-ind')); return; }
+  var ty = e.target.closest('[data-type]');
+  if (ty){
+    activeType = ty.getAttribute('data-type');
+    var chips = document.querySelectorAll('[data-type]');
+    for (var i = 0; i < chips.length; i++) chips[i].classList.toggle('on', chips[i] === ty);
+    render();
   }
 });
 
-var init = (location.search.match(/[?&]cat=([a-z]+)/) || [])[1];
-if(init){
-  var target = document.querySelector('.chip[data-cat="'+init+'"]');
-  if(target){ active = init; target.classList.add('on'); document.querySelector('.chip[data-cat="all"]').classList.remove('on'); }
+var qs = location.search;
+var initInd = (qs.match(/[?&]cat=([a-z]+)/) || [])[1];
+var initType = (qs.match(/[?&]type=([a-z]+)/) || [])[1];
+if (initInd) setInd(initInd);
+if (initType){
+  activeType = initType;
+  var tc = document.querySelector('[data-type="' + initType + '"]');
+  if (tc){
+    var allT = document.querySelectorAll('[data-type]');
+    for (var j = 0; j < allT.length; j++) allT[j].classList.toggle('on', allT[j] === tc);
+  }
 }
 render();
 </script>
