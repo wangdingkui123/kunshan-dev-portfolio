@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>运维服务台 · 演示样例 Demo</title>
+<style>
+  :root{--bg:#0f1418;--panel:#151c22;--panel2:#1a232a;--line:#26323b;--ink:#e6edf1;--ink2:#a4b2bd;--mut:#6f8090;--acc:#4ea8de;--ok:#3ddc97;--warn:#e6b555;--bad:#e2685f;--radius:10px}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 "PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+  button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  .app{display:grid;grid-template-columns:208px 1fr;min-height:100vh}
+  /* sidebar */
+  .side{background:var(--panel);border-right:1px solid var(--line);padding:18px 14px;display:flex;flex-direction:column;gap:22px}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:13.5px;letter-spacing:.02em}
+  .logo i{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#4ea8de,#2b6f9e);display:grid;place-items:center;font-size:11px;font-style:normal;font-family:ui-monospace,monospace;color:#04121c;font-weight:700}
+  .nav{display:flex;flex-direction:column;gap:3px;font-size:13px}
+  .nav a{padding:8px 10px;border-radius:7px;color:var(--ink2);display:flex;align-items:center;gap:8px}
+  .nav a:hover{background:#1c262e}
+  .nav a.on{background:#1d3a4c;color:#cfe8f8;box-shadow:inset 2px 0 0 var(--acc)}
+  .nav b{margin-left:auto;font-size:11px;background:#2a3a46;color:#c3d2dd;border-radius:4px;padding:0 6px;font-weight:600}
+  .side .foot{margin-top:auto;font-size:11.5px;color:var(--mut);line-height:1.7}
+  /* main */
+  .main{padding:20px 24px 40px;min-width:0}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+  h1{font-size:17px;margin:0;font-weight:650;letter-spacing:0}
+  .sub{color:var(--mut);font-size:12px;margin-top:2px}
+  .demo-note{font-size:11.5px;color:var(--mut);border:1px solid var(--line);border-radius:6px;padding:4px 9px;background:#131a20}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 15px}
+  .kpi span{font-size:11.5px;color:var(--mut);display:block}
+  .kpi strong{font-size:22px;font-weight:650;letter-spacing:-.01em;display:block;margin-top:4px}
+  .kpi em{font-style:normal;font-size:11.5px;color:var(--mut)}
+  .kpi.warn strong{color:var(--warn)}.kpi.bad strong{color:var(--bad)}.kpi.ok strong{color:var(--ok)}
+  .cols{display:grid;grid-template-columns:1.55fr 1fr;gap:14px;align-items:start}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .card-h{display:flex;align-items:center;gap:10px;padding:12px 15px;border-bottom:1px solid var(--line)}
+  .card-h h2{font-size:13.5px;margin:0;font-weight:600}
+  .card-h .r{margin-left:auto;font-size:11.5px;color:var(--mut)}
+  .tabs{display:flex;gap:4px;padding:9px 12px;border-bottom:1px solid var(--line)}
+  .tabs button{font-size:12.5px;padding:5px 11px;border-radius:6px;color:var(--mut)}
+  .tabs button.on{background:#22303a;color:#dbe9f4}
+  /* ticket table */
+  table{width:100%;border-collapse:collapse;font-size:12.8px}
+  th{text-align:left;color:var(--mut);font-weight:500;font-size:11.5px;padding:9px 12px;border-bottom:1px solid var(--line);background:#131a20;white-space:nowrap}
+  td{padding:11px 12px;border-bottom:1px solid #1e282f;vertical-align:middle}
+  tr.row{cursor:pointer}
+  tr.row:hover td{background:#18222a}
+  tr.row.on td{background:#1b2a35;box-shadow:inset 2px 0 0 var(--acc)}
+  .tid{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--mut);font-size:11.5px}
+  .ttl{color:var(--ink);font-weight:500}
+  .ttl small{display:block;color:var(--mut);font-weight:400;font-size:11.5px;margin-top:1px}
+  .tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:4px;border:1px solid transparent;white-space:nowrap}
+  .tag.p1{background:#3a2222;color:#f0a49d;border-color:#4d2b2b}
+  .tag.p2{background:#3a3222;color:#e8cf94;border-color:#4d4229}
+  .tag.p3{background:#22303a;color:#a9c5d6;border-color:#2b3b47}
+  .tag.done{background:#16352a;color:#88dbb5;border-color:#1e4636}
+  .tag.doing{background:#1d3346;color:#8cc4ea;border-color:#244458}
+  .tag.wait{background:#2c2f36;color:#b6bec8;border-color:#393e47}
+  .sla{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
+  .sla.bad{color:var(--bad)}.sla.warn{color:var(--warn)}.sla.ok{color:var(--ok)}
+  /* detail */
+  .detail{padding:15px;display:none}
+  .detail.on{display:block}
+  .d-head{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;margin-bottom:4px}
+  .d-head h3{margin:0;font-size:14.5px;font-weight:600;line-height:1.5}
+  .d-meta{color:var(--mut);font-size:11.5px;margin-bottom:12px}
+  .timeline{list-style:none;margin:0;padding:0 0 0 14px;border-left:1px solid var(--line)}
+  .timeline li{position:relative;padding:0 0 14px 12px;font-size:12.5px;color:var(--ink2)}
+  .timeline li:before{content:"";position:absolute;left:-19px;top:5px;width:7px;height:7px;border-radius:50%;background:#3c4b57;box-shadow:0 0 0 3px var(--panel)}
+  .timeline li.ok:before{background:var(--ok)}
+  .timeline li.now:before{background:var(--acc);box-shadow:0 0 0 3px var(--panel),0 0 0 5px rgba(78,168,222,.18)}
+  .timeline b{color:var(--ink);font-weight:600;display:block;font-size:12.8px}
+  .timeline time{color:var(--mut);font-size:11px;font-family:ui-monospace,monospace}
+  .d-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .btn{font-size:12.5px;padding:7px 13px;border-radius:7px;border:1px solid var(--line);background:#1b242c;color:var(--ink2)}
+  .btn:hover{border-color:#33424e;color:#dbe9f4}
+  .btn.pri{background:#1f4f6e;border-color:#2b6c93;color:#d7ecfa}
+  .btn.pri:hover{background:#255f83}
+  /* alerts */
+  .alerts{padding:6px 0}
+  .alert{display:flex;gap:10px;padding:11px 15px;border-bottom:1px solid #1e282f;align-items:flex-start}
+  .alert:last-child{border-bottom:none}
+  .dot{width:7px;height:7px;border-radius:50%;margin-top:7px;flex:0 0 auto}
+  .dot.bad{background:var(--bad);box-shadow:0 0 0 3px rgba(226,104,95,.14)}
+  .dot.warn{background:var(--warn);box-shadow:0 0 0 3px rgba(230,181,85,.12)}
+  .dot.ok{background:var(--ok)}
+  .alert div{font-size:12.5px}
+  .alert div small{display:block;color:var(--mut);font-size:11px;margin-top:2px}
+  .alert div b{font-weight:600}
+  .slaBar{padding:12px 15px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font-size:11.5px;color:var(--mut)}
+  @media (max-width:1080px){.cols{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:760px){
+    .app{grid-template-columns:1fr}
+    .side{flex-direction:row;overflow-x:auto;padding:10px 12px;gap:14px;align-items:center;border-right:none;border-bottom:1px solid var(--line)}
+    .side .nav{flex-direction:row;gap:4px}
+    .side .foot{display:none}
+    .main{padding:16px 14px 32px}
+    th:nth-child(4),td:nth-child(4){display:none}
+    .kpis{grid-template-columns:repeat(2,1fr);gap:8px}
+    .kpi strong{font-size:18px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="logo"><i>IT</i>运维服务台</div>
+    <nav class="nav">
+      <a class="on" href="#top">工单中心 <b id="navCount">6</b></a>
+      <a href="#alerts">告警监控</a>
+      <a href="#sla">SLA 看板</a>
+      <a href="#assets">资产清单</a>
+      <a href="#onsite">驻场排班</a>
+    </nav>
+    <div class="foot">演示样例 · Demo<br>数据为模拟，非真实工单</div>
+  </aside>
+
+  <main class="main" id="top">
+    <div class="top">
+      <div>
+        <h1>工单与 SLA</h1>
+        <div class="sub">运维 / IT 支持 · 有人在管，响应有时限</div>
+      </div>
+      <span class="demo-note">演示样例 · Demo · 数据为模拟</span>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><span>待响应</span><strong id="k-wait">3</strong><em>其中 P1 一个</em></div>
+      <div class="kpi warn"><span>临近超时</span><strong id="k-risk">2</strong><em>剩余不足 30 分钟</em></div>
+      <div class="kpi ok"><span>今日已解决</span><strong>7</strong><em>平均 1.4 小时</em></div>
+      <div class="kpi bad"><span>活跃告警</span><strong>3</strong><em>磁盘 / 证书 / 内存</em></div>
+    </div>
+
+    <div class="cols">
+      <section class="card">
+        <div class="card-h">
+          <h2>工单列表</h2>
+          <span class="r">按紧急度与剩余 SLA 排序</span>
+        </div>
+        <div class="tabs" id="tabs">
+          <button class="on" data-f="open">待处理 6</button>
+          <button data-f="doing">处理中 0</button>
+          <button data-f="done">已完成 2</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>工单</th><th>客户 / 系统</th><th>优先级</th><th>状态</th><th>剩余 SLA</th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <div>
+        <section class="card" style="margin-bottom:14px">
+          <div class="card-h"><h2>工单详情</h2><span class="r" id="dId">#—</span></div>
+          <div class="detail on" id="detail">
+            <div class="d-head">
+              <h3 id="dTitle">选择左侧工单</h3>
+              <span class="tag p3" id="dPri">—</span>
+            </div>
+            <div class="d-meta" id="dMeta">—</div>
+            <ul class="timeline" id="dTime"></ul>
+            <div class="d-actions">
+              <button class="btn pri" id="btnAck">接单并响应</button>
+              <button class="btn" id="btnDone">标记已解决</button>
+              <button class="btn">转二线</button>
+            </div>
+          </div>
+          <div class="slaBar"><span id="slaText">SLA：—</span><span id="slaState">—</span></div>
+        </section>
+
+        <section class="card" id="alerts">
+          <div class="card-h"><h2>告警监控</h2><span class="r">近 24 小时</span></div>
+          <div class="alerts">
+            <div class="alert"><span class="dot bad"></span><div><b>磁盘使用率 93%</b><small>prod-web-02 · /var/log · 触发于 09:12</small></div></div>
+            <div class="alert"><span class="dot warn"></span><div><b>SSL 证书 14 天后到期</b><small>api.example.com · 建议本周续期</small></div></div>
+            <div class="alert"><span class="dot warn"></span><div><b>内存使用率 86%</b><small>prod-db-01 · 持续 22 分钟</small></div></div>
+            <div class="alert"><span class="dot ok"></span><div><b>备份任务成功</b><small>03:00 全量备份 · 38.2 GB</small></div></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* 工单数据（模拟） */
+var TICKETS = [
+  { id:'IT-2041', title:'ERP 客户端无法登录，提示令牌失效', sys:'昆山某制造 · ERP', pri:'P1', status:'open',
+    created:'09:04', sla:60, left:11,
+    events:[['已提交','09:04','工单创建，来源：电话'],['已派单','09:06','自动派给 值班工程师 A'],['待响应','09:06','等待接单']] },
+  { id:'IT-2040', title:'办公区打印机无法连接网络', sys:'总部 3F · 办公 IT', pri:'P3', status:'open',
+    created:'09:31', sla:240, left:186,
+    events:[['已提交','09:31','工单创建，来源：工单页'],['待响应','09:31','等待接单']] },
+  { id:'IT-2039', title:'官网证书即将到期，需续期并重载 Nginx', sys:'www.example.com · 云服务器', pri:'P2', status:'open',
+    created:'08:47', sla:120, left:44,
+    events:[['已提交','08:47','监控自动生成'],['已确认','08:52','确认为真实告警'],['待响应','08:52','等待接单']] },
+  { id:'IT-2038', title:'数据库磁盘告警，需清理归档日志', sys:'prod-db-01 · 运维', pri:'P1', status:'open',
+    created:'07:58', sla:60, left:6,
+    events:[['已提交','07:58','监控自动生成'],['已确认','08:01','磁盘 93%'],['待响应','08:01','等待接单']] },
+  { id:'IT-2037', title:'新员工账号开通（5 人）与权限分配', sys:'总部 · 办公 IT', pri:'P3', status:'open',
+    created:'09:15', sla:480, left:412,
+    events:[['已提交','09:15','工单创建'],['待响应','09:15','等待接单']] },
+  { id:'IT-2036', title:'小程序后台数据同步延迟 20 分钟', sys:'拾光集 · 接口', pri:'P2', status:'open',
+    created:'08:20', sla:120, left:71,
+    events:[['已提交','08:20','客户反馈'],['已确认','08:24','队列积压'],['待响应','08:24','等待接单']] },
+  { id:'IT-2035', title:'邮件进垃圾箱，检查 SPF/DKIM 记录', sys:'luye-demo.com · 邮箱', pri:'P2', status:'done',
+    created:'昨日 16:10', sla:120, left:0,
+    events:[['已提交','16:10','工单创建'],['已响应','16:18','Engineer B 接单'],['已解决','17:02','补充 DKIM 记录并验证通过']] },
+  { id:'IT-2034', title:'办公室无线网络频繁掉线', sys:'总部 2F · 办公 IT', pri:'P3', status:'done',
+    created:'昨日 14:02', sla:240, left:0,
+    events:[['已提交','14:02','工单创建'],['已响应','14:20','更换 AP 网线'],['已解决','15:05','复测稳定']] }
+];
+
+var filter = 'open';
+var current = TICKETS[0];
+var timerHandle = null;
+
+function priClass(p){ return p==='P1'?'p1':p==='P2'?'p2':'p3'; }
+function statusClass(s){ return s==='done'?'done':s==='doing'?'doing':'wait'; }
+function statusText(s){ return s==='done'?'已完成':s==='doing'?'处理中':'待响应'; }
+
+function fmtLeft(min){
+  if(min <= 0) return '已超时';
+  if(min < 60) return min + ' 分钟';
+  var h = Math.floor(min/60), m = min%60;
+  return h + ' 小时' + (m? ' ' + m + ' 分' : '');
+}
+function slaLevel(min){ return min<=15?'bad':min<=45?'warn':'ok'; }
+
+function renderList(){
+  var rows = TICKETS.filter(function(t){ return t.status === filter; });
+  var html = rows.map(function(t){
+    return '<tr class="row' + (t===current?' on':'') + '" data-id="'+t.id+'">'
+      + '<td><span class="tid">'+t.id+'</span></td>'
+      + '<td><div class="ttl">'+t.title+'<small>'+t.sys+'</small></div></td>'
+      + '<td><span class="tag '+priClass(t.pri)+'">'+t.pri+'</span></td>'
+      + '<td><span class="tag '+statusClass(t.status)+'">'+statusText(t.status)+'</span></td>'
+      + '<td><span class="sla '+(t.status==='done'?'ok':slaLevel(t.left))+'">'+(t.status==='done'?'—':fmtLeft(t.left))+'</span></td>'
+      + '</tr>';
+  }).join('');
+  document.getElementById('tbody').innerHTML = html || '<tr><td colspan="5" style="color:#6f8090;padding:22px 12px">该状态下暂无工单</td></tr>';
+  document.getElementById('navCount').textContent = TICKETS.filter(function(t){return t.status!=='done';}).length;
+}
+
+function renderDetail(){
+  var t = current;
+  document.getElementById('dId').textContent = '#' + t.id;
+  document.getElementById('dTitle').textContent = t.title;
+  var pri = document.getElementById('dPri');
+  pri.textContent = t.pri;
+  pri.className = 'tag ' + priClass(t.pri);
+  document.getElementById('dMeta').textContent = t.sys + ' · 创建于 ' + t.created + ' · 目标响应 ' + t.sla + ' 分钟';
+  document.getElementById('dTime').innerHTML = t.events.map(function(e, i){
+    var cls = (i === t.events.length - 1 && t.status !== 'done') ? 'now' : 'ok';
+    return '<li class="'+cls+'"><b>'+e[0]+'</b><time>'+e[1]+'</time><br>'+e[2]+'</li>';
+  }).join('');
+  updateSla();
+}
+
+function updateSla(){
+  var t = current;
+  var txt, state, cls;
+  if(t.status === 'done'){ txt = 'SLA：已关闭'; state = '处理完成'; cls = 'ok'; }
+  else {
+    txt = 'SLA：剩余 ' + fmtLeft(t.left);
+    state = t.left <= 15 ? '即将超时' : '正常计时中';
+    cls = slaLevel(t.left);
+  }
+  var a = document.getElementById('slaText'), b = document.getElementById('slaState');
+  a.textContent = txt; b.textContent = state;
+  a.className = 'sla ' + cls; b.className = 'sla ' + cls;
+}
+
+function tick(){
+  if(current.status === 'open' && current.left > 0){ current.left--; }
+  renderList(); updateSla();
+}
+
+document.getElementById('tbody').addEventListener('click', function(e){
+  var tr = e.target.closest('tr.row');
+  if(!tr) return;
+  var id = tr.getAttribute('data-id');
+  current = TICKETS.filter(function(t){ return t.id === id; })[0];
+  renderList(); renderDetail();
+});
+
+document.getElementById('tabs').addEventListener('click', function(e){
+  var b = e.target.closest('button');
+  if(!b) return;
+  filter = b.getAttribute('data-f');
+  var list = this.querySelectorAll('button');
+  for(var i=0;i<list.length;i++) list[i].classList.toggle('on', list[i] === b);
+  renderList();
+});
+
+document.getElementById('btnAck').addEventListener('click', function(){
+  if(current.status === 'done') return;
+  current.status = 'doing';
+  current.events.push(['已接单', nowHM(), '工程师已响应，开始处理']);
+  filter = 'doing';
+  var list = document.querySelectorAll('#tabs button');
+  for(var i=0;i<list.length;i++) list[i].classList.toggle('on', list[i].getAttribute('data-f') === 'doing');
+  renderList(); renderDetail();
+});
+
+document.getElementById('btnDone').addEventListener('click', function(){
+  if(current.status === 'done') return;
+  current.status = 'done';
+  current.events.push(['已解决', nowHM(), '处理完成，等待客户确认']);
+  filter = 'done';
+  var list = document.querySelectorAll('#tabs button');
+  for(var i=0;i<list.length;i++) list[i].classList.toggle('on', list[i].getAttribute('data-f') === 'done');
+  renderList(); renderDetail();
+});
+
+function nowHM(){
+  var d = new Date();
+  function p(n){ return n<10?'0'+n:''+n; }
+  return p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+renderList(); renderDetail();
+timerHandle = setInterval(tick, 60000);
+</script>
+</body>
+</html>
