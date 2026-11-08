@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>恒铖精工 · 精密零部件制造（演示样例）</title>
+<meta name="description" content="制造型企业官网演示：产品参数表、车间实拍位、资质证书位、质量检测流程。演示样例 · Demo，非真实客户项目。">
+<style>
+  :root{
+    --bg:#f2f5f7;--panel:#fff;--ink:#0e1c28;--ink2:#3d4d5a;--mut:#7c8b96;
+    --line:#dbe3e8;--line2:#c3d0d8;--navy:#0d2c45;--navy2:#123a5a;--steel:#5a7487;
+    --orange:#c2551c;--orange-soft:#f8ece4;
+    --max:1200px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif;font-size:15.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 26px}
+  @media(max-width:600px){.wrap{padding:0 18px}}
+  .mono{font-family:ui-monospace,"SFMono-Regular",Consolas,Menlo,monospace}
+
+  .ribbon{background:#0b1f30;color:#cfe0ea;font-size:11.5px;letter-spacing:.1em;padding:7px 14px;text-align:center}
+  .ribbon b{color:#f0b184;font-weight:500}
+  .ribbon a{color:#f0b184;margin-left:10px}
+
+  .topbar{background:#0d2c45;color:#b9cdda;font-size:12px}
+  .topbar .wrap{display:flex;justify-content:space-between;align-items:center;height:36px;gap:16px}
+  .topbar b{color:#fff;font-weight:500}
+  @media(max-width:700px){.topbar .hide-s{display:none}}
+
+  header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .hd{display:flex;align-items:center;justify-content:space-between;height:72px;gap:24px}
+  .logo{display:flex;align-items:center;gap:11px}
+  .logo-mark{width:38px;height:38px;background:var(--navy);display:grid;place-items:center;color:#fff;font-family:ui-monospace,Menlo,monospace;font-size:13px;letter-spacing:.02em}
+  .logo-txt strong{display:block;font-size:18px;letter-spacing:.12em;line-height:1.2}
+  .logo-txt span{display:block;font-size:9.5px;letter-spacing:.18em;color:var(--mut);font-family:ui-monospace,Menlo,monospace}
+  nav{display:flex;gap:28px;font-size:14px;color:var(--ink2)}
+  nav a{padding:6px 0;border-bottom:2px solid transparent}
+  nav a:hover,nav a.on{border-color:var(--orange);color:var(--ink)}
+  .tel{display:flex;align-items:center;gap:9px;background:var(--orange);color:#fff;padding:10px 18px;font-size:13px;font-weight:500}
+  .tel small{display:block;font-size:9.5px;letter-spacing:.14em;opacity:.8;font-weight:400}
+  @media(max-width:980px){nav{display:none}}
+  @media(max-width:520px){.tel{padding:8px 12px;font-size:12px}.tel .tel-no{display:none}}
+
+  /* hero */
+  .hero{background:linear-gradient(105deg,#0b2537 0%,#123a5a 58%,#1b4a6d 100%);color:#fff;position:relative;overflow:hidden}
+  .hero:before{
+    content:"";position:absolute;inset:0;opacity:.16;
+    background-image:linear-gradient(rgba(255,255,255,.6) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.6) 1px,transparent 1px);
+    background-size:56px 56px;
+    -webkit-mask-image:linear-gradient(100deg,#000,transparent 72%);mask-image:linear-gradient(100deg,#000,transparent 72%);
+  }
+  .hero-in{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:48px;padding:64px 0 0;align-items:start}
+  @media(max-width:900px){.hero-in{grid-template-columns:1fr;gap:32px;padding-top:48px}}
+  .hero-tag{display:inline-block;font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:.2em;color:#8fc0dd;border:1px solid rgba(143,192,221,.35);padding:5px 11px;margin-bottom:22px}
+  .hero h1{font-size:clamp(28px,3.6vw,44px);line-height:1.3;margin:0 0 18px;font-weight:700;letter-spacing:.01em}
+  .hero h1 em{font-style:normal;color:#f0a970}
+  .hero p{color:#c2d6e2;font-size:14px;line-height:1.9;margin:0 0 26px;max-width:34em}
+  .hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:38px}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;font-size:13.5px;font-weight:500;border:1px solid rgba(255,255,255,.3);color:#fff;transition:.18s}
+  .btn:hover{background:rgba(255,255,255,.1)}
+  .btn-solid{background:var(--orange);border-color:var(--orange)}
+  .btn-solid:hover{background:#a9450f}
+  .hero-stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgba(255,255,255,.16);margin-bottom:0}
+  .hero-stats div{padding:18px 0 22px;border-right:1px solid rgba(255,255,255,.12)}
+  .hero-stats div:last-child{border-right:none}
+  .hero-stats strong{display:block;font-size:24px;font-weight:600;letter-spacing:-.01em}
+  .hero-stats strong i{font-style:normal;font-size:13px;color:#8fc0dd;margin-left:2px}
+  .hero-stats span{font-size:11.5px;color:#9db8c9}
+  @media(max-width:520px){.hero-stats{grid-template-columns:1fr 1fr}.hero-stats div:nth-child(2){border-right:none}.hero-stats div:nth-child(1),.hero-stats div:nth-child(2){border-bottom:1px solid rgba(255,255,255,.12)}}
+
+  .hero-fig{position:relative;border:1px solid rgba(255,255,255,.2);height:330px;margin-top:8px;background:
+    repeating-linear-gradient(135deg,rgba(255,255,255,.05) 0 2px,transparent 2px 9px),
+    linear-gradient(160deg,#1b4763,#0e2c42);
+    display:grid;place-items:center;text-align:center;padding:20px}
+  .hero-fig b{display:block;font-size:13px;letter-spacing:.26em;color:rgba(255,255,255,.55);font-weight:400}
+  .hero-fig span{display:block;margin-top:10px;font-size:11px;color:rgba(255,255,255,.38);letter-spacing:.06em}
+  .hero-fig:after{content:"FIG. 01 / 厂区主图位";position:absolute;left:14px;bottom:12px;font-family:ui-monospace,Menlo,monospace;font-size:9.5px;letter-spacing:.14em;color:rgba(255,255,255,.4)}
+  @media(max-width:900px){.hero-fig{height:220px}}
+
+  /* section shell */
+  section{padding:66px 0}
+  .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;margin-bottom:30px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:16px}
+  .sec-t{display:flex;align-items:baseline;gap:14px}
+  .sec-no{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--orange);letter-spacing:.16em}
+  h2{font-size:clamp(20px,2.4vw,26px);margin:0;font-weight:700;letter-spacing:.01em}
+  .sec-en{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.2em;color:var(--mut);text-transform:uppercase}
+  .sec-desc{font-size:13px;color:var(--mut);margin:0;max-width:32em}
+
+  /* products */
+  .prod-tabs{display:flex;gap:0;border:1px solid var(--line2);background:#fff;overflow-x:auto;margin-bottom:0}
+  .prod-tab{
+    flex:1 0 auto;padding:14px 22px;font-size:13.5px;color:var(--ink2);background:#fff;border:none;border-right:1px solid var(--line);
+    cursor:pointer;font-family:inherit;white-space:nowrap;transition:.16s;text-align:left;
+  }
+  .prod-tab:last-child{border-right:none}
+  .prod-tab small{display:block;font-family:ui-monospace,Menlo,monospace;font-size:9.5px;letter-spacing:.14em;color:var(--mut);margin-top:2px}
+  .prod-tab:hover{background:#f7fafb}
+  .prod-tab.on{background:var(--navy);color:#fff}
+  .prod-tab.on small{color:#8fc0dd}
+
+  .prod-body{display:grid;grid-template-columns:300px 1fr;gap:0;border:1px solid var(--line);border-top:none;background:#fff}
+  @media(max-width:880px){.prod-body{grid-template-columns:1fr}}
+  .prod-visual{border-right:1px solid var(--line);padding:22px;background:#fbfcfd}
+  @media(max-width:880px){.prod-visual{border-right:none;border-bottom:1px solid var(--line)}}
+  .prod-shot{
+    height:190px;border:1px dashed var(--line2);display:grid;place-items:center;text-align:center;
+    background:repeating-linear-gradient(45deg,#f4f7f9 0 10px,#eef3f6 10px 20px);
+  }
+  .prod-shot b{font-size:11.5px;letter-spacing:.16em;color:var(--steel);font-weight:400}
+  .prod-shot span{display:block;font-size:10px;color:var(--mut);margin-top:6px}
+  .prod-app{padding:20px;font-size:12.5px;color:var(--ink2);line-height:1.9;border-top:1px solid var(--line);margin-top:20px}
+  .prod-app strong{display:block;font-size:11px;letter-spacing:.14em;color:var(--mut);margin-bottom:8px;font-family:ui-monospace,Menlo,monospace}
+
+  .spec-wrap{overflow-x:auto}
+  table.spec{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+  table.spec th,table.spec td{padding:11px 16px;text-align:left;border-bottom:1px solid var(--line)}
+  table.spec th{background:#f5f8fa;font-weight:600;color:var(--ink2);font-size:12px;letter-spacing:.04em;white-space:nowrap}
+  table.spec td:first-child{color:var(--mut);width:34%;white-space:nowrap}
+  table.spec tr:last-child td{border-bottom:none}
+  table.spec td b{color:var(--navy)}
+  .prod-note{padding:12px 16px;background:var(--orange-soft);font-size:11.5px;color:#8c3f13;border-top:1px solid #eed7c8}
+
+  /* workshop */
+  .ws-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:14px}
+  .ws-grid .cell{position:relative;border:1px solid var(--line);background:#e9eef2;display:grid;place-items:center;text-align:center;padding:16px;overflow:hidden}
+  .ws-grid .cell:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(13,44,69,.05) 0 2px,transparent 2px 10px)}
+  .ws-grid .cell b{position:relative;font-size:11.5px;letter-spacing:.18em;color:var(--steel);font-weight:400}
+  .ws-grid .cell span{position:relative;display:block;margin-top:6px;font-size:10px;color:var(--mut)}
+  .ws-grid .cell.big{height:300px}
+  .ws-grid .cell.small{height:143px}
+  .ws-grid .col{display:grid;gap:14px}
+  @media(max-width:820px){.ws-grid{grid-template-columns:1fr}.ws-grid .cell.big{height:210px}.ws-grid .cell.small{height:130px}.ws-grid .col{grid-template-columns:1fr 1fr}}
+
+  .eq-list{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:14px}
+  @media(max-width:820px){.eq-list{grid-template-columns:1fr 1fr}}
+  .eq{background:#fff;padding:16px 18px}
+  .eq strong{display:block;font-size:20px;color:var(--navy);letter-spacing:-.01em}
+  .eq span{font-size:11.5px;color:var(--mut)}
+
+  /* certificates */
+  .cert-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:820px){.cert-grid{grid-template-columns:1fr 1fr}}
+  .cert{border:1px solid var(--line);background:#fff;padding:12px}
+  .cert-paper{
+    height:150px;border:1px solid #e7e2d4;background:linear-gradient(160deg,#fffdf7,#f6f2e6);
+    display:grid;place-items:center;text-align:center;position:relative;padding:10px;
+  }
+  .cert-paper:before{content:"";position:absolute;inset:9px;border:1px solid rgba(180,160,120,.35)}
+  .cert-paper b{font-size:11px;letter-spacing:.1em;color:#8a7b5c;font-weight:500;line-height:1.6}
+  .cert-paper s{display:block;text-decoration:none;font-size:9.5px;color:#a99b7e;margin-top:6px;font-family:ui-monospace,Menlo,monospace;letter-spacing:.1em}
+  .cert p{margin:10px 2px 2px;font-size:12.5px;color:var(--ink2)}
+  .cert small{display:block;font-size:10.5px;color:var(--mut);margin-top:3px}
+  .cert-note{margin-top:14px;font-size:11.5px;color:var(--mut)}
+
+  /* quality flow */
+  .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border:1px solid var(--line);background:#fff}
+  @media(max-width:900px){.flow{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.flow{grid-template-columns:1fr}}
+  .flow div{padding:22px 18px;border-right:1px solid var(--line);position:relative}
+  .flow div:last-child{border-right:none}
+  .flow .k{font-family:ui-monospace,Menlo,monospace;font-size:10px;color:var(--orange);letter-spacing:.16em}
+  .flow h3{font-size:14.5px;margin:8px 0 6px;font-weight:600}
+  .flow p{margin:0;font-size:12px;color:var(--mut);line-height:1.8}
+
+  /* contact */
+  .contact{background:var(--navy);color:#fff;padding:58px 0}
+  .contact-in{display:grid;grid-template-columns:1fr 1.15fr;gap:54px}
+  @media(max-width:880px){.contact-in{grid-template-columns:1fr;gap:32px}}
+  .contact h2{color:#fff;font-size:clamp(22px,2.8vw,30px);margin-bottom:14px}
+  .contact p{color:#aec5d3;font-size:13.5px;margin:0 0 8px;max-width:30em}
+  .cform{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.15);padding:24px}
+  .cform .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:520px){.cform .row{grid-template-columns:1fr}}
+  .cform label{display:block;font-size:11px;letter-spacing:.1em;color:#9db8c9;margin-bottom:6px}
+  .cform input,.cform textarea,.cform select{
+    width:100%;background:rgba(0,0,0,.16);border:1px solid rgba(255,255,255,.18);color:#fff;
+    padding:11px 12px;font-size:13px;font-family:inherit;margin-bottom:14px;outline:none;border-radius:0;
+  }
+  .cform input:focus,.cform textarea:focus{border-color:#7fb4d4}
+  .cform textarea{resize:vertical;min-height:78px}
+  .cform button{
+    width:100%;background:var(--orange);border:none;color:#fff;padding:13px;font-size:14px;font-weight:500;
+    cursor:pointer;font-family:inherit;letter-spacing:.06em;
+  }
+  .cform button:hover{background:#a9450f}
+  .cform .tip{font-size:10.5px;color:#8ba6b8;margin-top:10px;line-height:1.7}
+  .cform .ok{display:none;background:rgba(61,220,151,.14);border:1px solid rgba(61,220,151,.4);color:#a9f0cd;font-size:12.5px;padding:10px 12px;margin-bottom:12px}
+
+  footer{background:#081c2b;color:#7f97a6;font-size:11.5px;padding:26px 0}
+  .footin{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .footin a{color:#b9cdda}
+</style>
+</head>
+<body>
+
+<div class="ribbon">演示样例 · DEMO &nbsp;·&nbsp; 本页为能力演示，<b>非真实客户项目</b>，参数与资质均为示意<a href="../../cases/">← 返回案例库</a></div>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="hide-s">ISO 9001 质量管理体系 · IATF 16949 汽车行业配套能力</div>
+    <div><b>0512-0000 0000</b> &nbsp;|&nbsp; 周一至周六 08:00–17:30</div>
+  </div>
+</div>
+
+<header>
+  <div class="wrap hd">
+    <div class="logo">
+      <div class="logo-mark">HC</div>
+      <div class="logo-txt"><strong>恒铖精工</strong><span>HENGCHENG PRECISION</span></div>
+    </div>
+    <nav>
+      <a href="#product">产品中心</a>
+      <a href="#workshop">车间设备</a>
+      <a href="#cert">资质证书</a>
+      <a href="#quality">质量体系</a>
+      <a href="#contact">联系我们</a>
+    </nav>
+    <a class="tel" href="#contact">
+      <span>&#9742;</span>
+      <span><small>咨询报价</small><span class="tel-no">0512-0000 0000</span></span>
+    </a>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap hero-in">
+    <div>
+      <div class="hero-tag">CNC PRECISION MACHINING · SINCE 2009</div>
+      <h1>汽车与自动化设备的<br><em>精密零部件加工</em></h1>
+      <p>主做铝合金、不锈钢中小件，三轴到五轴加工中心共 28 台。单件打样到中小批量均可，常规公差 ±0.01mm，可出具首件检测报告与材质证明。</p>
+      <div class="hero-btns">
+        <a class="btn btn-solid" href="#contact">索取报价单 →</a>
+        <a class="btn" href="#product">查看产品参数</a>
+      </div>
+    </div>
+    <div class="hero-fig">
+      <div>
+        <b>厂 区 / 车 间 主 图 位</b>
+        <span>正式上线替换为实拍照片 · 1600×1000</span>
+      </div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="hero-stats">
+      <div><strong>28<i>台</i></strong><span>加工中心</span></div>
+      <div><strong>±0.01<i>mm</i></strong><span>常规加工公差</span></div>
+      <div><strong>16<i>年</i></strong><span>精密件加工经验</span></div>
+      <div><strong>72<i>h</i></strong><span>样品最快交付</span></div>
+    </div>
+  </div>
+</div>
+
+<section id="product">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-t"><span class="sec-no">01</span><h2>产品中心</h2><span class="sec-en">/ products</span></div>
+      <p class="sec-desc">切换分类查看典型零件的材质、公差与表面处理范围。</p>
+    </div>
+
+    <div class="prod-tabs" id="prodTabs">
+      <button class="prod-tab on" data-p="0">汽车结构件<small>Auto Parts</small></button>
+      <button class="prod-tab" data-p="1">自动化夹具<small>Fixture</small></button>
+      <button class="prod-tab" data-p="2">医疗与仪器件<small>Medical</small></button>
+      <button class="prod-tab" data-p="3">非标定制<small>Custom</small></button>
+    </div>
+
+    <div class="prod-body">
+      <div class="prod-visual">
+        <div class="prod-shot"><div><b>产 品 图 位</b><span id="pvName">汽车结构件</span></div></div>
+        <div class="prod-app">
+          <strong>典型应用</strong>
+          <span id="pvApp">新能源电池托盘连接件、座椅骨架、转向支架等中小型承力结构件。</span>
+        </div>
+      </div>
+      <div>
+        <div class="spec-wrap">
+          <table class="spec">
+            <thead><tr><th>参数项</th><th>范围 / 说明</th></tr></thead>
+            <tbody id="specBody"></tbody>
+          </table>
+        </div>
+        <div class="prod-note">以上为加工能力范围示意。实际公差、材质与表面处理需按图纸评估，正式报价以工程评审结论为准。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="workshop" style="background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-t"><span class="sec-no">02</span><h2>车间与设备</h2><span class="sec-en">/ workshop</span></div>
+      <p class="sec-desc">恒温加工区、三坐标检测室、表面处理外协配套。</p>
+    </div>
+
+    <div class="ws-grid">
+      <div class="cell big"><div><b>车 间 全 景 图 位</b><span>建议 1600×900 · 广角拍摄</span></div></div>
+      <div class="col">
+        <div class="cell small"><div><b>五 轴 加 工 区</b><span>图位 800×400</span></div></div>
+        <div class="cell small"><div><b>三 坐 标 检 测 室</b><span>图位 800×400</span></div></div>
+      </div>
+      <div class="col">
+        <div class="cell small"><div><b>去 毛 刺 工 位</b><span>图位 800×400</span></div></div>
+        <div class="cell small"><div><b>成 品 检 验 区</b><span>图位 800×400</span></div></div>
+      </div>
+    </div>
+
+    <div class="eq-list">
+      <div class="eq"><strong>12 台</strong><span>三轴加工中心</span></div>
+      <div class="eq"><strong>9 台</strong><span>四轴 / 五轴加工中心</span></div>
+      <div class="eq"><strong>7 台</strong><span>数控车床（含车铣复合）</span></div>
+      <div class="eq"><strong>2 台</strong><span>三坐标测量机</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="cert">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-t"><span class="sec-no">03</span><h2>资质证书</h2><span class="sec-en">/ certificates</span></div>
+      <p class="sec-desc">采购方常用到的体系与检测类文件，可随报价单一并提供。</p>
+    </div>
+
+    <div class="cert-grid">
+      <div class="cert">
+        <div class="cert-paper"><div><b>ISO 9001<br>质量管理体系认证</b><s>CERT NO. 0000-0000</s></div></div>
+        <p>质量管理体系</p><small>证书扫描件位 · 有效期示意</small>
+      </div>
+      <div class="cert">
+        <div class="cert-paper"><div><b>IATF 16949<br>汽车行业质量体系</b><s>CERT NO. 0000-0000</s></div></div>
+        <p>汽车行业配套</p><small>证书扫描件位 · 有效期示意</small>
+      </div>
+      <div class="cert">
+        <div class="cert-paper"><div><b>ISO 14001<br>环境管理体系</b><s>CERT NO. 0000-0000</s></div></div>
+        <p>环境管理体系</p><small>证书扫描件位 · 有效期示意</small>
+      </div>
+      <div class="cert">
+        <div class="cert-paper"><div><b>材质证明<br>MTC / ROHS</b><s>PER BATCH</s></div></div>
+        <p>随批次出具</p><small>检测报告样式位</small>
+      </div>
+    </div>
+    <div class="cert-note">注：本页为演示版面，证书名称为占位示例，不对应任何真实主体。正式站点此处放置企业实际持有的证书扫描件。</div>
+  </div>
+</section>
+
+<section id="quality" style="background:#fff;border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-t"><span class="sec-no">04</span><h2>质量与交付</h2><span class="sec-en">/ quality control</span></div>
+      <p class="sec-desc">从来料到出货，五个必须留痕的节点。</p>
+    </div>
+    <div class="flow">
+      <div><div class="k">Q1</div><h3>来料检验</h3><p>材质单核对、硬度抽检，异常批次直接退料。</p></div>
+      <div><div class="k">Q2</div><h3>首件确认</h3><p>首件三坐标全尺寸检测，出具 FAIR 报告。</p></div>
+      <div><div class="k">Q3</div><h3>过程巡检</h3><p>按批次抽检关键尺寸，超差即停线调机。</p></div>
+      <div><div class="k">Q4</div><h3>出货全检</h3><p>外观、关键尺寸、包装数量逐项确认并拍照归档。</p></div>
+      <div><div class="k">Q5</div><h3>追溯与售后</h3><p>批次号可追溯到机床、刀具与操作人员，异常可召回。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="contact">
+  <div class="wrap contact-in">
+    <div>
+      <h2>发图纸，24 小时内回评估。</h2>
+      <p>支持 STEP / DWG / PDF 图纸，注明材质、数量与表面处理要求即可。</p>
+      <p style="margin-top:22px;font-size:13px;line-height:2.1">
+        地址：江苏省昆山市 厂区地址示意<br>
+        电话：0512-0000 0000<br>
+        邮箱：sales@example.com<br>
+        业务时间：周一至周六 08:00–17:30
+      </p>
+    </div>
+    <form class="cform" id="rfq">
+      <div class="ok" id="ok">已收到示意提交 —— 本演示不会真实发送，仅展示表单交互。</div>
+      <div class="row">
+        <div><label>公司名称</label><input type="text" placeholder="例：某某精密科技有限公司" required></div>
+        <div><label>联系人</label><input type="text" placeholder="姓名" required></div>
+      </div>
+      <div class="row">
+        <div><label>联系电话</label><input type="tel" placeholder="手机或固话" required></div>
+        <div><label>数量区间</label>
+          <select>
+            <option>打样 1–10 件</option>
+            <option>小批量 11–500 件</option>
+            <option>批量 500 件以上</option>
+          </select>
+        </div>
+      </div>
+      <label>需求说明</label>
+      <textarea placeholder="材质、公差要求、表面处理、期望交期"></textarea>
+      <button type="submit">提交询价</button>
+      <div class="tip">演示表单：点击提交只会在本页提示，不会上传任何数据。</div>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footin">
+    <div>© 2026 恒铖精工（演示主体）· 本页为演示样例 · Demo，非真实客户项目</div>
+    <a href="../../cases/">返回案例库 →</a>
+  </div>
+</footer>
+
+<script>
+var PROD = [
+  {
+    name:'汽车结构件',
+    app:'新能源电池托盘连接件、座椅骨架、转向支架等中小型承力结构件。',
+    rows:[
+      ['常用材质','6061 / 7075 铝合金、304 不锈钢、45# 钢'],
+      ['尺寸范围','5 – 420 mm（单件最大外形）'],
+      ['常规公差','±0.01 mm（关键尺寸 ±0.005 mm 可评）'],
+      ['表面处理','阳极氧化、喷砂、镀镍、钝化、激光打标'],
+      ['批量区间','打样 1 件起，量产 5,000 件/月'],
+      ['交付周期','样品 3–5 天，批量 12–18 天'],
+      ['检测方式','三坐标全尺寸 + 首件报告 FAIR']
+    ]
+  },
+  {
+    name:'自动化夹具',
+    app:'非标夹具底板、定位块、快换盘，配合产线节拍与重复定位精度要求。',
+    rows:[
+      ['常用材质','6061 铝板、S50C 钢板、SKD11 淬硬件'],
+      ['尺寸范围','20 – 800 mm（底板类可拼接）'],
+      ['常规公差','±0.02 mm，孔位 ±0.01 mm'],
+      ['表面处理','硬质阳极氧化、发黑、精磨'],
+      ['批量区间','单套起做，10–200 套/批'],
+      ['交付周期','7–12 天'],
+      ['检测方式','孔位三坐标抽检 + 装配试跑']
+    ]
+  },
+  {
+    name:'医疗与仪器件',
+    app:'仪器面板、腔体、精密轴类零件，对外观与清洁度要求较高。',
+    rows:[
+      ['常用材质','316L 不锈钢、钛合金 TC4、POM / PEEK'],
+      ['尺寸范围','3 – 260 mm'],
+      ['常规公差','±0.008 mm，表面粗糙度 Ra0.4 可达'],
+      ['表面处理','电解抛光、钝化、喷砂、激光刻字'],
+      ['批量区间','小批 50–2,000 件/月'],
+      ['交付周期','样品 5–7 天，批量 15–20 天'],
+      ['检测方式','全检关键尺寸 + 清洁度记录']
+    ]
+  },
+  {
+    name:'非标定制',
+    app:'设备改造件、停产件替代、单件维修件，按图纸或实物测绘加工。',
+    rows:[
+      ['常用材质','按图纸要求，常见铝、钢、铜、工程塑料'],
+      ['尺寸范围','单件 ≤ 1,200 mm（视结构复杂度）'],
+      ['常规公差','±0.02 mm，可协商更高精度'],
+      ['表面处理','按需外协，提供处理厂对接'],
+      ['批量区间','1 件起'],
+      ['交付周期','3–10 天（视工序）'],
+      ['检测方式','按关键尺寸出简版检测单']
+    ]
+  }
+];
+
+var tabs = document.getElementById('prodTabs');
+var specBody = document.getElementById('specBody');
+var pvName = document.getElementById('pvName');
+var pvApp = document.getElementById('pvApp');
+
+function renderProd(i){
+  var p = PROD[i];
+  pvName.textContent = p.name;
+  pvApp.textContent = p.app;
+  specBody.innerHTML = p.rows.map(function(r){
+    return '<tr><td>'+r[0]+'</td><td><b>'+r[1]+'</b></td></tr>';
+  }).join('');
+}
+
+tabs.addEventListener('click', function(e){
+  var btn = e.target.closest('.prod-tab');
+  if(!btn) return;
+  var all = tabs.querySelectorAll('.prod-tab');
+  for(var i=0;i<all.length;i++) all[i].classList.toggle('on', all[i]===btn);
+  renderProd(+btn.getAttribute('data-p'));
+});
+renderProd(0);
+
+document.getElementById('rfq').addEventListener('submit', function(e){
+  e.preventDefault();
+  var ok = document.getElementById('ok');
+  ok.style.display = 'block';
+  this.querySelector('button').textContent = '已提交（演示）';
+});
+</script>
+</body>
+</html>
